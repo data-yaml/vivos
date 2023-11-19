@@ -1,10 +1,10 @@
-import "dotenv/config";
+import 'dotenv/config';
 
 class Constants {
   private context: any;
 
   public DEFAULTS: { [key: string]: any } = {
-    VIVOS_CONFIG_FILE: "./test/data/vivos.json",
+    VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
 
   constructor(context: any) {

@@ -1,11 +1,11 @@
-import { Vivos } from "./vivos";
+import { Vivos } from './vivos';
 
 export async function handler(event: any, context: any) {
   const vivos = new Vivos(event, context);
 
   try {
     // Submit the workflow using Axios
-    const response = await vivos.call("nextflow");
+    const response = await vivos.call('nextflow');
     // Return the response
     return {
       statusCode: response.status,

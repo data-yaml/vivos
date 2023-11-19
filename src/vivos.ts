@@ -1,6 +1,6 @@
-import axios, { AxiosResponse } from "axios";
-import fs from "fs";
-import Constants from "./constants";
+import fs from 'fs';
+import axios, { AxiosResponse } from 'axios';
+import Constants from './constants';
 
 export class Vivos {
   private event: any;
@@ -14,11 +14,11 @@ export class Vivos {
   }
 
   public loadVivosConfig(): { [key: string]: any } {
-    const configFilePath = this.cc.get("VIVOS_CONFIG_FILE");
+    const configFilePath = this.cc.get('VIVOS_CONFIG_FILE');
     if (configFilePath === undefined) {
-      throw new Error("VIVOS_CONFIG_FILE environment variable is not set");
+      throw new Error('VIVOS_CONFIG_FILE environment variable is not set');
     }
-    const configData = fs.readFileSync(configFilePath, "utf-8");
+    const configData = fs.readFileSync(configFilePath, 'utf-8');
     const config = JSON.parse(configData);
     return config;
   }
