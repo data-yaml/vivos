@@ -1,7 +1,7 @@
 import { App, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-export class MyStack extends Stack {
+export class VivosStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps = {}) {
     super(scope, id, props);
 
@@ -17,7 +17,7 @@ const devEnv = {
 
 const app = new App();
 
-new MyStack(app, 'vivos-dev', { env: devEnv });
-// new MyStack(app, 'vivos-prod', { env: prodEnv });
+new VivosStack(app, 'vivos-dev', { env: devEnv });
+// new VivosStack(app, 'vivos-prod', { env: prodEnv });
 
 app.synth();

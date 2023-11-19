@@ -1,5 +1,6 @@
 {
   "name": "vivos",
+  "description": "AWS CDK project for VIVOS",
   "scripts": {
     "build": "npx projen build",
     "bundle": "npx projen bundle",
@@ -43,7 +44,11 @@
   },
   "dependencies": {
     "aws-cdk-lib": "^2.1.0",
-    "constructs": "^10.0.5"
+    "aws-lambda": "^1.0.7",
+    "aws-sdk": "^2.1499.0",
+    "axios": "^1.6.2",
+    "constructs": "^10.0.5",
+    "dotenv": "^16.3.1"
   },
   "license": "Apache-2.0",
   "version": "0.0.0",
