@@ -9,9 +9,14 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'aws-lambda',
     'aws-sdk',
     'axios',
-    // 'config',
     'dotenv',
+    'openapicmd',
+    'openapi-client-axios',
   ],
   // devDeps: [],             /* Build dependencies for this module. */
+  gitignore: [
+    '.env',
+    '.DS_Store',
+  ],
 });
 project.synth();
