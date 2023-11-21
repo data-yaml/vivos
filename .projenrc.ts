@@ -15,7 +15,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   ],
   // devDeps: [],             /* Build dependencies for this module. */
   gitignore: [
-    '.env',
+    '.env*',
     '.DS_Store',
   ],
 });

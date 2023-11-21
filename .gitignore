@@ -30,7 +30,7 @@ jspm_packages/
 *.tgz
 .yarn-integrity
 .cache
-.env
+.env*
 .DS_Store
 !/.projenrc.js
 /test-reports/
