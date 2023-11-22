@@ -1,4 +1,4 @@
-import { VivosNextFlow } from './vivos';
+import { VivosNextFlow } from './vivos.nextflow';
 
 export async function handler(event: any, context: any) {
   const vivos = new VivosNextFlow(event, context);

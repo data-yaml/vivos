@@ -3,7 +3,6 @@ import { readFileSync } from 'fs';
 import yaml from 'js-yaml';
 import { Document, OpenAPIClientAxios } from 'openapi-client-axios';
 import Constants from './constants';
-import type { Client as TowerClient } from './types/tower';
 
 type KeyedConfig = {
   [key: string]: any;
@@ -46,20 +45,5 @@ export class Vivos {
       context: this.cc,
     };
     return JSON.stringify(vars);
-  }
-}
-
-export class VivosNextFlow extends Vivos {
-
-  public async getTowerClient(): Promise<TowerClient> {
-    const api = this.loadApi('./api/tower.yaml');
-    const tower = await api.init<TowerClient>();
-    return tower;
-  }
-
-  public async call(workflow: string): Promise<any> {
-    const tower = await this.getTowerClient();
-    const response = await tower.CreateWorkflowLaunch(workflow);
-    return response;
   }
 }
