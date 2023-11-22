@@ -21,4 +21,11 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     '.DS_Store',
   ],
 });
+// Fix Jest 29 warning about deprecated config in `globals`
+project.jest!.config.transform ??= {};
+project.jest!.config.transform['\\.ts$'] = [
+  'ts-jest',
+  project.jest?.config.globals['ts-jest'],
+];
+delete project.jest!.config.globals['ts-jest'];
 project.synth();
