@@ -1,0 +1,141 @@
+{
+    "launch": {
+        "id": "3am8PJytJMEttSeTvzw0FW",
+        "computeEnv": {
+            "id": "521lycv2VB4ghtfsiv9Ceo",
+            "name": "nf-core-production",
+            "description": null,
+            "platform": "aws-batch",
+            "config": {
+                "region": "us-west-2",
+                "computeQueue": "TowerForge-521lycv2VB4ghtfsiv9Ceo-work",
+                "dragenQueue": null,
+                "dragenInstanceType": null,
+                "computeJobRole": null,
+                "executionRole": "arn:aws:iam::850787717197:role/TowerForge-521lycv2VB4ghtfsiv9Ceo-ExecutionRole",
+                "headQueue": "TowerForge-521lycv2VB4ghtfsiv9Ceo-head",
+                "headJobRole": "arn:aws:iam::850787717197:role/TowerForge-521lycv2VB4ghtfsiv9Ceo-FargateRole",
+                "cliPath": null,
+                "volumes": [],
+                "workDir": "s3://nf-core-gallery/tower",
+                "preRunScript": null,
+                "postRunScript": null,
+                "headJobCpus": null,
+                "headJobMemoryMb": null,
+                "environment": [],
+                "waveEnabled": true,
+                "fusion2Enabled": true,
+                "nvnmeStorageEnabled": true,
+                "logGroup": null,
+                "forge": {
+                    "type": "SPOT",
+                    "minCpus": 0,
+                    "maxCpus": 2000,
+                    "gpuEnabled": false,
+                    "ebsAutoScale": null,
+                    "instanceTypes": [],
+                    "allocStrategy": null,
+                    "imageId": null,
+                    "vpcId": null,
+                    "subnets": [],
+                    "securityGroups": [],
+                    "fsxMount": null,
+                    "fsxName": null,
+                    "fsxSize": null,
+                    "disposeOnDeletion": true,
+                    "ec2KeyPair": null,
+                    "allowBuckets": [
+                        "s3://nextflow-hackathon",
+                        "s3://ngi-igenomes",
+                        "s3://nf-core-awsmegatests",
+                        "s3://annotation-cache",
+                        "s3://nf-core-gallery/tower",
+                        "s3://nf-core-gallery/tower/latest",
+                        "s3://nf-core-gallery"
+                    ],
+                    "ebsBlockSize": null,
+                    "fusionEnabled": null,
+                    "bidPercentage": null,
+                    "efsCreate": false,
+                    "efsId": null,
+                    "efsMount": null,
+                    "dragenEnabled": null,
+                    "dragenAmiId": null,
+                    "ebsBootSize": null,
+                    "ecsConfig": null,
+                    "fargateHeadEnabled": true,
+                    "arm64Enabled": false,
+                    "dragenInstanceType": null
+                },
+                "forgedResources": [
+                    {
+                        "IamRole": "arn:aws:iam::850787717197:role/TowerForge-521lycv2VB4ghtfsiv9Ceo-ServiceRole"
+                    },
+                    {
+                        "IamRole": "arn:aws:iam::850787717197:role/TowerForge-521lycv2VB4ghtfsiv9Ceo-ExecutionRole"
+                    },
+                    {
+                        "IamInstanceProfile": "arn:aws:iam::850787717197:instance-profile/TowerForge-521lycv2VB4ghtfsiv9Ceo-InstanceRole"
+                    },
+                    {
+                        "IamRole": "arn:aws:iam::850787717197:role/TowerForge-521lycv2VB4ghtfsiv9Ceo-FargateRole"
+                    },
+                    {
+                        "BatchEnv": "arn:aws:batch:us-west-2:850787717197:compute-environment/TowerForge-521lycv2VB4ghtfsiv9Ceo-head"
+                    },
+                    {
+                        "BatchQueue": "arn:aws:batch:us-west-2:850787717197:job-queue/TowerForge-521lycv2VB4ghtfsiv9Ceo-head"
+                    },
+                    {
+                        "Ec2LaunchTemplate": "TowerForge-521lycv2VB4ghtfsiv9Ceo"
+                    },
+                    {
+                        "BatchEnv": "arn:aws:batch:us-west-2:850787717197:compute-environment/TowerForge-521lycv2VB4ghtfsiv9Ceo-work"
+                    },
+                    {
+                        "BatchQueue": "arn:aws:batch:us-west-2:850787717197:job-queue/TowerForge-521lycv2VB4ghtfsiv9Ceo-work"
+                    }
+                ],
+                "discriminator": "aws-batch"
+            },
+            "dateCreated": "2023-10-17T08:48:47Z",
+            "lastUpdated": "2023-10-17T09:15:25Z",
+            "lastUsed": "2023-11-21T17:32:30Z",
+            "deleted": null,
+            "status": "AVAILABLE",
+            "message": null,
+            "primary": true,
+            "credentialsId": "6rC7RvHP96aOCGPaGaJWgw",
+            "orgId": 21072782831698,
+            "workspaceId": 252612196927646
+        },
+        "pipeline": "https://github.com/nf-core/hlatyping",
+        "workDir": "s3://nf-core-gallery/tower",
+        "revision": null,
+        "configText": "plugins = ['nf-quilt']",
+        "towerConfig": null,
+        "paramsText": "{\"input\":\"https://raw.githubusercontent.com/nf-core/test-datasets/hlatyping/samplesheets/samplesheet_full.csv\",\"outdir\":\"quilt+s3://nf-core-gallery#package=nf-core/hlatyping\",\"solver\":\"glpk\",\"enumerations\":1,\"beta\":0.009,\"igenomes_base\":\"s3://ngi-igenomes/igenomes\",\"igenomes_ignore\":false,\"custom_config_version\":\"master\",\"custom_config_base\":\"https://raw.githubusercontent.com/nf-core/configs/master\",\"config_profile_name\":\"Full test profile\",\"config_profile_description\":\"Full test dataset (fastq and bam files) to check pipeline function\",\"max_cpus\":16,\"max_memory\":\"128.GB\",\"max_time\":\"240.h\",\"help\":false,\"publish_dir_mode\":\"copy\",\"plaintext_email\":false,\"max_multiqc_email_size\":\"25.MB\",\"monochrome_logs\":false,\"multiqc_config\":\"${projectDir}/assets/multiqc_optitype_config.yml\",\"multiqc_logo\":\"${projectDir}/assets/nf-core-hlatyping_logo_light.png\",\"tracedir\":\"${params.outdir}/pipeline_info\",\"validate_params\":true,\"show_hidden_params\":false,\"enable_conda\":false}",
+        "preRunScript": null,
+        "postRunScript": null,
+        "mainScript": null,
+        "entryName": null,
+        "schemaName": null,
+        "resume": false,
+        "resumeLaunchId": null,
+        "pullLatest": false,
+        "stubRun": false,
+        "sessionId": null,
+        "runName": "stoic_fourier",
+        "configProfiles": [
+            "test_full"
+        ],
+        "userSecrets": [],
+        "workspaceSecrets": [],
+        "optimizationId": null,
+        "optimizationTargets": "",
+        "headJobCpus": null,
+        "headJobMemoryMb": null,
+        "dateCreated": "2023-11-21T17:32:25Z",
+        "lastUpdated": "2023-11-21T17:32:30Z"
+    }
+}
