@@ -1,0 +1,17 @@
+{
+    "POST": "/workflow/launch",
+    "launch": {
+        "computeEnvId": "521lycv2VB4ghtfsiv9Ceo",
+        "runName": "desperate_maxwell",
+        "pipeline": "https://github.com/nf-core/hlatyping",
+        "workDir": "s3://nf-core-gallery",
+        "configProfiles": [
+            "test_full"
+        ],
+        "configText": "plugins = ['nf-quilt']",
+        "paramsText": "{\"input\":\"https://raw.githubusercontent.com/nf-core/test-datasets/hlatyping/samplesheets/samplesheet_full.csv\",\"outdir\":\"quilt+s3://nf-core-gallery#package=nf-core/hlatyping\",\"solver\":\"glpk\",\"enumerations\":1,\"beta\":0.009,\"igenomes_base\":\"s3://ngi-igenomes/igenomes\",\"igenomes_ignore\":false,\"custom_config_version\":\"master\",\"custom_config_base\":\"https://raw.githubusercontent.com/nf-core/configs/master\",\"config_profile_name\":\"Full test profile\",\"config_profile_description\":\"Full test dataset (fastq and bam files) to check pipeline function\",\"max_cpus\":16,\"max_memory\":\"128.GB\",\"max_time\":\"240.h\",\"help\":false,\"publish_dir_mode\":\"copy\",\"plaintext_email\":false,\"max_multiqc_email_size\":\"25.MB\",\"monochrome_logs\":false,\"multiqc_config\":\"${projectDir}/assets/multiqc_optitype_config.yml\",\"multiqc_logo\":\"${projectDir}/assets/nf-core-hlatyping_logo_light.png\",\"tracedir\":\"${params.outdir}/pipeline_info\",\"validate_params\":true,\"show_hidden_params\":false,\"enable_conda\":false}"
+    },
+    "workflowId": "4yshijj9bW7ZZa",
+    "workspaceId": "252612196927646",
+    "URL": "https://tower.nf/orgs/Quilt_Data/workspaces/hackathon_2023/watch/4yshijj9bW7ZZa"
+}
