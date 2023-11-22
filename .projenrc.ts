@@ -12,6 +12,8 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'dotenv',
     'openapicmd',
     'openapi-client-axios',
+    'js-yaml',
+    '@types/js-yaml',
   ],
   // devDeps: [],             /* Build dependencies for this module. */
   gitignore: [

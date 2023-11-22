@@ -72,6 +72,10 @@
       "type": "build"
     },
     {
+      "name": "@types/js-yaml",
+      "type": "runtime"
+    },
+    {
       "name": "aws-cdk-lib",
       "version": "^2.1.0",
       "type": "runtime"
@@ -95,6 +99,10 @@
     },
     {
       "name": "dotenv",
+      "type": "runtime"
+    },
+    {
+      "name": "js-yaml",
       "type": "runtime"
     },
     {

@@ -1,4 +1,6 @@
-import { OpenAPIClientAxios } from 'openapi-client-axios';
+import { readFileSync } from 'fs';
+import yaml from 'js-yaml';
+import { Document, OpenAPIClientAxios } from 'openapi-client-axios';
 import type { Client as BenchlingClient } from '../src/types/benchling';
 import type { Client as PetStoreClient } from '../src/types/petstore';
 import type { Client as TowerClient } from '../src/types/tower';
@@ -32,9 +34,11 @@ describe('OpenAPI', () => {
       expect(e).toBeUndefined();
     }
   });
-  test.skip('should init Tower Client', async () => {
+  test('should init Tower Client', async () => {
+    const TOWER_YAML = './api/tower.yaml';
+    const yaml_doc = yaml.load(readFileSync(TOWER_YAML, 'utf8')) as Document;
     const api = new OpenAPIClientAxios({
-      definition: 'https://tower.nf/openapi/nextflow-tower-api-latest.yml',
+      definition: yaml_doc,
     });
     expect(api).toBeDefined();
     try {
