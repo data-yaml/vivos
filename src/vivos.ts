@@ -1,35 +1,43 @@
-import fs from 'fs';
-import axios, { AxiosResponse } from 'axios';
+import { readFileSync } from 'fs';
+//import axios, { AxiosResponse } from 'axios';
+import yaml from 'js-yaml';
+import { Document, OpenAPIClientAxios } from 'openapi-client-axios';
 import Constants from './constants';
+import type { Client as TowerClient } from './types/tower';
+
+type KeyedConfig = {
+  [key: string]: any;
+};
 
 export class Vivos {
+
+  public static loadConfig(filePath: string): KeyedConfig {
+    const fileData = readFileSync(filePath, 'utf-8');
+    const fileExtension = filePath.split('.').pop()?.toLowerCase();
+
+    if (fileExtension === 'yaml' || fileExtension === 'yml') {
+      return yaml.load(fileData) as KeyedConfig;
+    } else if (fileExtension === 'json') {
+      return JSON.parse(fileData);
+    } else {
+      throw new Error(`Unsupported file extension: ${fileExtension}`);
+    }
+  }
+
   private event: any;
   private cc: Constants;
-  private vivos: { [key: string]: any };
 
   constructor(event: any, context: any) {
     this.event = event;
     this.cc = new Constants(context);
-    this.vivos = this.loadVivosConfig();
   }
 
-  public loadVivosConfig(): { [key: string]: any } {
-    const configFilePath = this.cc.get('VIVOS_CONFIG_FILE');
-    if (configFilePath === undefined) {
-      throw new Error('VIVOS_CONFIG_FILE environment variable is not set');
-    }
-    const configData = fs.readFileSync(configFilePath, 'utf-8');
-    const config = JSON.parse(configData);
-    return config;
-  }
-
-  public async call(key: string): Promise<AxiosResponse> {
-    if (this.vivos[key]) {
-      const project: any = this.vivos[key];
-      const response = await axios.post(project.url, project.data);
-      return response;
-    }
-    throw new Error(`Project ${key} not found in VIVOS config`);
+  public loadApi(filename: string): OpenAPIClientAxios {
+    const yaml_doc = Vivos.loadConfig(filename) as Document;
+    const api = new OpenAPIClientAxios({
+      definition: yaml_doc,
+    });
+    return api;
   }
 
   public toString(): string {
@@ -38,5 +46,20 @@ export class Vivos {
       context: this.cc,
     };
     return JSON.stringify(vars);
+  }
+}
+
+export class VivosNextFlow extends Vivos {
+
+  public async getTowerClient(): Promise<TowerClient> {
+    const api = this.loadApi('./api/tower.yaml');
+    const tower = await api.init<TowerClient>();
+    return tower;
+  }
+
+  public async call(workflow: string): Promise<any> {
+    const tower = await this.getTowerClient();
+    const response = await tower.CreateWorkflowLaunch(workflow);
+    return response;
   }
 }
