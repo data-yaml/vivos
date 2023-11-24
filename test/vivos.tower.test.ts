@@ -16,6 +16,12 @@ describe('VivosNextFlow', () => {
     expect(towerClient).toBeDefined();
   });
 
+  it('should be able to get envars', async () => {
+    for (const key of VivosTower.env) {
+      expect(vivos.get(key)).toBeDefined();
+    }
+  });
+
   it.skip('should call a workflow', async () => {
     const workflow = 'exampleWorkflow';
     const result = await vivos.launch(workflow);
