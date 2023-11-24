@@ -1,11 +1,14 @@
 import 'dotenv/config';
 
-class Constants {
-  private context: any;
-
-  public DEFAULTS: { [key: string]: any } = {
+export class Constants {
+  public static DEFAULTS: { [key: string]: any } = {
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
+    PETSTORE_API_FILE: './api/petstore.yaml',
+    TOWER_API_FILE: './api/tower.yaml',
+    BENCHLING_API_FILE: './api/benchling.yaml',
   };
+
+  private context: any;
 
   constructor(context: any) {
     this.context = context;
@@ -19,8 +22,8 @@ class Constants {
     if (process.env[key]) {
       return process.env[key];
     }
-    if (this.DEFAULTS[key]) {
-      return this.DEFAULTS[key];
+    if (Constants.DEFAULTS[key]) {
+      return Constants.DEFAULTS[key];
     }
     return undefined;
   }

@@ -1,13 +1,12 @@
-/**
- * This file contains tests for the VivosNextFlow class.
- */
+import { Constants } from '../src/constants';
 import { VivosTower } from '../src/vivos.tower';
 
-describe('VivosNextFlow', () => {
+describe('VivosTower', () => {
   let vivos: VivosTower;
 
   beforeEach(() => {
-    vivos = new VivosTower({ name: 'VivosTowerTest' }, { api: './api/tower.yaml' });
+    const ctx = { OPEN_API_FILE: Constants.DEFAULTS.TOWER_API_FILE };
+    vivos = new VivosTower({ name: 'VivosTowerTest' }, ctx);
   });
 
   it('should get the Tower client', async () => {

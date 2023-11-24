@@ -1,44 +1,38 @@
+import { Constants } from '../src/constants';
 import { Vivos } from '../src/vivos';
-
-const YAML_API = './api/petstore.yaml';
 
 describe('Vivos', () => {
   let vivos: Vivos;
 
   beforeEach(() => {
-    vivos = new Vivos({ name: 'VivosTest' }, { file: YAML_API });
+    const ctx = { OPEN_API_FILE: Constants.DEFAULTS.PETSTORE_API_FILE };
+    vivos = new Vivos({ name: 'VivosTest' }, ctx);
   });
 
-  describe('loadConfig', () => {
-    it('should load the config from a file', () => {
-      const config = Vivos.loadConfig(YAML_API);
-      // print keys of config
-      for (const key in config) {
-        console.log(key);
-        console.log(config[key]);
-      }
-
-      // Assert that the config is loaded correctly
-      expect(config.info.title).toContain('Petstore');
-    });
+  it('should error if OPEN_API_FILE not provided', () => {
+    expect(() => {
+      new Vivos({ name: 'VivosTest' }, {});
+    }).toThrow('OPEN_API_FILE not provided');
   });
+  it('should load the config from a file', () => {
+    const config = Vivos.loadConfig(Constants.DEFAULTS.PETSTORE_API_FILE);
+    // print keys of config
+    for (const key in config) {
+      console.log(key);
+      console.log(config[key]);
+    }
 
-  describe('loadApi', () => {
-    it('should load the API definition', () => {
-      const api = vivos.loadApi(YAML_API);
-
-      // Assert that the API is loaded correctly
-      expect(api).toBeDefined();
-    });
+    // Assert that the config is loaded correctly
+    expect(config.info.title).toContain('Petstore');
   });
+  it('should load the API definition', () => {
+    expect(vivos.api).toBeDefined();
+  });
+  it('should return a string representation of the Vivos instance', () => {
+    const str = vivos.toString();
 
-  describe('toString', () => {
-    it('should return a string representation of the Vivos instance', () => {
-      const str = vivos.toString();
-
-      // Assert that the string representation is correct
-      expect(str).toContain('VivosTest');
-      expect(str).toContain(YAML_API);
-    });
+    // Assert that the string representation is correct
+    expect(str).toContain('VivosTest');
+    expect(str).toContain(Constants.DEFAULTS.PETSTORE_API_FILE);
   });
 });

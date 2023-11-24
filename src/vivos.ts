@@ -1,5 +1,4 @@
 import { readFileSync } from 'fs';
-//import axios, { AxiosResponse } from 'axios';
 import yaml from 'js-yaml';
 import { Document, OpenAPIClientAxios } from 'openapi-client-axios';
 import Constants from './constants';
@@ -25,10 +24,17 @@ export class Vivos {
 
   private event: any;
   private cc: Constants;
+  private api_file: string;
+  public api: OpenAPIClientAxios;
 
   constructor(event: any, context: any) {
     this.event = event;
     this.cc = new Constants(context);
+    this.api_file = this.cc.get('OPEN_API_FILE');
+    if (!this.api_file) {
+      throw new Error('OPEN_API_FILE not provided');
+    }
+    this.api = this.loadApi(this.api_file);
   }
 
   public get(key: string): any {
@@ -43,11 +49,16 @@ export class Vivos {
     return api;
   }
 
-  public toString(): string {
-    const vars = {
+  public toDict(): any {
+    return {
       event: this.event,
       context: this.cc,
+      api_file: this.api_file,
+      api: this.api,
     };
-    return JSON.stringify(vars);
+  }
+
+  public toString(): string {
+    return JSON.stringify(this.toDict(), null, 2);
   }
 }

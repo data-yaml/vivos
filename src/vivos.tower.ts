@@ -9,10 +9,15 @@ export class VivosTower extends Vivos {
     'TOWER_COMPUTE_ENV_ID',
   ];
 
+  private _tower: Promise<TowerClient>;
+
+  constructor(event: any, context: any) {
+    super(event, context);
+    this._tower = this.api.init<TowerClient>();
+  }
+
   public async getTowerClient(): Promise<TowerClient> {
-    const api = this.loadApi('./api/tower.yaml');
-    const tower = await api.init<TowerClient>();
-    return tower;
+    return this._tower;
   }
 
   public async launch(workflow: string): Promise<any> {
