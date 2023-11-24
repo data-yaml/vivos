@@ -1,7 +1,7 @@
 import type { Client as TowerClient } from './types/tower';
 import { Vivos } from './vivos';
 
-export class VivosNextFlow extends Vivos {
+export class VivosTower extends Vivos {
 
   public static env = [
     'TOWER_ACCESS_TOKEN',

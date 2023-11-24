@@ -45,4 +45,4 @@ describe('handler', () => {
   // Add more test cases to cover different scenarios of the handler function
 });
 import axios from 'axios';
-import { handler } from '../src/main.nextflow';
+import { handler } from '../src/main.tower';

@@ -31,6 +31,10 @@ export class Vivos {
     this.cc = new Constants(context);
   }
 
+  public get(key: string): any {
+    return this.cc.get(key);
+  }
+
   public loadApi(filename: string): OpenAPIClientAxios {
     const yaml_doc = Vivos.loadConfig(filename) as Document;
     const api = new OpenAPIClientAxios({

@@ -1,7 +1,7 @@
-import { VivosNextFlow } from './vivos.nextflow';
+import { VivosTower } from './vivos.tower';
 
 export async function handler(event: any, context: any) {
-  const vivos = new VivosNextFlow(event, context);
+  const vivos = new VivosTower(event, context);
 
   try {
     // Submit the workflow using Axios
