@@ -5,7 +5,7 @@ export async function handler(event: any, context: any) {
 
   try {
     // Submit the workflow using Axios
-    const response = await vivos.call('nextflow');
+    const response = await vivos.launch('nextflow');
     // Return the response
     return {
       statusCode: response.status,
