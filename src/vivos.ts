@@ -31,12 +31,16 @@ export class Vivos {
   private event: any;
   private cc: Constants;
   private api_file: string;
+  private api_key: string;
+  private api_url: string;
   public api: OpenAPIClientAxios;
 
   constructor(event: any, context: any) {
     this.event = event;
     this.cc = new Constants(context);
     this.api_file = this.get('OPEN_API_FILE');
+    this.api_key = this.cc.get('OPEN_API_KEY');
+    this.api_url = this.cc.get('OPEN_API_URL');
     this.api = this.loadApi(this.api_file);
   }
 
@@ -49,29 +53,49 @@ export class Vivos {
   }
 
   public loadApi(filename: string): OpenAPIClientAxios {
-    const key = this.cc.get('OPEN_API_KEY');
-    const url = this.cc.get('OPEN_API_URL');
     const yaml_doc = Vivos.loadConfig(filename) as Document;
     let options = {
       definition: yaml_doc,
       axiosConfigDefaults: {},
     };
-    if (key !== '') {
+    if (typeof this.api_key !== 'string') {
       options.axiosConfigDefaults= {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${key}`,
+          Authorization: `Bearer ${this.api_key}`,
         },
       };
     }
-    if (url == '') {
+    if (typeof this.api_url !== 'string') {
       return new OpenAPIClientAxios(options);
     } else {
       const server = {
         ...options,
-        withServer: url,
+        withServer: { url: this.api_url, description: `OPEN_API_URL for ${filename}` },
       };
       return new OpenAPIClientAxios(server);
+    }
+  }
+
+  public async api_post(path: string, params: any): Promise<any> {
+    const client = await this.api.getClient();
+    try {
+      const response = await client.post(path, params);
+      return response;
+    } catch (e) {
+      console.log(this, e);
+      throw `Failed to invoke POST ${path} with ${params}`;
+    }
+  }
+
+  public async api_get(path: string): Promise<any> {
+    const client = await this.api.getClient();
+    try {
+      const response = await client.get(path);
+      return response;
+    } catch (e) {
+      console.log(this, e);
+      throw `Failed to invoke GET ${path}`;
     }
   }
 
@@ -79,6 +103,8 @@ export class Vivos {
     return {
       event: this.event,
       api_file: this.api_file,
+      api_key: this.api_key,
+      api_url: this.api_url,
       api: this.api,
     };
   }

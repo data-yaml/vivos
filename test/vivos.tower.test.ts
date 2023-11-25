@@ -17,10 +17,24 @@ describe('VivosTower', () => {
     }
   });
 
-  it.skip('should get the Tower client', async () => {
+  it('should get the Tower client', async () => {
     const towerClient = await vivos.getTowerClient();
-    // Add your assertions here
     expect(towerClient).toBeDefined();
+  });
+
+  it.skip('should get service info', async () => {
+    try {
+      const info = await vivos.info();
+      expect(info).toBeDefined();
+    } catch (e) {
+      console.log('failed to get ServiceInfo', e);
+      expect(true).toBe(false);
+    }
+  });
+
+  it.skip('should list workflows', async () => {
+    const workflows = await vivos.list();
+    expect(workflows).toBeDefined();
   });
 
   it.skip('should call a workflow', async () => {

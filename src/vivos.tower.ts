@@ -2,6 +2,8 @@ import type { Client as TowerClient, Components } from './types/tower';
 export type SubmitWorkflowLaunchResponse = Components.Schemas.SubmitWorkflowLaunchResponse;
 export type ListWorkflowsResponse = Components.Schemas.ListWorkflowsResponse;
 export type DescribeWorkflowResponse = Components.Schemas.DescribeWorkflowResponse;
+export type ServiceInfoResponse = Components.Schemas.ServiceInfoResponse;
+export type ServiceInfo = Components.Schemas.ServiceInfo;
 
 import { Vivos } from './vivos';
 
@@ -28,6 +30,12 @@ export class VivosTower extends Vivos {
       console.log(e);
       throw 'Failed to initialize Tower client';
     }
+  }
+
+  public async info(): Promise<ServiceInfo> {
+    const tower = await this.getTowerClient();
+    const response = await tower.Info() as ServiceInfoResponse;
+    return response.serviceInfo!;
   }
 
   public async list(): Promise<ListWorkflowsResponse> {
