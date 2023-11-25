@@ -29,7 +29,7 @@ describe('VivosTower', () => {
     expect(info.landingUrl).toBe('https://cloud.tower.nf');
   });
 
-  it.skip('should list workflows', async () => {
+  it('should list workflows', async () => {
     const workflows = await vivos.list();
     expect(workflows).toBeDefined();
   });

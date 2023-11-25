@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import yaml from 'js-yaml';
-import { Document, OpenAPIClientAxios } from 'openapi-client-axios';
+import { Document, OpenAPIClientAxios, OpenAPIClient } from 'openapi-client-axios';
 import Constants from './constants';
 
 type KeyedConfig = {
@@ -33,7 +33,7 @@ export class Vivos {
   protected api_file: string;
   private api_key: string;
   private api_url: string;
-  public api: OpenAPIClientAxios;
+  private _api: OpenAPIClientAxios;
 
   constructor(event: any, context: any) {
     this.event = event;
@@ -41,7 +41,18 @@ export class Vivos {
     this.api_file = this.get('OPEN_API_FILE');
     this.api_key = this.cc.get('OPEN_API_KEY');
     this.api_url = this.cc.get('OPEN_API_URL');
-    this.api = this.loadApi(this.api_file);
+    this._api = this.loadApi(this.api_file);
+  }
+
+  public api(): OpenAPIClientAxios {
+    if (this._api === undefined) {
+      this._api = this.loadApi(this.api_file);
+    }
+    return this._api;
+  }
+
+  public client(): Promise<OpenAPIClient> {
+    return this.api().getClient();
   }
 
   public get(key: string): string {
@@ -78,7 +89,7 @@ export class Vivos {
   }
 
   public async api_post(path: string, params: any): Promise<any> {
-    const client = await this.api.getClient();
+    const client = await this.client();
     try {
       const response = await client.post(path, params);
       return response;
@@ -89,7 +100,7 @@ export class Vivos {
   }
 
   public async api_get(path: string): Promise<any> {
-    const client = await this.api.getClient();
+    const client = await this.client();
     try {
       const response = await client.get(path);
       return response;
@@ -105,7 +116,7 @@ export class Vivos {
       api_file: this.api_file,
       api_key: this.api_key,
       api_url: this.api_url,
-      api: this.api,
+      api: this._api,
     };
   }
 
