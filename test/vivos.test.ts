@@ -12,22 +12,19 @@ describe('Vivos', () => {
   it('should error if OPEN_API_FILE not provided', () => {
     expect(() => {
       new Vivos({ name: 'VivosTest' }, {});
-    }).toThrow('OPEN_API_FILE not provided');
+    }).toThrow('get[OPEN_API_FILE] not a valid string: undefined');
   });
+
   it('should load the config from a file', () => {
     const config = Vivos.loadConfig(Constants.DEFAULTS.PETSTORE_API_FILE);
-    // print keys of config
-    for (const key in config) {
-      console.log(key);
-      console.log(config[key]);
-    }
-
     // Assert that the config is loaded correctly
     expect(config.info.title).toContain('Petstore');
   });
+
   it('should load the API definition', () => {
     expect(vivos.api).toBeDefined();
   });
+
   it('should return a string representation of the Vivos instance', () => {
     const str = vivos.toString();
 

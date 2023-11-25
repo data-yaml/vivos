@@ -9,6 +9,12 @@ type KeyedConfig = {
 
 export class Vivos {
 
+  public static env = [
+    'OPEN_API_FILE',
+    'OPEN_API_KEY',
+    'OPEN_API_URL',
+  ];
+
   public static loadConfig(filePath: string): KeyedConfig {
     const fileData = readFileSync(filePath, 'utf-8');
     const fileExtension = filePath.split('.').pop()?.toLowerCase();
@@ -30,29 +36,48 @@ export class Vivos {
   constructor(event: any, context: any) {
     this.event = event;
     this.cc = new Constants(context);
-    this.api_file = this.cc.get('OPEN_API_FILE');
-    if (!this.api_file) {
-      throw new Error('OPEN_API_FILE not provided');
-    }
+    this.api_file = this.get('OPEN_API_FILE');
     this.api = this.loadApi(this.api_file);
   }
 
-  public get(key: string): any {
-    return this.cc.get(key);
+  public get(key: string): string {
+    const value = this.cc.get(key);
+    if (typeof value !== 'string' || value === '') {
+      throw new Error(`get[${key}] not a valid string: ${value}`);
+    }
+    return value;
   }
 
   public loadApi(filename: string): OpenAPIClientAxios {
+    const key = this.cc.get('OPEN_API_KEY');
+    const url = this.cc.get('OPEN_API_URL');
     const yaml_doc = Vivos.loadConfig(filename) as Document;
-    const api = new OpenAPIClientAxios({
+    let options = {
       definition: yaml_doc,
-    });
-    return api;
+      axiosConfigDefaults: {},
+    };
+    if (key !== '') {
+      options.axiosConfigDefaults= {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${key}`,
+        },
+      };
+    }
+    if (url == '') {
+      return new OpenAPIClientAxios(options);
+    } else {
+      const server = {
+        ...options,
+        withServer: url,
+      };
+      return new OpenAPIClientAxios(server);
+    }
   }
 
   public toDict(): any {
     return {
       event: this.event,
-      context: this.cc,
       api_file: this.api_file,
       api: this.api,
     };
