@@ -28,9 +28,9 @@ export class Vivos {
     }
   }
 
-  private event: any;
-  private cc: Constants;
-  private api_file: string;
+  protected event: any;
+  protected cc: Constants;
+  protected api_file: string;
   private api_key: string;
   private api_url: string;
   public api: OpenAPIClientAxios;
@@ -58,7 +58,7 @@ export class Vivos {
       definition: yaml_doc,
       axiosConfigDefaults: {},
     };
-    if (typeof this.api_key !== 'string') {
+    if (typeof this.api_key === 'string') {
       options.axiosConfigDefaults= {
         withCredentials: true,
         headers: {
@@ -82,7 +82,7 @@ export class Vivos {
     try {
       const response = await client.post(path, params);
       return response;
-    } catch (e) {
+    } catch (e: any) {
       console.log(this, e);
       throw `Failed to invoke POST ${path} with ${params}`;
     }
@@ -93,7 +93,7 @@ export class Vivos {
     try {
       const response = await client.get(path);
       return response;
-    } catch (e) {
+    } catch (e: any) {
       console.log(this, e);
       throw `Failed to invoke GET ${path}`;
     }

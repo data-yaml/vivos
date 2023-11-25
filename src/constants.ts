@@ -29,6 +29,10 @@ export class Constants {
     }
     return undefined;
   }
+
+  public put(key: string, value: any): void {
+    this.context[key] = value;
+  }
 }
 
 export default Constants;

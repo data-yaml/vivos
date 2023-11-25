@@ -16,18 +16,21 @@ export class VivosTower extends Vivos {
   ];
 
   private workspaceId: string;
+  private computeEnvId: string;
 
   constructor(event: any, context: any) {
     super(event, context);
+    this.cc.put('OPEN_API_KEY', this.get('TOWER_ACCESS_TOKEN'));
     this.workspaceId = this.get('TOWER_WORKSPACE_ID');
+    this.computeEnvId = this.get('TOWER_COMPUTE_ENV_ID');
   }
 
   public async getTowerClient(): Promise<TowerClient> {
     try {
       const client = await this.api.init<TowerClient>();
       return client;
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.error(e);
       throw 'Failed to initialize Tower client';
     }
   }
@@ -36,9 +39,10 @@ export class VivosTower extends Vivos {
     try {
       const tower = await this.getTowerClient();
       const response = await tower.Info() as ServiceInfoResponse;
+      console.debug(response.serviceInfo);
       return response.serviceInfo!;
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.error(e);
       throw 'Failed to retrieve service info';
     }
   }
@@ -48,8 +52,8 @@ export class VivosTower extends Vivos {
       const tower = await this.getTowerClient();
       const response = await tower.ListWorkflows(this.workspaceId) as ListWorkflowsResponse;
       return response;
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.error(e);
       throw 'Failed to list workflows';
     }
   }
@@ -60,19 +64,24 @@ export class VivosTower extends Vivos {
       const response = await tower.DescribeWorkflow(workflow);
       const data = response.data as DescribeWorkflowResponse;
       return data;
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.error(e);
       throw 'Failed to describe workflow';
     }
   }
 
   public async launch(workflow: string): Promise<SubmitWorkflowLaunchResponse> {
+    const options = {
+      workspaceId: this.workspaceId,
+      computeEnvId: this.computeEnvId,
+    };
     try {
       const tower = await this.getTowerClient();
       const response = await tower.CreateWorkflowLaunch(workflow) as SubmitWorkflowLaunchResponse;
       return response;
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.error(options);
+      console.error(e.code);
       throw 'Failed to launch workflow';
     }
   }

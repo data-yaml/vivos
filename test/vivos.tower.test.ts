@@ -24,13 +24,9 @@ describe('VivosTower', () => {
   });
 
   it('should get service info', async () => {
-    try {
-      const info = await vivos.info();
-      expect(info).toBeDefined();
-    } catch (e) {
-      console.log('failed to get ServiceInfo', e);
-      expect(true).toBe(false);
-    }
+    const info = await vivos.info();
+    expect(info).toBeDefined();
+    expect(info.version).toBe('Tower');
   });
 
   it.skip('should list workflows', async () => {
