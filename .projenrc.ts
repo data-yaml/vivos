@@ -21,7 +21,12 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     '.DS_Store',
   ],
 });
-// Fix Jest 29 warning about deprecated config in `globals`
+project.tryFindObjectFile('.github/workflows/build.yml')!.addOverride('jobs.build.env', {
+  CI: 'true',
+  TOWER_ACCESS_TOKEN: '${{ secrets.TOWER_ACCESS_TOKEN }}',
+  TOWER_COMPUTE_ENV_ID: '${{ secrets.TOWER_COMPUTE_ENV_ID }}',
+  TOWER_WORKSPACE_ID: '${{ secrets.TOWER_WORKSPACE_ID }}',
+});// Fix Jest 29 warning about deprecated config in `globals`
 project.jest!.config.transform ??= {};
 project.jest!.config.transform['\\.ts$'] = [
   'ts-jest',
