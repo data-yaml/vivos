@@ -13,17 +13,21 @@ export class VivosTower extends Vivos {
     'TOWER_COMPUTE_ENV_ID',
   ];
 
-  private _tower: Promise<TowerClient>;
   private workspaceId: string;
 
   constructor(event: any, context: any) {
     super(event, context);
-    this._tower = this.api.init<TowerClient>();
     this.workspaceId = this.get('TOWER_WORKSPACE_ID');
   }
 
   public async getTowerClient(): Promise<TowerClient> {
-    return this._tower;
+    try {
+      const client = await this.api.init<TowerClient>();
+      return client;
+    } catch (e) {
+      console.log(e);
+      throw 'Failed to initialize Tower client';
+    }
   }
 
   public async list(): Promise<ListWorkflowsResponse> {
