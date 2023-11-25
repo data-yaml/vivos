@@ -7,6 +7,7 @@ describe('VivosTower', () => {
   beforeEach(() => {
     const ctx = {
       OPEN_API_FILE: Constants.DEFAULTS.TOWER_API_FILE,
+      OPEN_API_URL: Constants.DEFAULTS.TOWER_API_URL,
     };
     vivos = new VivosTower({ name: 'VivosTowerTest' }, ctx);
   });
@@ -22,7 +23,7 @@ describe('VivosTower', () => {
     expect(towerClient).toBeDefined();
   });
 
-  it.skip('should get service info', async () => {
+  it('should get service info', async () => {
     try {
       const info = await vivos.info();
       expect(info).toBeDefined();

@@ -6,6 +6,8 @@ export class Constants {
     PETSTORE_API_FILE: './api/petstore.yaml',
     TOWER_API_FILE: './api/tower.yaml',
     BENCHLING_API_FILE: './api/benchling.yaml',
+    TOWER_API_URL: 'https://api.tower.nf',
+    PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
   };
 
   private context: any;

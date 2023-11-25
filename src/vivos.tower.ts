@@ -33,27 +33,47 @@ export class VivosTower extends Vivos {
   }
 
   public async info(): Promise<ServiceInfo> {
-    const tower = await this.getTowerClient();
-    const response = await tower.Info() as ServiceInfoResponse;
-    return response.serviceInfo!;
+    try {
+      const tower = await this.getTowerClient();
+      const response = await tower.Info() as ServiceInfoResponse;
+      return response.serviceInfo!;
+    } catch (e) {
+      console.log(e);
+      throw 'Failed to retrieve service info';
+    }
   }
 
   public async list(): Promise<ListWorkflowsResponse> {
-    const tower = await this.getTowerClient();
-    const response = await tower.ListWorkflows(this.workspaceId) as ListWorkflowsResponse;
-    return response;
+    try {
+      const tower = await this.getTowerClient();
+      const response = await tower.ListWorkflows(this.workspaceId) as ListWorkflowsResponse;
+      return response;
+    } catch (e) {
+      console.log(e);
+      throw 'Failed to list workflows';
+    }
   }
 
   public async describe(workflow: string): Promise<DescribeWorkflowResponse> {
-    const tower = await this.getTowerClient();
-    const response = await tower.DescribeWorkflow(workflow);
-    const data = response.data as DescribeWorkflowResponse;
-    return data;
+    try {
+      const tower = await this.getTowerClient();
+      const response = await tower.DescribeWorkflow(workflow);
+      const data = response.data as DescribeWorkflowResponse;
+      return data;
+    } catch (e) {
+      console.log(e);
+      throw 'Failed to describe workflow';
+    }
   }
 
   public async launch(workflow: string): Promise<SubmitWorkflowLaunchResponse> {
-    const tower = await this.getTowerClient();
-    const response = await tower.CreateWorkflowLaunch(workflow) as SubmitWorkflowLaunchResponse;
-    return response;
+    try {
+      const tower = await this.getTowerClient();
+      const response = await tower.CreateWorkflowLaunch(workflow) as SubmitWorkflowLaunchResponse;
+      return response;
+    } catch (e) {
+      console.log(e);
+      throw 'Failed to launch workflow';
+    }
   }
 }
