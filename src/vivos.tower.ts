@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios';
 import type { Client as TowerClient, Components } from './types/tower';
 export type SubmitWorkflowLaunchResponse = Components.Schemas.SubmitWorkflowLaunchResponse;
 export type ListWorkflowsResponse = Components.Schemas.ListWorkflowsResponse;
@@ -38,9 +39,9 @@ export class VivosTower extends Vivos {
   public async info(): Promise<ServiceInfo> {
     try {
       const tower = await this.getTowerClient();
-      const response = await tower.Info() as ServiceInfoResponse;
-      console.debug(response.serviceInfo);
-      return response.serviceInfo!;
+      const response = await tower.Info() as AxiosResponse<ServiceInfoResponse>;
+      const data = response.data as ServiceInfoResponse;
+      return data.serviceInfo!;
     } catch (e: any) {
       console.error(e);
       throw 'Failed to retrieve service info';
@@ -50,8 +51,10 @@ export class VivosTower extends Vivos {
   public async list(): Promise<ListWorkflowsResponse> {
     try {
       const tower = await this.getTowerClient();
-      const response = await tower.ListWorkflows(this.workspaceId) as ListWorkflowsResponse;
-      return response;
+      const response = await tower.ListWorkflows(this.workspaceId) as AxiosResponse<ListWorkflowsResponse>;
+      const data = response.data as ListWorkflowsResponse;
+      return data;
+
     } catch (e: any) {
       console.error(e);
       throw 'Failed to list workflows';
@@ -61,7 +64,7 @@ export class VivosTower extends Vivos {
   public async describe(workflow: string): Promise<DescribeWorkflowResponse> {
     try {
       const tower = await this.getTowerClient();
-      const response = await tower.DescribeWorkflow(workflow);
+      const response = await tower.DescribeWorkflow(workflow) as AxiosResponse<DescribeWorkflowResponse>;
       const data = response.data as DescribeWorkflowResponse;
       return data;
     } catch (e: any) {
@@ -77,8 +80,9 @@ export class VivosTower extends Vivos {
     };
     try {
       const tower = await this.getTowerClient();
-      const response = await tower.CreateWorkflowLaunch(workflow) as SubmitWorkflowLaunchResponse;
-      return response;
+      const response = await tower.CreateWorkflowLaunch(workflow) as AxiosResponse<SubmitWorkflowLaunchResponse>;
+      const data = response.data as SubmitWorkflowLaunchResponse;
+      return data;
     } catch (e: any) {
       console.error(options);
       console.error(e.code);

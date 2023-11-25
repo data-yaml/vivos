@@ -26,7 +26,7 @@ describe('VivosTower', () => {
   it('should get service info', async () => {
     const info = await vivos.info();
     expect(info).toBeDefined();
-    expect(info.version).toBe('Tower');
+    expect(info.landingUrl).toBe('https://cloud.tower.nf');
   });
 
   it.skip('should list workflows', async () => {
