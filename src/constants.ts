@@ -1,6 +1,13 @@
 import 'dotenv/config';
+import { readFileSync } from 'fs';
+import yaml from 'js-yaml';
+
+export type KeyedConfig = {
+  [key: string]: any;
+};
 
 export class Constants {
+
   public static DEFAULTS: { [key: string]: any } = {
     BENCHLING_API_FILE: './api/benchling.yaml',
     PETSTORE_API_FILE: './api/petstore.yaml',
@@ -10,6 +17,19 @@ export class Constants {
     TOWER_TEST_PIPELINE: 'quiltdata/nf-quilt',
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
+
+  public static loadObjectFile(filePath: string): KeyedConfig {
+    const fileData = readFileSync(filePath, 'utf-8');
+    const fileExtension = filePath.split('.').pop()?.toLowerCase();
+
+    if (fileExtension === 'yaml' || fileExtension === 'yml') {
+      return yaml.load(fileData) as KeyedConfig;
+    } else if (fileExtension === 'json') {
+      return JSON.parse(fileData);
+    } else {
+      throw new Error(`Unsupported file extension: ${fileExtension}`);
+    }
+  }
 
   private context: any;
 

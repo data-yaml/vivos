@@ -1,11 +1,5 @@
-import { readFileSync } from 'fs';
-import yaml from 'js-yaml';
 import { Document, OpenAPIClientAxios, OpenAPIClient } from 'openapi-client-axios';
-import Constants from './constants';
-
-type KeyedConfig = {
-  [key: string]: any;
-};
+import { Constants } from './constants';
 
 export class Vivos {
 
@@ -14,19 +8,6 @@ export class Vivos {
     'OPEN_API_KEY',
     'OPEN_API_URL',
   ];
-
-  public static loadConfig(filePath: string): KeyedConfig {
-    const fileData = readFileSync(filePath, 'utf-8');
-    const fileExtension = filePath.split('.').pop()?.toLowerCase();
-
-    if (fileExtension === 'yaml' || fileExtension === 'yml') {
-      return yaml.load(fileData) as KeyedConfig;
-    } else if (fileExtension === 'json') {
-      return JSON.parse(fileData);
-    } else {
-      throw new Error(`Unsupported file extension: ${fileExtension}`);
-    }
-  }
 
   protected event: any;
   protected cc: Constants;
@@ -64,7 +45,7 @@ export class Vivos {
   }
 
   public loadApi(filename: string): OpenAPIClientAxios {
-    const yaml_doc = Vivos.loadConfig(filename) as Document;
+    const yaml_doc = Constants.loadObjectFile(filename) as Document;
     let options = {
       definition: yaml_doc,
       axiosConfigDefaults: {},
