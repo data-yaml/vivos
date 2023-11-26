@@ -2,12 +2,13 @@ import 'dotenv/config';
 
 export class Constants {
   public static DEFAULTS: { [key: string]: any } = {
-    VIVOS_CONFIG_FILE: './test/data/vivos.json',
-    PETSTORE_API_FILE: './api/petstore.yaml',
-    TOWER_API_FILE: './api/tower.yaml',
     BENCHLING_API_FILE: './api/benchling.yaml',
-    TOWER_API_URL: 'https://api.tower.nf',
+    PETSTORE_API_FILE: './api/petstore.yaml',
     PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
+    TOWER_API_FILE: './api/tower.yaml',
+    TOWER_API_URL: 'https://api.tower.nf',
+    TOWER_TEST_LAUNCH_FILE: './test/data/test-launch.json',
+    VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
 
   private context: any;

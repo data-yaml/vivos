@@ -1,20 +1,21 @@
 import { AxiosResponse } from 'axios';
 import type { Client as TowerClient, Components } from './types/tower';
-export type SubmitWorkflowLaunchResponse = Components.Schemas.SubmitWorkflowLaunchResponse;
-export type ListWorkflowsResponse = Components.Schemas.ListWorkflowsResponse;
-export type ListWorkflowsElement = Components.Schemas.ListWorkflowsResponseListWorkflowsElement;
 export type DescribeWorkflowResponse = Components.Schemas.DescribeWorkflowResponse;
-export type ServiceInfoResponse = Components.Schemas.ServiceInfoResponse;
+export type ListWorkflowsElement = Components.Schemas.ListWorkflowsResponseListWorkflowsElement;
+export type ListWorkflowsResponse = Components.Schemas.ListWorkflowsResponse;
 export type ServiceInfo = Components.Schemas.ServiceInfo;
-
+export type ServiceInfoResponse = Components.Schemas.ServiceInfoResponse;
+export type SubmitWorkflowLaunchResponse = Components.Schemas.SubmitWorkflowLaunchResponse;
+export type WorkflowLaunchRequest = Components.Schemas.WorkflowLaunchRequest;
 import { Vivos } from './vivos';
 
 export class VivosTower extends Vivos {
 
   public static env = [
     'TOWER_ACCESS_TOKEN',
-    'TOWER_WORKSPACE_ID',
     'TOWER_COMPUTE_ENV_ID',
+    'TOWER_OUTPUT_BUCKET',
+    'TOWER_WORKSPACE_ID',
   ];
 
   private workspaceId: string;
@@ -68,18 +69,24 @@ export class VivosTower extends Vivos {
     }
   }
 
-  public async launch(workflow: string): Promise<SubmitWorkflowLaunchResponse> {
+  public launch_options(pipeline: string): WorkflowLaunchRequest {
     const options = {
-      workspaceId: this.workspaceId,
+      pipeline: pipeline,
       computeEnvId: this.computeEnvId,
     };
+    return options;
+  }
+
+  public async launch(pipeline: string): Promise<SubmitWorkflowLaunchResponse> {
     try {
       const tower = await this.getTowerClient();
-      const response = await tower.CreateWorkflowLaunch(workflow) as AxiosResponse<SubmitWorkflowLaunchResponse>;
+      const response = await tower.CreateWorkflowLaunch(
+        this.workspaceId,
+        { launch: this.launch_options(pipeline) },
+      ) as AxiosResponse<SubmitWorkflowLaunchResponse>;
       const data = response.data as SubmitWorkflowLaunchResponse;
       return data;
     } catch (e: any) {
-      console.error(options);
       console.error(e.code);
       throw 'Failed to launch workflow';
     }
