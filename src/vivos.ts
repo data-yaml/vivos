@@ -31,9 +31,9 @@ export class Vivos {
   protected event: any;
   protected cc: Constants;
   protected api_file: string;
-  private api_key: string;
-  private api_url: string;
-  private _api: OpenAPIClientAxios;
+  protected api_key: string;
+  protected api_url: string;
+  private _api: OpenAPIClientAxios | undefined;
 
   constructor(event: any, context: any) {
     this.event = event;
@@ -41,11 +41,11 @@ export class Vivos {
     this.api_file = this.get('OPEN_API_FILE');
     this.api_key = this.cc.get('OPEN_API_KEY');
     this.api_url = this.cc.get('OPEN_API_URL');
-    this._api = this.loadApi(this.api_file);
+    this._api = undefined;
   }
 
-  public api(): OpenAPIClientAxios {
-    if (this._api === undefined) {
+  public api(reset: boolean = false): OpenAPIClientAxios {
+    if (reset || this._api === undefined) {
       this._api = this.loadApi(this.api_file);
     }
     return this._api;

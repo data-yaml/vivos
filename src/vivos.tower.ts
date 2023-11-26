@@ -2,6 +2,7 @@ import { AxiosResponse } from 'axios';
 import type { Client as TowerClient, Components } from './types/tower';
 export type SubmitWorkflowLaunchResponse = Components.Schemas.SubmitWorkflowLaunchResponse;
 export type ListWorkflowsResponse = Components.Schemas.ListWorkflowsResponse;
+export type ListWorkflowsElement = Components.Schemas.ListWorkflowsResponseListWorkflowsElement;
 export type DescribeWorkflowResponse = Components.Schemas.DescribeWorkflowResponse;
 export type ServiceInfoResponse = Components.Schemas.ServiceInfoResponse;
 export type ServiceInfo = Components.Schemas.ServiceInfo;
@@ -21,19 +22,14 @@ export class VivosTower extends Vivos {
 
   constructor(event: any, context: any) {
     super(event, context);
-    this.cc.put('OPEN_API_KEY', this.get('TOWER_ACCESS_TOKEN'));
+    this.api_key = this.get('TOWER_ACCESS_TOKEN');
     this.workspaceId = this.get('TOWER_WORKSPACE_ID');
     this.computeEnvId = this.get('TOWER_COMPUTE_ENV_ID');
   }
 
   public async getTowerClient(): Promise<TowerClient> {
-    try {
-      const client = await this.api().init<TowerClient>();
-      return client;
-    } catch (e: any) {
-      console.error(e);
-      throw 'Failed to initialize Tower client';
-    }
+    const client = await this.api(true).init<TowerClient>();
+    return client;
   }
 
   public async info(): Promise<ServiceInfo> {
@@ -48,13 +44,12 @@ export class VivosTower extends Vivos {
     }
   }
 
-  public async list(): Promise<ListWorkflowsResponse> {
+  public async list(): Promise<ListWorkflowsElement[]> {
     try {
       const tower = await this.getTowerClient();
       const response = await tower.ListWorkflows(this.workspaceId) as AxiosResponse<ListWorkflowsResponse>;
       const data = response.data as ListWorkflowsResponse;
-      return data;
-
+      return data.workflows!;
     } catch (e: any) {
       console.error(e);
       throw 'Failed to list workflows';

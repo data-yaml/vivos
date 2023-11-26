@@ -32,6 +32,7 @@ describe('VivosTower', () => {
   it('should list workflows', async () => {
     const workflows = await vivos.list();
     expect(workflows).toBeDefined();
+    expect(workflows.length).toBeGreaterThan(0);
   });
 
   it.skip('should call a workflow', async () => {
