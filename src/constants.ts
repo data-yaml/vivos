@@ -7,7 +7,7 @@ export class Constants {
     PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
     TOWER_API_FILE: './api/tower.yaml',
     TOWER_API_URL: 'https://api.tower.nf',
-    TOWER_TEST_LAUNCH_FILE: './test/data/test-launch.json',
+    TOWER_TEST_PIPELINE: 'quiltdata/nf-quilt',
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
 

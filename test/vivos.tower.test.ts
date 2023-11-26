@@ -46,10 +46,32 @@ describe('VivosTower', () => {
     }
   });
 
-  it.skip('should call a workflow', async () => {
-    const workflow = 'exampleWorkflow';
-    const result = await vivos.launch(workflow);
-    // Add your assertions here
-    expect(result).toBeDefined();
+  it('should generate valid workflow_request', async () => {
+    const pipeline = vivos.get('TOWER_TEST_PIPELINE');
+    const bucket = 's3://quilt-example';
+    const workflowRequest = vivos.workflow_request(pipeline, bucket);
+    expect(workflowRequest).toBeDefined();
+    expect(workflowRequest.computeEnvId).toBe(vivos.get('TOWER_COMPUTE_ENV_ID'));
+    expect(workflowRequest.configProfiles).toEqual(['standard']);
+    expect(workflowRequest.configText).toBe("plugins = ['nf-quilt']");
+    expect(workflowRequest.pipeline).toContain(pipeline);
+    expect(workflowRequest.revision).toBe('main');
+    expect(workflowRequest.workDir).toEqual(bucket);
+
+    const params = workflowRequest.paramsText!;
+    expect(params).toContain(bucket);
+    expect(params).toContain(pipeline);
+  });
+
+  it.skip('should launch a workflow', async () => {
+    try {
+      const pipeline = vivos.get('TOWER_TEST_PIPELINE');
+      const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
+      const launchOptions = vivos.workflow_request(pipeline, bucket);
+      const result = await vivos.launch(launchOptions);
+      expect(result).toBeDefined();
+    } catch (error) {
+      console.error('Error launching workflow: TOWER_OUTPUT_BUCKET not found?', error);
+    }
   });
 });

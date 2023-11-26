@@ -69,20 +69,25 @@ export class VivosTower extends Vivos {
     }
   }
 
-  public launch_options(pipeline: string): WorkflowLaunchRequest {
+  public workflow_request(pipeline: string, bucket: string): WorkflowLaunchRequest {
     const options = {
-      pipeline: pipeline,
       computeEnvId: this.computeEnvId,
+      configProfiles: ['standard'],
+      configText: "plugins = ['nf-quilt']",
+      paramsText: `"{\"outdir\":\"quilt+${bucket}#package=${pipeline}\"}"`,
+      pipeline: `https://github.com/${pipeline}`,
+      revision: 'main',
+      workDir: bucket,
     };
     return options;
   }
 
-  public async launch(pipeline: string): Promise<SubmitWorkflowLaunchResponse> {
+  public async launch(workflowRequest: WorkflowLaunchRequest): Promise<SubmitWorkflowLaunchResponse> {
     try {
       const tower = await this.getTowerClient();
       const response = await tower.CreateWorkflowLaunch(
         this.workspaceId,
-        { launch: this.launch_options(pipeline) },
+        { launch: workflowRequest },
       ) as AxiosResponse<SubmitWorkflowLaunchResponse>;
       const data = response.data as SubmitWorkflowLaunchResponse;
       return data;
