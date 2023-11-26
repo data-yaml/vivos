@@ -1,11 +1,17 @@
 import 'dotenv/config';
 
-class Constants {
-  private context: any;
-
-  public DEFAULTS: { [key: string]: any } = {
+export class Constants {
+  public static DEFAULTS: { [key: string]: any } = {
+    BENCHLING_API_FILE: './api/benchling.yaml',
+    PETSTORE_API_FILE: './api/petstore.yaml',
+    PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
+    TOWER_API_FILE: './api/tower.yaml',
+    TOWER_API_URL: 'https://api.tower.nf',
+    TOWER_TEST_PIPELINE: 'quiltdata/nf-quilt',
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
+
+  private context: any;
 
   constructor(context: any) {
     this.context = context;
@@ -19,10 +25,14 @@ class Constants {
     if (process.env[key]) {
       return process.env[key];
     }
-    if (this.DEFAULTS[key]) {
-      return this.DEFAULTS[key];
+    if (Constants.DEFAULTS[key]) {
+      return Constants.DEFAULTS[key];
     }
     return undefined;
+  }
+
+  public put(key: string, value: any): void {
+    this.context[key] = value;
   }
 }
 

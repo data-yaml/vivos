@@ -13,8 +13,8 @@ describe('OpenAPI', () => {
     try {
       const client = await api.init<PetStoreClient>();
       expect(client).toBeDefined();
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.error(e);
       expect(e).toBeUndefined();
     }
   });
@@ -29,8 +29,8 @@ describe('OpenAPI', () => {
       // const result = await client.listEntries();
       //expect(result.status).toBe(200);
 
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.error(e);
       expect(e).toBeUndefined();
     }
   });
@@ -44,8 +44,8 @@ describe('OpenAPI', () => {
     try {
       const client = await api.init<TowerClient>();
       expect(client).toBeDefined();
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.error(e);
       expect(e).toBeUndefined();
     }
   });

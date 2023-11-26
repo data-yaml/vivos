@@ -1,42 +1,126 @@
-import fs from 'fs';
-import axios, { AxiosResponse } from 'axios';
+import { readFileSync } from 'fs';
+import yaml from 'js-yaml';
+import { Document, OpenAPIClientAxios, OpenAPIClient } from 'openapi-client-axios';
 import Constants from './constants';
 
+type KeyedConfig = {
+  [key: string]: any;
+};
+
 export class Vivos {
-  private event: any;
-  private cc: Constants;
-  private vivos: { [key: string]: any };
+
+  public static env = [
+    'OPEN_API_FILE',
+    'OPEN_API_KEY',
+    'OPEN_API_URL',
+  ];
+
+  public static loadConfig(filePath: string): KeyedConfig {
+    const fileData = readFileSync(filePath, 'utf-8');
+    const fileExtension = filePath.split('.').pop()?.toLowerCase();
+
+    if (fileExtension === 'yaml' || fileExtension === 'yml') {
+      return yaml.load(fileData) as KeyedConfig;
+    } else if (fileExtension === 'json') {
+      return JSON.parse(fileData);
+    } else {
+      throw new Error(`Unsupported file extension: ${fileExtension}`);
+    }
+  }
+
+  protected event: any;
+  protected cc: Constants;
+  protected api_file: string;
+  protected api_key: string;
+  protected api_url: string;
+  private _api: OpenAPIClientAxios | undefined;
 
   constructor(event: any, context: any) {
     this.event = event;
     this.cc = new Constants(context);
-    this.vivos = this.loadVivosConfig();
+    this.api_file = this.get('OPEN_API_FILE');
+    this.api_key = this.cc.get('OPEN_API_KEY');
+    this.api_url = this.cc.get('OPEN_API_URL');
+    this._api = undefined;
   }
 
-  public loadVivosConfig(): { [key: string]: any } {
-    const configFilePath = this.cc.get('VIVOS_CONFIG_FILE');
-    if (configFilePath === undefined) {
-      throw new Error('VIVOS_CONFIG_FILE environment variable is not set');
+  public api(reset: boolean = false): OpenAPIClientAxios {
+    if (reset || this._api === undefined) {
+      this._api = this.loadApi(this.api_file);
     }
-    const configData = fs.readFileSync(configFilePath, 'utf-8');
-    const config = JSON.parse(configData);
-    return config;
+    return this._api;
   }
 
-  public async call(key: string): Promise<AxiosResponse> {
-    if (this.vivos[key]) {
-      const project: any = this.vivos[key];
-      const response = await axios.post(project.url, project.data);
+  public client(): Promise<OpenAPIClient> {
+    return this.api().getClient();
+  }
+
+  public get(key: string): string {
+    const value = this.cc.get(key);
+    if (typeof value !== 'string' || value === '') {
+      throw new Error(`get[${key}] not a valid string: ${value}`);
+    }
+    return value;
+  }
+
+  public loadApi(filename: string): OpenAPIClientAxios {
+    const yaml_doc = Vivos.loadConfig(filename) as Document;
+    let options = {
+      definition: yaml_doc,
+      axiosConfigDefaults: {},
+    };
+    if (typeof this.api_key === 'string') {
+      options.axiosConfigDefaults= {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${this.api_key}`,
+        },
+      };
+    }
+    if (typeof this.api_url !== 'string') {
+      return new OpenAPIClientAxios(options);
+    } else {
+      const server = {
+        ...options,
+        withServer: { url: this.api_url, description: `OPEN_API_URL for ${filename}` },
+      };
+      return new OpenAPIClientAxios(server);
+    }
+  }
+
+  public async api_post(path: string, params: any): Promise<any> {
+    const client = await this.client();
+    try {
+      const response = await client.post(path, params);
       return response;
+    } catch (e: any) {
+      console.log(this, e);
+      throw `Failed to invoke POST ${path} with ${params}`;
     }
-    throw new Error(`Project ${key} not found in VIVOS config`);
+  }
+
+  public async api_get(path: string): Promise<any> {
+    const client = await this.client();
+    try {
+      const response = await client.get(path);
+      return response;
+    } catch (e: any) {
+      console.log(this, e);
+      throw `Failed to invoke GET ${path}`;
+    }
+  }
+
+  public toDict(): any {
+    return {
+      event: this.event,
+      api_file: this.api_file,
+      api_key: this.api_key,
+      api_url: this.api_url,
+      api: this._api,
+    };
   }
 
   public toString(): string {
-    const vars = {
-      event: this.event,
-      context: this.cc,
-    };
-    return JSON.stringify(vars);
+    return JSON.stringify(this.toDict(), null, 2);
   }
 }
