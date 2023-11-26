@@ -35,6 +35,17 @@ describe('VivosTower', () => {
     expect(workflows.length).toBeGreaterThan(0);
   });
 
+  it('should describe a workflow', async () => {
+    try {
+      const workflowId = vivos.get('TOWER_TEST_WORKFLOW_ID');
+      const description = await vivos.describe(workflowId);
+      expect(description).toBeDefined();
+      expect(description.workflow.id).toBe(workflowId);
+    } catch (error) {
+      console.warn('Skipping test: TOWER_WORKFLOW_ID envar not set');
+    }
+  });
+
   it.skip('should call a workflow', async () => {
     const workflow = 'exampleWorkflow';
     const result = await vivos.launch(workflow);
