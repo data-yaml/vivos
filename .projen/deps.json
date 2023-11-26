@@ -97,11 +97,19 @@
       "type": "runtime"
     },
     {
+      "name": "handlebars",
+      "type": "runtime"
+    },
+    {
       "name": "js-yaml",
       "type": "runtime"
     },
     {
       "name": "openapi-client-axios",
+      "type": "runtime"
+    },
+    {
+      "name": "openapi-types",
       "type": "runtime"
     },
     {
