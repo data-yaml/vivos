@@ -1,6 +1,10 @@
 import { Constants } from '../src/constants';
 import { VivosTower } from '../src/vivos.tower';
 
+const hasOutput = process.env.TOWER_OUTPUT_BUCKET !== undefined;
+const hasWorkflow = process.env.TOWER_TEST_WORKFLOW_ID !== undefined;
+const itif = (condition: boolean) => condition ? it : it.skip;
+
 describe('VivosTower', () => {
   let vivos: VivosTower;
 
@@ -35,15 +39,11 @@ describe('VivosTower', () => {
     expect(workflows.length).toBeGreaterThan(0);
   });
 
-  it('should describe a workflow', async () => {
-    try {
-      const workflowId = vivos.get('TOWER_TEST_WORKFLOW_ID');
-      const description = await vivos.describe(workflowId);
-      expect(description).toBeDefined();
-      expect(description.workflow.id).toBe(workflowId);
-    } catch (error) {
-      console.warn('Skipping test: TOWER_WORKFLOW_ID envar not set');
-    }
+  itif(hasWorkflow)('should describe a workflow', async () => {
+    const workflowId = vivos.get('TOWER_TEST_WORKFLOW_ID');
+    const description = await vivos.describe(workflowId);
+    expect(description).toBeDefined();
+    expect(description.workflow.id).toBe(workflowId);
   });
 
   it('should generate valid workflow_request', async () => {
@@ -63,15 +63,15 @@ describe('VivosTower', () => {
     expect(params).toContain(pipeline);
   });
 
-  it.skip('should launch a workflow', async () => {
-    try {
-      const pipeline = vivos.get('TOWER_TEST_PIPELINE');
-      const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
-      const launchOptions = vivos.workflow_request(pipeline, bucket);
-      const result = await vivos.launch(launchOptions);
-      expect(result).toBeDefined();
-    } catch (error) {
-      console.error('Error launching workflow: TOWER_OUTPUT_BUCKET not found?', error);
-    }
+  itif(hasOutput)('should launch a workflow', async () => {
+    const pipeline = vivos.get('TOWER_TEST_PIPELINE');
+    const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
+    const launchOptions = vivos.workflow_request(pipeline, bucket);
+    const workflowId = await vivos.launch(launchOptions);
+    expect(workflowId).toBeDefined();
+    console.debug(`Launched workflow: ${workflowId}`);
+    const status = await vivos.cancel(workflowId);
+    expect(status).toBeDefined();
+    expect(status).toBe(204);
   });
 });

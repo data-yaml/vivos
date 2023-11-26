@@ -74,7 +74,7 @@ export class VivosTower extends Vivos {
       computeEnvId: this.computeEnvId,
       configProfiles: ['standard'],
       configText: "plugins = ['nf-quilt']",
-      paramsText: `"{\"outdir\":\"quilt+${bucket}#package=${pipeline}\"}"`,
+      paramsText: `{\"outdir\":\"quilt+${bucket}#package=${pipeline}\"}`,
       pipeline: `https://github.com/${pipeline}`,
       revision: 'main',
       workDir: bucket,
@@ -82,7 +82,7 @@ export class VivosTower extends Vivos {
     return options;
   }
 
-  public async launch(workflowRequest: WorkflowLaunchRequest): Promise<SubmitWorkflowLaunchResponse> {
+  public async launch(workflowRequest: WorkflowLaunchRequest): Promise<string> {
     try {
       const tower = await this.getTowerClient();
       const response = await tower.CreateWorkflowLaunch(
@@ -90,10 +90,21 @@ export class VivosTower extends Vivos {
         { launch: workflowRequest },
       ) as AxiosResponse<SubmitWorkflowLaunchResponse>;
       const data = response.data as SubmitWorkflowLaunchResponse;
-      return data;
+      return data.workflowId!;
     } catch (e: any) {
-      console.error(e.code);
+      console.error(workflowRequest, e);
       throw 'Failed to launch workflow';
+    }
+  }
+
+  public async cancel(workflow: string): Promise<number> {
+    try {
+      const tower = await this.getTowerClient();
+      const response = await tower.CancelWorkflow(workflow);
+      return response.status;
+    } catch (e: any) {
+      console.error(e);
+      throw 'Failed to cancel workflow';
     }
   }
 }
