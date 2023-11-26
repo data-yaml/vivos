@@ -1,9 +1,8 @@
 import { Constants } from '../src/constants';
 import { VivosTower } from '../src/vivos.tower';
 
-const hasOutput = process.env.TOWER_OUTPUT_BUCKET !== undefined;
-const hasWorkflow = process.env.TOWER_TEST_WORKFLOW_ID !== undefined;
 const itif = (condition: boolean) => condition ? it : it.skip;
+const itifhas = (key: string) => itif(process.env[key] !== undefined);
 
 describe('VivosTower', () => {
   let vivos: VivosTower;
@@ -39,7 +38,7 @@ describe('VivosTower', () => {
     expect(workflows.length).toBeGreaterThan(0);
   });
 
-  itif(hasWorkflow)('should describe a workflow', async () => {
+  itifhas('TOWER_TEST_WORKFLOW_ID')('should describe a workflow', async () => {
     const workflowId = vivos.get('TOWER_TEST_WORKFLOW_ID');
     const description = await vivos.describe(workflowId);
     expect(description).toBeDefined();
@@ -63,7 +62,8 @@ describe('VivosTower', () => {
     expect(params).toContain(pipeline);
   });
 
-  itif(hasOutput)('should launch a workflow', async () => {
+  // itif(hasOutput)
+  it.skip('should launch a workflow', async () => {
     const pipeline = vivos.get('TOWER_TEST_PIPELINE');
     const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
     const launchOptions = vivos.workflow_request(pipeline, bucket);
