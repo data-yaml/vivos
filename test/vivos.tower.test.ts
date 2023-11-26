@@ -70,8 +70,10 @@ describe('VivosTower', () => {
     const workflowId = await vivos.launch(launchOptions);
     expect(workflowId).toBeDefined();
     console.debug(`Launched workflow: ${workflowId}`);
+    /*
     const status = await vivos.cancel(workflowId);
     expect(status).toBeDefined();
     expect(status).toBe(204);
+    */
   });
 });

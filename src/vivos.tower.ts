@@ -100,7 +100,13 @@ export class VivosTower extends Vivos {
   public async cancel(workflow: string): Promise<number> {
     try {
       const tower = await this.getTowerClient();
-      const response = await tower.CancelWorkflow(workflow);
+      const options = { workspaceId: parseInt(this.workspaceId) };
+      // const response = await tower.CancelWorkflow(workflow, JSON.stringify(options)) as AxiosResponse<number>;
+      const response = await tower.post(`/workflows/${workflow}/cancel`, JSON.stringify(options), {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }) as AxiosResponse;
       return response.status;
     } catch (e: any) {
       console.error(e);
