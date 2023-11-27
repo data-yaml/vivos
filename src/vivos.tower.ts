@@ -8,6 +8,7 @@ export type ServiceInfoResponse = Components.Schemas.ServiceInfoResponse;
 export type SubmitWorkflowLaunchResponse = Components.Schemas.SubmitWorkflowLaunchResponse;
 export type WorkflowLaunchRequest = Components.Schemas.WorkflowLaunchRequest;
 import { Vivos } from './vivos';
+import { Constants } from './constants';
 
 export class VivosTower extends Vivos {
 
@@ -69,30 +70,26 @@ export class VivosTower extends Vivos {
     }
   }
 
-  public workflow_request(pipeline: string, bucket: string): WorkflowLaunchRequest {
-    const options = {
+  public launch_options(pipeline: string, bucket: string): WorkflowLaunchRequest {
+    const env = {
+      bucket: bucket,
       computeEnvId: this.computeEnvId,
-      configProfiles: ['standard'],
-      configText: "plugins = ['nf-quilt']",
-      paramsText: `{\"outdir\":\"quilt+${bucket}#package=${pipeline}\"}`,
-      pipeline: `https://github.com/${pipeline}`,
-      revision: 'main',
-      workDir: bucket,
+      workspaceId: this.workspaceId,
     };
-    return options;
+    return Constants.loadPipeline(pipeline, env) as WorkflowLaunchRequest;
   }
 
-  public async launch(workflowRequest: WorkflowLaunchRequest): Promise<string> {
+  public async launch(launchOptions: WorkflowLaunchRequest): Promise<string> {
     try {
       const tower = await this.getTowerClient();
       const response = await tower.CreateWorkflowLaunch(
         this.workspaceId,
-        { launch: workflowRequest },
+        { launch: launchOptions },
       ) as AxiosResponse<SubmitWorkflowLaunchResponse>;
       const data = response.data as SubmitWorkflowLaunchResponse;
       return data.workflowId!;
     } catch (e: any) {
-      console.error(workflowRequest, e);
+      console.error(launchOptions, e);
       throw 'Failed to launch workflow';
     }
   }

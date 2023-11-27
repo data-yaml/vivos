@@ -12,6 +12,7 @@ describe('Constants', () => {
     param_file = `./config/${pipeline}/params.json`;
     env = {
       bucket: 's3://quilt-example',
+      computeEnvId: 'ce-1234567890abcdef',
     };
   });
 
@@ -23,14 +24,14 @@ describe('Constants', () => {
     it('should expand environment variables', () => {
       const result = Constants.loadObjectFile(param_file, env);
       expect(result.outdir).toContain(env.bucket);
-    },
-    );
+    });
     it('should load the pipeline correctly', () => {
       const result = Constants.loadPipeline(pipeline, env);
       expect(result).toBeDefined();
       expect(result.pipeline).toContain(pipeline);
+      expect(result.computeEnvId).toContain(env.computeEnvId);
+      expect(result.paramsText).toContain(env.bucket);
     });
-
     it('should throw an error if the pipeline is not found', () => {
       const non_pipeline = 'nonexistent-pipeline';
       const action = () => Constants.loadPipeline(non_pipeline, env);

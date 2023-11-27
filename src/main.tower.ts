@@ -5,7 +5,7 @@ export async function handler(event: any, context: any) {
 
   try {
     // Submit the workflow using Axios
-    const options = vivos.workflow_request('nextflow', 's3://quilt-example');
+    const options = vivos.launch_options('nextflow', 's3://quilt-example');
     const workflowId = await vivos.launch(options);
     console.log(`Workflow ID: ${workflowId}`);
     // Return the response
