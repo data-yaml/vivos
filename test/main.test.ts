@@ -4,7 +4,7 @@ import { VivosStack } from '../src/main';
 
 test('Snapshot', () => {
   const app = new App();
-  const stack = new VivosStack(app, 'test');
+  const stack = new VivosStack(app, 'test', VivosStack.defaultProps());
 
   const template = Template.fromStack(stack);
   expect(template.toJSON()).toMatchSnapshot();

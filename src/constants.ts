@@ -10,6 +10,7 @@ export type KeyedConfig = {
 export class Constants {
 
   public static DEFAULTS: { [key: string]: any } = {
+    APP_NAME: 'vivos',
     BENCHLING_API_FILE: './api/benchling.yaml',
     PETSTORE_API_FILE: './api/petstore.yaml',
     PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
@@ -71,6 +72,15 @@ export class Constants {
 
   public put(key: string, value: any): void {
     this.context[key] = value;
+  }
+
+  public defaultProps() : KeyedConfig {
+    return {
+      account: this.get('CDK_DEFAULT_ACCOUNT'),
+      region: this.get('CDK_DEFAULT_REGION'),
+      bucket: this.get('TOWER_OUTPUT_BUCKET'),
+      email: this.get('CDK_CONTACT_EMAIL'),
+    };
   }
 }
 
