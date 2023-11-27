@@ -34,7 +34,9 @@ project.tryFindObjectFile('.github/workflows/build.yml')!.addOverride('jobs.buil
   TOWER_OUTPUT_BUCKET: '${{ secrets.TOWER_OUTPUT_BUCKET }}',
   AWS_ACCESS_KEY_ID: '${{ secrets.AWS_ACCESS_KEY_ID }}',
   AWS_SECRET_ACCESS_KEY: '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
-  AWS_DEFAULT_REGION: '${{ secrets.AWS_REGION }}',
+  AWS_DEFAULT_REGION: '${{ secrets.AWS_DEFAULT_REGION }}',
+  CDK_DEFAULT_ACCOUNT: '${{ secrets.AWS_ACCOUNT_ID }}',
+  CDK_CONTACT_EMAIL: '${{ secrets.CDK_CONTACT_EMAIL }}',
 });
 // Fix Jest 29 warning about deprecated config in `globals`
 project.jest!.config.transform ??= {};
