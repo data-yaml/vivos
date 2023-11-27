@@ -23,6 +23,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   gitignore: [
     '.env*',
     '.DS_Store',
+    'test/__snapshots__/*',
   ],
 });
 project.tryFindObjectFile('.github/workflows/build.yml')!.addOverride('jobs.build.env', {

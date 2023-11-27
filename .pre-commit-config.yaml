@@ -1,4 +1,4 @@
-exclude: ".projen*|.git*"
+exclude: ".projen*|.git*|test/__*"
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
