@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { readFileSync } from 'fs';
+import handlebars from 'handlebars';
 import yaml from 'js-yaml';
 
 export type KeyedConfig = {
@@ -18,10 +19,15 @@ export class Constants {
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
 
-  public static loadObjectFile(filePath: string): KeyedConfig {
-    const fileData = readFileSync(filePath, 'utf-8');
-    const fileExtension = filePath.split('.').pop()?.toLowerCase();
+  public static loadObjectFile(filePath: string, env: object = {}): KeyedConfig {
+    var fileData = readFileSync(filePath, 'utf-8');
 
+    if (Object.keys(env).length > 0) {
+      const template = handlebars.compile(fileData);
+      fileData = template(env);
+    }
+
+    const fileExtension = filePath.split('.').pop()?.toLowerCase();
     if (fileExtension === 'yaml' || fileExtension === 'yml') {
       return yaml.load(fileData) as KeyedConfig;
     } else if (fileExtension === 'json') {
@@ -29,6 +35,16 @@ export class Constants {
     } else {
       throw new Error(`Unsupported file extension: ${fileExtension}`);
     }
+  }
+
+  public static loadPipeline(pipeline: string, env: any = {}) {
+    env.pipeline = pipeline;
+    const paramsFile = `./config/${pipeline}/params.json`;
+    const launchFile = `./config/${pipeline}/launch.json`;
+    const params = Constants.loadObjectFile(paramsFile, env);
+    const launch = Constants.loadObjectFile(launchFile, env);
+    launch.paramsText = JSON.stringify(params, null, 2);
+    return launch;
   }
 
   private context: any;

@@ -1,0 +1,8 @@
+{
+    "outdir": "quilt+{{ bucket }}#package={{ pipeline }}",
+    "help": true,
+    "publish_dir_mode": "copy",
+    "tracedir": "${params.outdir}/pipeline_info",
+    "validate_params": true,
+    "show_hidden_params": false
+}

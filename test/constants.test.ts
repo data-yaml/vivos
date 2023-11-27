@@ -1,24 +1,41 @@
-
-import Constants, { KeyedConfig } from '../src/constants';
+import Constants from '../src/constants';
 
 describe('Constants', () => {
   let constants: Constants;
+  let pipeline: string;
+  let param_file: string;
+  let env: any;
 
   beforeEach(() => {
     constants = new Constants({});
+    pipeline = Constants.DEFAULTS.TOWER_TEST_PIPELINE;
+    param_file = `./config/${pipeline}/params.json`;
+    env = {
+      bucket: 's3://quilt-example',
+    };
   });
 
-  it('should load object file correctly', () => {
-    const filePath = './test/data/vivos.json';
-    const expectedConfig: KeyedConfig = {
-      apiUrl: 'https://api.example.com',
-      apiKey: 'your-api-key',
-      timeout: 5000,
-    };
+  describe('loadObjectFile', () => {
+    it('should load object file correctly', () => {
+      const result = Constants.loadObjectFile(param_file);
+      expect(result.outdir).toContain('{{ bucket }}');
+    });
+    it('should expand environment variables', () => {
+      const result = Constants.loadObjectFile(param_file, env);
+      expect(result.outdir).toContain(env.bucket);
+    },
+    );
+    it('should load the pipeline correctly', () => {
+      const result = Constants.loadPipeline(pipeline, env);
+      expect(result).toBeDefined();
+      expect(result.pipeline).toContain(pipeline);
+    });
 
-    const result = Constants.loadObjectFile(filePath);
-
-    expect(result).toEqual(expectedConfig);
+    it('should throw an error if the pipeline is not found', () => {
+      const non_pipeline = 'nonexistent-pipeline';
+      const action = () => Constants.loadPipeline(non_pipeline, env);
+      expect(action).toThrow();
+    });
   });
 
   it('should get the correct value for a given key', () => {
@@ -26,7 +43,6 @@ describe('Constants', () => {
     const expectedValue = 'https://api.tower.nf';
 
     const result = constants.get(key);
-
     expect(result).toEqual(expectedValue);
   });
 
