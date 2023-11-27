@@ -1,6 +1,6 @@
 
 {
   "apiUrl": "https://api.example.com",
-  "apiKey": "your-api-key",
+  "access": "your-access",
   "timeout": 5000
 }

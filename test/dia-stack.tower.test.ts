@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Constants } from '../src/constants';
-import { handler } from '../src/main.tower';
+import { handler } from '../src/dia-stack.tower';
 
 describe('handler', () => {
   it('should return a response', async () => {
