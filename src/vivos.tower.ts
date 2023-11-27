@@ -1,5 +1,8 @@
 import { AxiosResponse } from 'axios';
+import { Constants } from './constants';
 import type { Client as TowerClient, Components } from './types/tower';
+import { Vivos } from './vivos';
+
 export type DescribeWorkflowResponse = Components.Schemas.DescribeWorkflowResponse;
 export type ListWorkflowsElement = Components.Schemas.ListWorkflowsResponseListWorkflowsElement;
 export type ListWorkflowsResponse = Components.Schemas.ListWorkflowsResponse;
@@ -7,8 +10,6 @@ export type ServiceInfo = Components.Schemas.ServiceInfo;
 export type ServiceInfoResponse = Components.Schemas.ServiceInfoResponse;
 export type SubmitWorkflowLaunchResponse = Components.Schemas.SubmitWorkflowLaunchResponse;
 export type WorkflowLaunchRequest = Components.Schemas.WorkflowLaunchRequest;
-import { Vivos } from './vivos';
-import { Constants } from './constants';
 
 export class VivosTower extends Vivos {
 

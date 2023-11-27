@@ -1,22 +1,22 @@
 [
     {
         "launch": {
-            "computeEnvId": "521lycv2VB4ghtfsiv9Ceo",
+            "computeEnvId": "{{ computeEnvId }}",
             "runName": "hideous_mccarthy",
             "pipeline": "https://github.com/quiltdata/nf-quilt",
-            "workDir": "s3://nf-core-gallery",
+            "workDir": "{{ bucket }}",
             "revision": "main",
             "configProfiles": [
                 "standard"
             ],
             "configText": "plugins = ['nf-quilt']",
-            "paramsText": "{\"outdir\":\"quilt+s3://nf-core-gallery#package=test/nf-quilt\"}"
+            "paramsText": "{\"outdir\":\"quilt+{{ bucket }}#package={{ pipeline }}\"}"
         }
     },
     {
         "POST": "/workflow/launch",
-        "workflowId": "1p2YmH9RS52Cl5",
-        "workspaceId": "252612196927646",
-        "URL": "https://tower.nf/orgs/Quilt_Data/workspaces/hackathon_2023/watch/4yshijj9bW7ZZa"
+        "workflowId": "{{ workflowId }}",
+        "workspaceId": "{{ workspaceId }}",
+        "URL": "https://tower.nf/orgs/{{ organizationId }}/workspaces/{{ workspaceId }}/watch/{{ workflowId }}"
     }
 ]

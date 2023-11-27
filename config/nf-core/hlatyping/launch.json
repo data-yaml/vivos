@@ -1,0 +1,10 @@
+{
+    "computeEnvId": "{{ computeEnvId }}",
+    "pipeline": "https://github.com/{{ pipeline }}",
+    "workDir": "{{ bucket }}",
+    "revision": "main",
+    "configProfiles": [
+        "test_full"
+    ],
+    "configText": "plugins = ['nf-quilt']"
+}
