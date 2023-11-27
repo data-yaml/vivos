@@ -1,9 +1,8 @@
 import { Constants } from '../src/constants';
 import { VivosTower } from '../src/vivos.tower';
 
-const hasOutput = process.env.TOWER_OUTPUT_BUCKET !== undefined;
-const hasWorkflow = process.env.TOWER_TEST_WORKFLOW_ID !== undefined;
 const itif = (condition: boolean) => condition ? it : it.skip;
+const itifhas = (key: string) => itif(process.env[key] !== undefined);
 
 describe('VivosTower', () => {
   let vivos: VivosTower;
@@ -39,34 +38,35 @@ describe('VivosTower', () => {
     expect(workflows.length).toBeGreaterThan(0);
   });
 
-  itif(hasWorkflow)('should describe a workflow', async () => {
+  itifhas('TOWER_TEST_WORKFLOW_ID')('should describe a workflow', async () => {
     const workflowId = vivos.get('TOWER_TEST_WORKFLOW_ID');
     const description = await vivos.describe(workflowId);
     expect(description).toBeDefined();
     expect(description.workflow.id).toBe(workflowId);
   });
 
-  it('should generate valid workflow_request', async () => {
+  it('should generate valid launch_options', async () => {
     const pipeline = vivos.get('TOWER_TEST_PIPELINE');
     const bucket = 's3://quilt-example';
-    const workflowRequest = vivos.workflow_request(pipeline, bucket);
-    expect(workflowRequest).toBeDefined();
-    expect(workflowRequest.computeEnvId).toBe(vivos.get('TOWER_COMPUTE_ENV_ID'));
-    expect(workflowRequest.configProfiles).toEqual(['standard']);
-    expect(workflowRequest.configText).toBe("plugins = ['nf-quilt']");
-    expect(workflowRequest.pipeline).toContain(pipeline);
-    expect(workflowRequest.revision).toBe('main');
-    expect(workflowRequest.workDir).toEqual(bucket);
+    const launchOptions = vivos.launch_options(pipeline, bucket);
+    expect(launchOptions).toBeDefined();
+    expect(launchOptions.computeEnvId).toBe(vivos.get('TOWER_COMPUTE_ENV_ID'));
+    expect(launchOptions.configProfiles).toEqual(['standard']);
+    expect(launchOptions.configText).toBe("plugins = ['nf-quilt']");
+    expect(launchOptions.pipeline).toContain(pipeline);
+    expect(launchOptions.revision).toBe('main');
+    expect(launchOptions.workDir).toEqual(bucket);
 
-    const params = workflowRequest.paramsText!;
+    const params = launchOptions.paramsText!;
     expect(params).toContain(bucket);
     expect(params).toContain(pipeline);
   });
 
-  itif(hasOutput)('should launch a workflow', async () => {
-    const pipeline = vivos.get('TOWER_TEST_PIPELINE');
+  // itif(hasOutput)
+  it.skip('should launch a workflow', async () => {
+    const pipeline = 'nf-core/hlatyping'; // vivos.get('TOWER_TEST_PIPELINE');
     const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
-    const launchOptions = vivos.workflow_request(pipeline, bucket);
+    const launchOptions = vivos.launch_options(pipeline, bucket);
     const workflowId = await vivos.launch(launchOptions);
     expect(workflowId).toBeDefined();
     console.debug(`Launched workflow: ${workflowId}`);

@@ -1,0 +1,10 @@
+{
+    "computeEnvId": "{{ computeEnvId }}",
+    "pipeline": "https://github.com/nf-core/hlatyping",
+    "workDir": "{{ bucket }}",
+    "revision": "master",
+    "configProfiles": [
+        "test_full"
+    ],
+    "configText": "plugins = ['nf-quilt']"
+}

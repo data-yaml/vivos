@@ -1,5 +1,5 @@
 {
-    "outdir": "quilt+s3://nf-core-gallery#package=nf-core/hlatyping",
+    "outdir": "quilt+{{ bucket }}#package={{ package }}",
     "help": true,
     "publish_dir_mode": "copy",
     "tracedir": "${params.outdir}/pipeline_info",

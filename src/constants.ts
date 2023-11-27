@@ -1,6 +1,14 @@
 import 'dotenv/config';
+import { readFileSync } from 'fs';
+import handlebars from 'handlebars';
+import yaml from 'js-yaml';
+
+export type KeyedConfig = {
+  [key: string]: any;
+};
 
 export class Constants {
+
   public static DEFAULTS: { [key: string]: any } = {
     BENCHLING_API_FILE: './api/benchling.yaml',
     PETSTORE_API_FILE: './api/petstore.yaml',
@@ -10,6 +18,36 @@ export class Constants {
     TOWER_TEST_PIPELINE: 'quiltdata/nf-quilt',
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
+
+  public static loadObjectFile(filePath: string, env: object = {}): KeyedConfig {
+    var fileData = readFileSync(filePath, 'utf-8');
+
+    if (Object.keys(env).length > 0) {
+      const template = handlebars.compile(fileData);
+      fileData = template(env);
+    }
+
+    const fileExtension = filePath.split('.').pop()?.toLowerCase();
+    if (fileExtension === 'yaml' || fileExtension === 'yml') {
+      return yaml.load(fileData) as KeyedConfig;
+    } else if (fileExtension === 'json') {
+      return JSON.parse(fileData);
+    } else {
+      throw new Error(`Unsupported file extension: ${fileExtension}`);
+    }
+  }
+
+  public static loadPipeline(pipeline: string, env: any = {}) {
+    if (typeof env.package !== 'string' || env.package === '') {
+      env.package = pipeline;
+    }
+    const paramsFile = `./config/${pipeline}/params.json`;
+    const launchFile = `./config/${pipeline}/launch.json`;
+    const params = Constants.loadObjectFile(paramsFile, env);
+    const launch = Constants.loadObjectFile(launchFile, env);
+    launch.paramsText = JSON.stringify(params);
+    return launch;
+  }
 
   private context: any;
 

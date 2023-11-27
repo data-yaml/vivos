@@ -10,12 +10,16 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'aws-sdk',
     'axios',
     'dotenv',
+    'handlebars',
     'openapicmd',
     'openapi-client-axios',
+    'openapi-types',
     'js-yaml',
     '@types/js-yaml',
   ],
-  // devDeps: [],             /* Build dependencies for this module. */
+  devDeps: [
+    'eslint',
+  ],
   gitignore: [
     '.env*',
     '.DS_Store',

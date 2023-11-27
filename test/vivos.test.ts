@@ -33,7 +33,7 @@ describe('Vivos', () => {
   });
 
   it('should load the config from a file', () => {
-    const config = Vivos.loadConfig(Constants.DEFAULTS.PETSTORE_API_FILE);
+    const config = Constants.loadObjectFile(Constants.DEFAULTS.PETSTORE_API_FILE);
     // Assert that the config is loaded correctly
     expect(config.info.title).toContain('Petstore');
   });
