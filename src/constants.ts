@@ -38,12 +38,14 @@ export class Constants {
   }
 
   public static loadPipeline(pipeline: string, env: any = {}) {
-    env.pipeline = pipeline;
+    if (typeof env.package !== 'string' || env.package === '') {
+      env.package = pipeline;
+    }
     const paramsFile = `./config/${pipeline}/params.json`;
     const launchFile = `./config/${pipeline}/launch.json`;
     const params = Constants.loadObjectFile(paramsFile, env);
     const launch = Constants.loadObjectFile(launchFile, env);
-    launch.paramsText = JSON.stringify(params, null, 2);
+    launch.paramsText = JSON.stringify(params);
     return launch;
   }
 

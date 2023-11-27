@@ -1,6 +1,6 @@
 {
     "computeEnvId": "{{ computeEnvId }}",
-    "pipeline": "https://github.com/{{ pipeline }}",
+    "pipeline": "https://github.com/quiltdata/nf-quilt",
     "workDir": "{{ bucket }}",
     "revision": "main",
     "configProfiles": [

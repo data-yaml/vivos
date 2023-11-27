@@ -64,7 +64,7 @@ describe('VivosTower', () => {
 
   // itif(hasOutput)
   it.skip('should launch a workflow', async () => {
-    const pipeline = vivos.get('TOWER_TEST_PIPELINE');
+    const pipeline = 'nf-core/hlatyping'; // vivos.get('TOWER_TEST_PIPELINE');
     const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
     const launchOptions = vivos.launch_options(pipeline, bucket);
     const workflowId = await vivos.launch(launchOptions);
