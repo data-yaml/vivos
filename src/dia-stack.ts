@@ -22,7 +22,7 @@ import { Constants } from './constants';
 export interface DiaStackProps extends StackProps {
   readonly account: string;
   readonly region: string;
-  readonly bucket: Bucket;
+  readonly bucketURI: string;
   readonly email: string;
 }
 
@@ -30,16 +30,21 @@ export class DiaStack extends Stack {
 
   public static defaultProps(context: any = {}): DiaStackProps {
     const cc = new Constants(context);
-    return cc.defaultProps() as DiaStackProps;
+    const props = cc.defaultProps();
+    props.bucketURI = cc.get('TOWER_OUTPUT_BUCKET');
+    return props as DiaStackProps;
   }
 
   private readonly lambdaRole: Role;
+  private readonly bucketURI: string;
   private readonly bucket: Bucket;
   private readonly principal: AccountPrincipal;
 
   constructor(scope: Construct, id: string, props: DiaStackProps) {
     super(scope, id, props);
-    this.bucket = props.bucket;
+    this.bucketURI = props.bucketURI;
+    const bucketName = this.bucketURI.split('/').pop()!;
+    this.bucket = Bucket.fromBucketName(this, 'VivosOutputBucket', bucketName) as Bucket;
     this.lambdaRole = this.makeLambdaRole();
     this.principal = new AccountPrincipal(props.account);
 
@@ -53,19 +58,19 @@ export class DiaStack extends Stack {
     statusTopic.grantPublish(servicePrincipal);
     statusTopic.grantPublish(this.principal);
 
-    const eventSource = new S3EventSource(props.bucket, {
+    const eventSource = new S3EventSource(this.bucket, {
       events: [EventType.OBJECT_CREATED],
       filters: [{ prefix: '/.quilt/named_packages/' }],
     });
     const towerLamdba = this.makeLambda('tower', {});
     console.debug(towerLamdba.stack.templateFile);
     console.debug(eventSource);
-    //towerLamdba.addEventSource(eventSource);
+    towerLamdba.addEventSource(eventSource);
   }
 
   private makeLambda(name: string, env: object) {
     const default_env = {
-      TOWER_OUTPUT_BUCKET: 's3://' + this.bucket.bucketName + '/outputs',
+      TOWER_OUTPUT_BUCKET: this.bucketURI,
       LOG_LEVEL: 'ALL',
     };
     // create merged env

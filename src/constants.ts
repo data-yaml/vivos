@@ -78,8 +78,7 @@ export class Constants {
     return {
       account: this.get('CDK_DEFAULT_ACCOUNT'),
       region: this.get('CDK_DEFAULT_REGION'),
-      bucket: this.get('TOWER_OUTPUT_BUCKET'),
-      email: this.get('CDK_CONTACT_EMAIL'),
+      email: this.get('CDK_DEFAULT_EMAIL'),
     };
   }
 }
