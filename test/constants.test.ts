@@ -16,6 +16,20 @@ describe('Constants', () => {
     };
   });
 
+  describe('loadObjectURI', () => {
+    it('should load object URI correctly', async () => {
+      const uri = 's3://quilt-example/akarve/covid-directory/vega.json';
+      const result = await Constants.loadObjectURI(uri);
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('config');
+    });
+
+    it('should throw an error if the object URI is invalid', async () => {
+      const nonExistentURI = 'https://quilt-example.com';
+      await expect(Constants.loadObjectURI(nonExistentURI)).rejects.toThrow();
+    });
+  });
+
   describe('loadObjectFile', () => {
     it('should load object file correctly', () => {
       const result = Constants.loadObjectFile(param_file);

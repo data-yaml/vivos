@@ -36,8 +36,9 @@ export class Constants {
     const paths = split[1].split('/');
     const s3 = new S3();
     const bucket = paths[0];
-    const file = paths[-1];
+    const file = paths.slice(-1)[0];
     const key = paths.slice(1).join('/');
+    console.log(`Loading ${file} from ${bucket} in ${key}`);
     const params = {
       Bucket: bucket,
       Key: key,
