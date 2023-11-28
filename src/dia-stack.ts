@@ -61,7 +61,7 @@ export class DiaStack extends Stack {
 
     const eventSource = new S3EventSource(this.bucket, {
       events: [EventType.OBJECT_CREATED],
-      filters: [{ prefix: '/.quilt/named_packages/' }],
+      filters: [{ prefix: Constants.DEFAULTS.TOWER_INPUT_PREFIX }],
     });
     const towerLambda = this.makeLambda('tower', {});
     console.debug(towerLambda.stack.templateFile);

@@ -17,6 +17,7 @@ export class Constants {
     TOWER_API_FILE: './api/tower.yaml',
     TOWER_API_URL: 'https://api.tower.nf',
     TOWER_TEST_PIPELINE: 'quiltdata/nf-quilt',
+    TOWER_INPUT_PREFIX: '.quilt/named_packages/benchling/',
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
 
