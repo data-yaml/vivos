@@ -1,3 +1,4 @@
+import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { Document, OpenAPIClientAxios, OpenAPIClient } from 'openapi-client-axios';
 import { Constants } from './constants';
 
@@ -7,6 +8,7 @@ export class Vivos {
     'OPEN_API_FILE',
     'OPEN_API_KEY',
     'OPEN_API_URL',
+    'STATUS_TOPIC_ARN',
   ];
 
   protected event: any;
@@ -14,15 +16,17 @@ export class Vivos {
   protected api_file: string;
   protected api_key: string;
   protected api_url: string;
+  protected sns_client: SNSClient;
   private _api: OpenAPIClientAxios | undefined;
 
   constructor(event: any, context: any) {
     this.event = event;
     this.cc = new Constants(context);
+    this._api = undefined;
     this.api_file = this.get('OPEN_API_FILE');
     this.api_key = this.cc.get('OPEN_API_KEY');
     this.api_url = this.cc.get('OPEN_API_URL');
-    this._api = undefined;
+    this.sns_client = new SNSClient({});
   }
 
   public api(reset: boolean = false): OpenAPIClientAxios {
@@ -34,6 +38,22 @@ export class Vivos {
 
   public client(): Promise<OpenAPIClient> {
     return this.api().getClient();
+  }
+
+  // log message to STATUS_TOPIC_ARN if defined
+  public async log(message: string): Promise<void> {
+    console.debug(`log[${message}]`);
+    const topic_arn = this.cc.get('STATUS_TOPIC_ARN');
+    if (typeof topic_arn !== 'string' || topic_arn === '') {
+      return;
+    }
+    const params = {
+      Message: message,
+      TopicArn: topic_arn,
+    };
+    const command = new PublishCommand(params);
+    const response = await this.sns_client.send(command);
+    console.debug(response);
   }
 
   public get(key: string): string {

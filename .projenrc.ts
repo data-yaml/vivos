@@ -8,6 +8,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   deps: [
     'aws-lambda',
     'aws-sdk',
+    '@aws-sdk/client-sns',
     'axios',
     'dotenv',
     'handlebars',

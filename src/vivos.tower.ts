@@ -88,7 +88,8 @@ export class VivosTower extends Vivos {
         { launch: launchOptions },
       ) as AxiosResponse<SubmitWorkflowLaunchResponse>;
       const data = response.data as SubmitWorkflowLaunchResponse;
-      return data.workflowId!;
+      const workflow = data.workflowId!;
+      return workflow;
     } catch (e: any) {
       console.error(launchOptions, e);
       throw 'Failed to launch workflow';

@@ -35,10 +35,11 @@ export class DiaStack extends Stack {
     return props as DiaStackProps;
   }
 
-  private readonly lambdaRole: Role;
-  private readonly bucketURI: string;
   private readonly bucket: Bucket;
+  private readonly bucketURI: string;
+  private readonly lambdaRole: Role;
   private readonly principal: AccountPrincipal;
+  private readonly statusTopic: Topic;
 
   constructor(scope: Construct, id: string, props: DiaStackProps) {
     super(scope, id, props);
@@ -48,28 +49,29 @@ export class DiaStack extends Stack {
     this.lambdaRole = this.makeLambdaRole();
     this.principal = new AccountPrincipal(props.account);
 
-    const statusTopic = new Topic(this, 'VivosStatusTopic', {
+    this.statusTopic = new Topic(this, 'VivosStatusTopic', {
       displayName: 'VIVOS Status Topic',
     });
-    statusTopic.addSubscription(
+    this.statusTopic.addSubscription(
       new EmailSubscription(props.email),
     );
     const servicePrincipal = new ServicePrincipal('events.amazonaws.com');
-    statusTopic.grantPublish(servicePrincipal);
-    statusTopic.grantPublish(this.principal);
+    this.statusTopic.grantPublish(servicePrincipal);
+    this.statusTopic.grantPublish(this.principal);
 
     const eventSource = new S3EventSource(this.bucket, {
       events: [EventType.OBJECT_CREATED],
       filters: [{ prefix: '/.quilt/named_packages/' }],
     });
-    const towerLamdba = this.makeLambda('tower', {});
-    console.debug(towerLamdba.stack.templateFile);
+    const towerLambda = this.makeLambda('tower', {});
+    console.debug(towerLambda.stack.templateFile);
     console.debug(eventSource);
-    towerLamdba.addEventSource(eventSource);
+    towerLambda.addEventSource(eventSource);
   }
 
   private makeLambda(name: string, env: object) {
     const default_env = {
+      STATUS_TOPIC_ARN: this.statusTopic.topicArn,
       TOWER_OUTPUT_BUCKET: this.bucketURI,
       LOG_LEVEL: 'ALL',
     };
