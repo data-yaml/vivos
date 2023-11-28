@@ -17,6 +17,7 @@ export async function handler(event: any, context: any) {
     };
   } catch (error: any) {
     // Return the error
+    console.error(error);
     return {
       statusCode: 500,
       body: error.message,
