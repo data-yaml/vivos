@@ -14,6 +14,7 @@ export class Constants {
     BENCHLING_API_FILE: './api/benchling.yaml',
     PETSTORE_API_FILE: './api/petstore.yaml',
     PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
+    TEST_ENTRY_FILE: './test/data/entry.json',
     TOWER_API_FILE: './api/tower.yaml',
     TOWER_API_URL: 'https://api.tower.nf',
     TOWER_TEST_PIPELINE: 'quiltdata/nf-quilt',
@@ -81,6 +82,23 @@ export class Constants {
       region: this.get('CDK_DEFAULT_REGION'),
       email: this.get('CDK_DEFAULT_EMAIL'),
     };
+  }
+
+  public getKeyPathFromFile(filePath: string, keyPath: string): any {
+    try {
+      const file = Constants.loadObjectFile(filePath);
+      const keys = keyPath.split('.');
+      let value = file;
+      for (const key of keys) {
+        value = value[key];
+        if (value === undefined) {
+          return undefined;
+        }
+      }
+      return value;
+    } catch (error) {
+      return undefined;
+    }
   }
 }
 

@@ -56,4 +56,32 @@ describe('Constants', () => {
     const result = constants.get(key);
     expect(result).toEqual(value);
   });
+
+  describe('getKeyPathFromFile', () => {
+    function checkKeyPathValue(keyPath: string, value: string) {
+      const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
+      const result = constants.getKeyPathFromFile(filePath, keyPath);
+      expect(result).toEqual(value);
+    }
+
+    it('should return the value for a given key path', () => {
+      checkKeyPathValue('id', 'etr_ehERLyf6');
+      checkKeyPathValue('fields.Pipeline.value', 'nf-core/hlatyping');
+    });
+
+    it('should return undefined if the key path does not exist', () => {
+      const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
+      const keyPath = 'undefined.Pipeline.value';
+      const result = constants.getKeyPathFromFile(filePath, keyPath);
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined if the file does not exist', () => {
+      const filePath = './test/data/nonExistentFile.json';
+      const keyPath = 'id';
+      const result = constants.getKeyPathFromFile(filePath, keyPath);
+      expect(result).toBeUndefined();
+    });
+  });
+
 });
