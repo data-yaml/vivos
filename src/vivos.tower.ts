@@ -22,12 +22,16 @@ export class VivosTower extends Vivos {
 
   private workspaceId: string;
   private computeEnvId: string;
+  private event_bucket: string;
+  private event_object: string;
 
   constructor(event: any, context: any) {
     super(event, context);
     this.api_key = this.get('TOWER_ACCESS_TOKEN');
     this.workspaceId = this.get('TOWER_WORKSPACE_ID');
     this.computeEnvId = this.get('TOWER_COMPUTE_ENV_ID');
+    this.event_bucket = this.cc.getKeyPathFromObject(event, 'Records[0].s3.bucket.name');
+    this.event_object = this.cc.getKeyPathFromObject(event, 'Records[0].s3.object.key');
   }
 
   public async getTowerClient(): Promise<TowerClient> {
@@ -71,7 +75,32 @@ export class VivosTower extends Vivos {
     }
   }
 
-  public launch_options(pipeline: string, bucket: string): WorkflowLaunchRequest {
+  public getPackageFromFilename(filename: string): string {
+    // extract a/b from '.quilt/named_packages/a/b/c'
+    const parts = filename.split('/');
+    const packageParts = parts.slice(2, 4);
+    const packageName = packageParts.join('/');
+    return packageName;
+  }
+
+  public getPipeline(bucket: string): string {
+    const packageName = this.getPackageFromFilename(this.event_object);
+    const entry_uri = `s3://${bucket}/${packageName}/entry.json`;
+    const pipeline = this.cc.getKeyPathFromFile(entry_uri, 'fields.Pipeline.value');
+    return pipeline;
+  }
+
+  public launch_options(pipeline: string = '', bucket: string = ''): WorkflowLaunchRequest {
+    if (bucket === '') {
+      bucket = this.get('TOWER_OUTPUT_BUCKET');
+    };
+    if (pipeline === '') {
+      pipeline = this.getPipeline(bucket);
+      if (pipeline === '') {
+        console.warn('Pipeline not specified');
+        return {} as WorkflowLaunchRequest;
+      }
+    }
     const env = {
       bucket: bucket,
       computeEnvId: this.computeEnvId,
@@ -111,5 +140,15 @@ export class VivosTower extends Vivos {
       console.error(e);
       throw 'Failed to cancel workflow';
     }
+  }
+
+  public toDict() {
+    // extend with new properties
+    const dict = super.toDict();
+    dict.workspaceId = this.workspaceId;
+    dict.computeEnvId = this.computeEnvId;
+    dict.event_bucket = this.event_bucket;
+    dict.event_object = this.event_object;
+    return dict;
   }
 }
