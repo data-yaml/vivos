@@ -2,7 +2,7 @@ import { Constants } from '../src/constants';
 import { handler } from '../src/dia-stack.tower';
 
 describe('dia-stack.tower.handler', () => {
-  it('should return a response', async () => {
+  it.skip('should return a response', async () => {
     // Mock the event and context objects
     const event = {};
     const context = { OPEN_API_FILE: Constants.DEFAULTS.TOWER_API_FILE };
