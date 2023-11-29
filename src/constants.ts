@@ -13,6 +13,7 @@ export class Constants {
   public static DEFAULTS: { [key: string]: any } = {
     APP_NAME: 'vivos',
     BENCHLING_API_FILE: './api/benchling.yaml',
+    BENCHLING_API_URL: 'https://quilt-dtt.benchling.com/api/v2',
     PETSTORE_API_FILE: './api/petstore.yaml',
     PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
     TEST_ENTRY_FILE: './test/data/entry.json',
