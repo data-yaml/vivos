@@ -6,6 +6,7 @@ import { Vivos } from './vivos';
 export type Entry = Components.Schemas.Entry;
 export type EntrySchema = Components.Schemas.EntrySchema;
 export type Field = Components.Schemas.Field;
+export type TokenResponse = Components.Schemas.TokenResponse;
 
 export class VivosBenchling extends Vivos {
 
@@ -20,9 +21,9 @@ export class VivosBenchling extends Vivos {
 
   constructor(event: any, context: any) {
     context.OPEN_API_FILE = Constants.DEFAULTS.BENCHLING_API_FILE;
-    context.OPEN_API_URL = Constants.DEFAULTS.BENCHLING_API_URL;
     super(event, context);
-    this.api_key = this.get('BENCHLING_ACCESS_TOKEN');
+    this.api_key = this.cc.get('BENCHLING_ACCESS_TOKEN');
+    this.api_url = `https://${this.cc.get('BENCHLING_TENANT')}.benchling.com/api/v2`;
     this.event_bucket = Constants.GetKeyPathFromObject(event, 'Records[0].s3.bucket.name');
     this.event_object = Constants.GetKeyPathFromObject(event, 'Records[0].s3.object.key');
   }
@@ -34,9 +35,14 @@ export class VivosBenchling extends Vivos {
 
   // get an entry by id
   public async getEntry(id: string): Promise<Entry> {
-    const client = await this.getBenchlingClient();
-    const response = await client.getEntry(id) as AxiosResponse<Entry>;
-    return response.data;
+    try {
+      const client = await this.getBenchlingClient();
+      const response = await client.getEntry(id) as AxiosResponse<Entry>;
+      return response.data;
+    } catch (e: any) {
+      console.error(e);
+      throw `Failed to retrieve entry ${id}`;
+    }
   }
 
   public async updateEntry(entry: Entry, fields: KeyedConfig): Promise<Entry> {

@@ -29,9 +29,9 @@ export class VivosTower extends Vivos {
 
   constructor(event: any, context: any) {
     context.OPEN_API_FILE = Constants.DEFAULTS.TOWER_API_FILE;
-    context.OPEN_API_URL = Constants.DEFAULTS.TOWER_API_URL;
     super(event, context);
     this.api_key = this.get('TOWER_ACCESS_TOKEN');
+    this.api_url = this.get('TOWER_API_URL');
     this.workspaceId = this.get('TOWER_WORKSPACE_ID');
     this.computeEnvId = this.get('TOWER_COMPUTE_ENV_ID');
     this.event_bucket = Constants.GetKeyPathFromObject(event, 'Records[0].s3.bucket.name');

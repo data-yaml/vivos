@@ -108,20 +108,26 @@ export class Constants {
 
   constructor(context: any) {
     this.context = context;
+    this.updateContext(process.env);
+    this.updateContext(Constants.DEFAULTS);
+  }
+
+  public updateContext(envs: KeyedConfig) {
+    Object.keys(envs).forEach(env => {
+      if (this.context[env] === undefined) {
+        // console.debug(`Setting ${env} to ${envs[env]}`)
+        this.context[env] = envs[env];
+      }
+    });
   }
 
   // get checks context, then process.env, then DEFAULT_CONFIG
   public get(key: string): any {
-    if (this.context[key]) {
-      return this.context[key];
-    }
-    if (process.env[key]) {
-      return process.env[key];
-    }
-    if (Constants.DEFAULTS[key]) {
-      return Constants.DEFAULTS[key];
-    }
-    return undefined;
+    return this.context[key];
+  }
+
+  public has(key: string): boolean {
+    return this.get(key) !== undefined;
   }
 
   public put(key: string, value: any): void {
