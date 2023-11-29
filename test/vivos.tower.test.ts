@@ -1,7 +1,5 @@
+import { IT } from './helpers';
 import { VivosTower } from '../src/vivos.tower';
-
-const itif = (condition: boolean) => condition ? it : it.skip;
-const itifhas = (key: string) => itif(process.env[key] !== undefined);
 
 describe('VivosTower', () => {
   let vivos: VivosTower;
@@ -33,7 +31,7 @@ describe('VivosTower', () => {
     expect(workflows.length).toBeGreaterThan(0);
   });
 
-  itifhas('TOWER_TEST_WORKFLOW_ID')('should describe a workflow', async () => {
+  IT.ifhas('TOWER_TEST_WORKFLOW_ID')('should describe a workflow', async () => {
     const workflowId = vivos.get('TOWER_TEST_WORKFLOW_ID');
     const description = await vivos.describe(workflowId);
     expect(description).toBeDefined();
@@ -58,7 +56,7 @@ describe('VivosTower', () => {
   });
 
   // itif(hasOutput)
-  it.skip('should launch a workflow', async () => {
+  IT.ifhas('LAUNCH_WORKFLOWS')('should launch a workflow', async () => {
     const pipeline = vivos.get('TOWER_DEFAULT_PIPELINE'); // 'nf-core/hlatyping'; // 'quiltdata/nf-quilt';
     const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
     const launchOptions = vivos.launch_options(pipeline, bucket);
