@@ -74,7 +74,7 @@ describe('Constants', () => {
   describe('getKeyPathFromFile', () => {
     function checkKeyPathValue(keyPath: string, value: string) {
       const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
-      const result = constants.getKeyPathFromFile(filePath, keyPath);
+      const result = Constants.getKeyPathFromFile(filePath, keyPath);
       expect(result).toEqual(value);
     }
 
@@ -86,14 +86,14 @@ describe('Constants', () => {
     it('should return undefined if the key path does not exist', () => {
       const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
       const keyPath = 'undefined.Pipeline.value';
-      const result = constants.getKeyPathFromFile(filePath, keyPath);
+      const result = Constants.getKeyPathFromFile(filePath, keyPath);
       expect(result).toBeUndefined();
     });
 
     it('should return undefined if the file does not exist', () => {
       const filePath = './test/data/nonExistentFile.json';
       const keyPath = 'id';
-      const result = constants.getKeyPathFromFile(filePath, keyPath);
+      const result = Constants.getKeyPathFromFile(filePath, keyPath);
       expect(result).toBeUndefined();
     });
   });

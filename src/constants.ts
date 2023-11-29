@@ -20,7 +20,7 @@ export class Constants {
     TOWER_API_FILE: './api/tower.yaml',
     TOWER_API_URL: 'https://api.tower.nf',
     TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
-    TOWER_INPUT_PREFIX: '.quilt/named_packages/benchling/',
+    TOWER_INPUT_FILE: 'entry.json',
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
 
@@ -82,6 +82,28 @@ export class Constants {
     return launch;
   }
 
+  public static getKeyPathFromObject(object: any, keyPath: string): any {
+    const keys = keyPath.split('.');
+    let value = object;
+    for (const key of keys) {
+      value = value[key];
+      if (value === undefined) {
+        return undefined;
+      }
+    }
+    return value;
+  }
+
+  public static getKeyPathFromFile(filePath: string, keyPath: string): any {
+    try {
+      const object = Constants.loadObjectFile(filePath);
+      return Constants.getKeyPathFromObject(object, keyPath);
+    } catch (e: any) {
+      console.error(e.message);
+      return undefined;
+    }
+  }
+
   private context: any;
 
   constructor(context: any) {
@@ -106,33 +128,12 @@ export class Constants {
     this.context[key] = value;
   }
 
-  public defaultProps() : KeyedConfig {
+  public defaultProps(): KeyedConfig {
     return {
       account: this.get('CDK_DEFAULT_ACCOUNT'),
       region: this.get('CDK_DEFAULT_REGION'),
       email: this.get('CDK_DEFAULT_EMAIL'),
     };
-  }
-  public getKeyPathFromObject(object: any, keyPath: string): any {
-    const keys = keyPath.split('.');
-    let value = object;
-    for (const key of keys) {
-      value = value[key];
-      if (value === undefined) {
-        return undefined;
-      }
-    }
-    return value;
-  }
-
-  public getKeyPathFromFile(filePath: string, keyPath: string): any {
-    try {
-      const object = Constants.loadObjectFile(filePath);
-      return this.getKeyPathFromObject(object, keyPath);
-    } catch (e: any) {
-      console.error(e.message);
-      return undefined;
-    }
   }
 }
 

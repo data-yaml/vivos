@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { Constants } from './constants';
+import { Constants, KeyedConfig } from './constants';
 import type { Client as TowerClient, Components } from './types/tower';
 import { Vivos } from './vivos';
 
@@ -24,6 +24,8 @@ export class VivosTower extends Vivos {
   private computeEnvId: string;
   private event_bucket: string;
   private event_object: string;
+  private entry_data: KeyedConfig;
+
 
   constructor(event: any, context: any) {
     context.OPEN_API_FILE = Constants.DEFAULTS.TOWER_API_FILE;
@@ -32,8 +34,10 @@ export class VivosTower extends Vivos {
     this.api_key = this.get('TOWER_ACCESS_TOKEN');
     this.workspaceId = this.get('TOWER_WORKSPACE_ID');
     this.computeEnvId = this.get('TOWER_COMPUTE_ENV_ID');
-    this.event_bucket = this.cc.getKeyPathFromObject(event, 'Records[0].s3.bucket.name');
-    this.event_object = this.cc.getKeyPathFromObject(event, 'Records[0].s3.object.key');
+    this.event_bucket = Constants.getKeyPathFromObject(event, 'Records[0].s3.bucket.name');
+    this.event_object = Constants.getKeyPathFromObject(event, 'Records[0].s3.object.key');
+    const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
+    this.entry_data = this.event_object ? Constants.loadObjectURI(entry_uri) : {};
   }
 
   public async getTowerClient(): Promise<TowerClient> {
@@ -77,23 +81,14 @@ export class VivosTower extends Vivos {
     }
   }
 
-  public getPackageFromFilename(filename: string): string {
-    // extract a/b from '.quilt/named_packages/a/b/c'
-    const parts = filename.split('/');
-    const packageParts = parts.slice(2, 4);
-    const packageName = packageParts.join('/');
-    return packageName;
+  public getPipeline(): string {
+    const pipeline = Constants.getKeyPathFromObject(this.entry_data, 'fields.Pipeline.value');
+    return pipeline || this.get('TOWER_DEFAULT_PIPELINE');
   }
 
-  public getPipeline(bucket: string): string {
-    if (!this.event_object || this.event_object === '') {
-      console.warn('Event object not specified');
-      return this.get('TOWER_DEFAULT_PIPELINE');
-    }
-    const packageName = this.getPackageFromFilename(this.event_object);
-    const entry_uri = `s3://${bucket}/${packageName}/entry.json`;
-    const pipeline = this.cc.getKeyPathFromFile(entry_uri, 'fields.Pipeline.value');
-    return pipeline;
+  public getStatus(): string {
+    const status = Constants.getKeyPathFromObject(this.entry_data, 'fields.Status.value');
+    return status || 'unknown';
   }
 
   public launch_options(pipeline: string = '', bucket: string = ''): WorkflowLaunchRequest {
@@ -101,7 +96,7 @@ export class VivosTower extends Vivos {
       bucket = this.get('TOWER_OUTPUT_BUCKET');
     };
     if (pipeline === '') {
-      pipeline = this.getPipeline(bucket);
+      pipeline = this.getPipeline();
       if (pipeline === '') {
         console.warn('Pipeline not specified');
         return {} as WorkflowLaunchRequest;
@@ -149,12 +144,13 @@ export class VivosTower extends Vivos {
   }
 
   public toDict() {
-    // extend with new properties
-    const dict = super.toDict();
-    dict.workspaceId = this.workspaceId;
-    dict.computeEnvId = this.computeEnvId;
-    dict.event_bucket = this.event_bucket;
-    dict.event_object = this.event_object;
-    return dict;
+    return {
+      ...super.toDict(),
+      workspaceId: this.workspaceId,
+      computeEnvId: this.computeEnvId,
+      event_bucket: this.event_bucket,
+      event_object: this.event_object,
+      entry_data: this.entry_data,
+    };
   }
 }

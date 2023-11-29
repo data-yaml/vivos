@@ -61,7 +61,7 @@ export class DiaStack extends Stack {
 
     const eventSource = new S3EventSource(this.bucket, {
       events: [EventType.OBJECT_CREATED],
-      filters: [{ prefix: Constants.DEFAULTS.TOWER_INPUT_PREFIX }],
+      filters: [{ suffix: Constants.DEFAULTS.TOWER_INPUT_FILE }],
     });
     const towerLambda = this.makeLambda('tower', {});
     towerLambda.addEventSource(eventSource);

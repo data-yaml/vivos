@@ -57,12 +57,6 @@ describe('VivosTower', () => {
     expect(params).toContain(pipeline);
   });
 
-  it('should return the package name from the filename', () => {
-    const filename = '.quilt/named_packages/a/b/c';
-    const packageName = vivos.getPackageFromFilename(filename);
-    expect(packageName).toBe('a/b');
-  });
-
   // itif(hasOutput)
   it.skip('should launch a workflow', async () => {
     const pipeline = vivos.get('TOWER_DEFAULT_PIPELINE'); // 'nf-core/hlatyping'; // 'quiltdata/nf-quilt';
