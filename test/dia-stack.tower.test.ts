@@ -12,6 +12,6 @@ describe('dia-stack.tower.handler', () => {
 
     // Assert that the response is not null or undefined
     expect(response).toBeDefined();
-    expect(response.statusCode).toBe(500);
+    expect(response.statusCode).toBe(200);
   });
 });

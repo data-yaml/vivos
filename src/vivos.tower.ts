@@ -26,6 +26,8 @@ export class VivosTower extends Vivos {
   private event_object: string;
 
   constructor(event: any, context: any) {
+    context.OPEN_API_FILE = Constants.DEFAULTS.TOWER_API_FILE;
+    context.OPEN_API_URL = Constants.DEFAULTS.TOWER_API_URL;
     super(event, context);
     this.api_key = this.get('TOWER_ACCESS_TOKEN');
     this.workspaceId = this.get('TOWER_WORKSPACE_ID');
