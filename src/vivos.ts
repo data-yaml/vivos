@@ -55,8 +55,7 @@ export class Vivos {
       TopicArn: topic_arn,
     };
     const command = new PublishCommand(params);
-    const response = await this.sns_client.send(command);
-    console.debug(response);
+    await this.sns_client.send(command);
   }
 
   public get(key: string): string {
@@ -98,7 +97,7 @@ export class Vivos {
       const response = await client.post(path, params);
       return response;
     } catch (e: any) {
-      console.log(this, e);
+      console.error(this, e);
       throw `Failed to invoke POST ${path} with ${params}`;
     }
   }
@@ -109,7 +108,7 @@ export class Vivos {
       const response = await client.get(path);
       return response;
     } catch (e: any) {
-      console.log(this, e);
+      console.error(this, e);
       throw `Failed to invoke GET ${path}`;
     }
   }

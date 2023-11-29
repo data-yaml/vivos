@@ -64,8 +64,6 @@ export class DiaStack extends Stack {
       filters: [{ prefix: Constants.DEFAULTS.TOWER_INPUT_PREFIX }],
     });
     const towerLambda = this.makeLambda('tower', {});
-    console.debug(towerLambda.stack.templateFile);
-    console.debug(eventSource);
     towerLambda.addEventSource(eventSource);
   }
 
@@ -98,13 +96,14 @@ export class DiaStack extends Stack {
     });
 
     const lambdaS3Policy = new PolicyStatement({
+      sid: 'VivosLambdaS3Policy',
       actions: ['s3:ListBucket', 's3:GetObject', 's3:PutObject'],
       resources: [
         this.bucket.bucketArn,
         this.bucket.bucketArn + '/*',
       ],
     });
-    console.debug(lambdaS3Policy);
+    console.debug(lambdaS3Policy.sid);
     //lambdaRole.addToPolicy(lambdaS3Policy);
     return lambdaRole;
   }
