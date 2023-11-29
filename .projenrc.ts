@@ -8,6 +8,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   deps: [
     'aws-lambda',
     'aws-sdk',
+    '@aws-sdk/client-sns',
     'axios',
     'dotenv',
     'handlebars',
@@ -23,6 +24,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   gitignore: [
     '.env*',
     '.DS_Store',
+    'test/__snapshots__/*',
   ],
 });
 project.tryFindObjectFile('.github/workflows/build.yml')!.addOverride('jobs.build.env', {
@@ -33,7 +35,10 @@ project.tryFindObjectFile('.github/workflows/build.yml')!.addOverride('jobs.buil
   TOWER_OUTPUT_BUCKET: '${{ secrets.TOWER_OUTPUT_BUCKET }}',
   AWS_ACCESS_KEY_ID: '${{ secrets.AWS_ACCESS_KEY_ID }}',
   AWS_SECRET_ACCESS_KEY: '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
-  AWS_DEFAULT_REGION: '${{ secrets.AWS_REGION }}',
+  AWS_DEFAULT_REGION: '${{ secrets.AWS_DEFAULT_REGION }}',
+  CDK_DEFAULT_ACCOUNT: '${{ secrets.AWS_ACCOUNT_ID }}',
+  CDK_DEFAULT_REGION: '${{ secrets.AWS_DEFAULT_REGION }}',
+  CDK_DEFAULT_EMAIL: '${{ secrets.CDK_DEFAULT_EMAIL }}',
 });
 // Fix Jest 29 warning about deprecated config in `globals`
 project.jest!.config.transform ??= {};

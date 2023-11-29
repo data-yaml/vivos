@@ -1,0 +1,74 @@
+{
+    "id": "etr_ehERLyf6",
+    "days": [
+        {
+            "date": "2023-11-27",
+            "notes": []
+        }
+    ],
+    "name": "Nf-Core-Gallery",
+    "apiURL": "https://quilt-dtt.benchling.com/api/v2/entries/etr_ehERLyf6",
+    "fields": {
+        "Status": {
+            "type": "text",
+            "value": "New",
+            "isMulti": false,
+            "textValue": "New",
+            "displayValue": "New"
+        },
+        "Pipeline": {
+            "type": "text",
+            "value": "nf-core/hlatyping",
+            "isMulti": false,
+            "textValue": "nf-core/hlatyping",
+            "displayValue": "nf-core/hlatyping"
+        },
+        "Quilt+ URI": {
+            "type": "text",
+            "value": "quilt+s3://nf-core-gallery#package=benchling/EXP23000052",
+            "isMulti": false,
+            "textValue": "quilt+s3://nf-core-gallery#package=benchling/EXP23000052",
+            "displayValue": "quilt+s3://nf-core-gallery#package=benchling/EXP23000052"
+        },
+        "Quilt Revise URL": {
+            "type": "text",
+            "value": "https://demo.quiltdata.com/b/nf-core-gallery/packages/benchling/EXP23000052?action=revisePackage",
+            "isMulti": false,
+            "textValue": "https://demo.quiltdata.com/b/nf-core-gallery/packages/benchling/EXP23000052?action=revisePackage",
+            "displayValue": "https://demo.quiltdata.com/b/nf-core-gallery/packages/benchling/EXP23000052?action=revisePackage"
+        },
+        "Quilt Catalog URL": {
+            "type": "text",
+            "value": "https://demo.quiltdata.com/b/nf-core-gallery/packages/benchling/EXP23000052",
+            "isMulti": false,
+            "textValue": "https://demo.quiltdata.com/b/nf-core-gallery/packages/benchling/EXP23000052",
+            "displayValue": "https://demo.quiltdata.com/b/nf-core-gallery/packages/benchling/EXP23000052"
+        }
+    },
+    "schema": {
+        "id": "ts_KnwihVhV",
+        "name": "Tower"
+    },
+    "webURL": "https://quilt-dtt.benchling.com/quilt-dev/f/lib_uz14ul16-quilt-integration/etr_ehERLyf6-nf-core-gallery-1/edit",
+    "authors": [
+        {
+            "id": "ent_9CIv9U8P",
+            "name": "Ernest Prabhakar",
+            "handle": "eprabhakar"
+        }
+    ],
+    "creator": {
+        "id": "ent_9CIv9U8P",
+        "name": "Ernest Prabhakar",
+        "handle": "eprabhakar"
+    },
+    "folderId": "lib_uz14ul16",
+    "createdAt": "2023-11-28T06:03:43.485947+00:00",
+    "displayId": "EXP23000052",
+    "modifiedAt": "2023-11-28T17:04:11.055321+00:00",
+    "customFields": {},
+    "reviewRecord": null,
+    "archiveRecord": null,
+    "entryTemplateId": null,
+    "assignedReviewers": []
+}

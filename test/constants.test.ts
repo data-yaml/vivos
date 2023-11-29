@@ -16,6 +16,20 @@ describe('Constants', () => {
     };
   });
 
+  describe('loadObjectURI', () => {
+    it('should load object URI correctly', async () => {
+      const uri = 's3://quilt-example/akarve/covid-directory/vega.json';
+      const result = await Constants.loadObjectURI(uri);
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('config');
+    });
+
+    it('should throw an error if the object URI is invalid', async () => {
+      const nonExistentURI = 'https://quilt-example.com';
+      await expect(Constants.loadObjectURI(nonExistentURI)).rejects.toThrow();
+    });
+  });
+
   describe('loadObjectFile', () => {
     it('should load object file correctly', () => {
       const result = Constants.loadObjectFile(param_file);
@@ -56,4 +70,32 @@ describe('Constants', () => {
     const result = constants.get(key);
     expect(result).toEqual(value);
   });
+
+  describe('getKeyPathFromFile', () => {
+    function checkKeyPathValue(keyPath: string, value: string) {
+      const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
+      const result = constants.getKeyPathFromFile(filePath, keyPath);
+      expect(result).toEqual(value);
+    }
+
+    it('should return the value for a given key path', () => {
+      checkKeyPathValue('id', 'etr_ehERLyf6');
+      checkKeyPathValue('fields.Pipeline.value', 'nf-core/hlatyping');
+    });
+
+    it('should return undefined if the key path does not exist', () => {
+      const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
+      const keyPath = 'undefined.Pipeline.value';
+      const result = constants.getKeyPathFromFile(filePath, keyPath);
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined if the file does not exist', () => {
+      const filePath = './test/data/nonExistentFile.json';
+      const keyPath = 'id';
+      const result = constants.getKeyPathFromFile(filePath, keyPath);
+      expect(result).toBeUndefined();
+    });
+  });
+
 });

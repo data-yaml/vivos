@@ -1,4 +1,3 @@
-import { Constants } from '../src/constants';
 import { VivosTower } from '../src/vivos.tower';
 
 const itif = (condition: boolean) => condition ? it : it.skip;
@@ -8,11 +7,7 @@ describe('VivosTower', () => {
   let vivos: VivosTower;
 
   beforeEach(() => {
-    const ctx = {
-      OPEN_API_FILE: Constants.DEFAULTS.TOWER_API_FILE,
-      OPEN_API_URL: Constants.DEFAULTS.TOWER_API_URL,
-    };
-    vivos = new VivosTower({ name: 'VivosTowerTest' }, ctx);
+    vivos = new VivosTower({ name: 'VivosTowerTest' }, {});
   });
 
   it('should be able to get envars', async () => {
@@ -62,9 +57,15 @@ describe('VivosTower', () => {
     expect(params).toContain(pipeline);
   });
 
+  it('should return the package name from the filename', () => {
+    const filename = '.quilt/named_packages/a/b/c';
+    const packageName = vivos.getPackageFromFilename(filename);
+    expect(packageName).toBe('a/b');
+  });
+
   // itif(hasOutput)
   it.skip('should launch a workflow', async () => {
-    const pipeline = 'nf-core/hlatyping'; // vivos.get('TOWER_TEST_PIPELINE');
+    const pipeline = vivos.get('TOWER_TEST_PIPELINE'); // 'nf-core/hlatyping'; // 'quiltdata/nf-quilt';
     const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
     const launchOptions = vivos.launch_options(pipeline, bucket);
     const workflowId = await vivos.launch(launchOptions);

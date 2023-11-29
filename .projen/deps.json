@@ -67,6 +67,10 @@
       "type": "build"
     },
     {
+      "name": "@aws-sdk/client-sns",
+      "type": "runtime"
+    },
+    {
       "name": "@types/js-yaml",
       "type": "runtime"
     },
