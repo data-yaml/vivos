@@ -13,7 +13,7 @@ export type WorkflowLaunchRequest = Components.Schemas.WorkflowLaunchRequest;
 
 export class VivosTower extends Vivos {
 
-  public static env = [
+  public static ENVARS = [
     'TOWER_ACCESS_TOKEN',
     'TOWER_COMPUTE_ENV_ID',
     'TOWER_OUTPUT_BUCKET',
@@ -34,10 +34,10 @@ export class VivosTower extends Vivos {
     this.api_key = this.get('TOWER_ACCESS_TOKEN');
     this.workspaceId = this.get('TOWER_WORKSPACE_ID');
     this.computeEnvId = this.get('TOWER_COMPUTE_ENV_ID');
-    this.event_bucket = Constants.getKeyPathFromObject(event, 'Records[0].s3.bucket.name');
-    this.event_object = Constants.getKeyPathFromObject(event, 'Records[0].s3.object.key');
+    this.event_bucket = Constants.GetKeyPathFromObject(event, 'Records[0].s3.bucket.name');
+    this.event_object = Constants.GetKeyPathFromObject(event, 'Records[0].s3.object.key');
     const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
-    this.entry_data = this.event_object ? Constants.loadObjectURI(entry_uri) : {};
+    this.entry_data = this.event_object ? Constants.LoadObjectURI(entry_uri) : {};
   }
 
   public async getTowerClient(): Promise<TowerClient> {
@@ -82,12 +82,12 @@ export class VivosTower extends Vivos {
   }
 
   public getPipeline(): string {
-    const pipeline = Constants.getKeyPathFromObject(this.entry_data, 'fields.Pipeline.value');
+    const pipeline = Constants.GetKeyPathFromObject(this.entry_data, 'fields.Pipeline.value');
     return pipeline || this.get('TOWER_DEFAULT_PIPELINE');
   }
 
   public getStatus(): string {
-    const status = Constants.getKeyPathFromObject(this.entry_data, 'fields.Status.value');
+    const status = Constants.GetKeyPathFromObject(this.entry_data, 'fields.Status.value');
     return status || 'unknown';
   }
 
@@ -107,7 +107,7 @@ export class VivosTower extends Vivos {
       computeEnvId: this.computeEnvId,
       workspaceId: this.workspaceId,
     };
-    return Constants.loadPipeline(pipeline, env) as WorkflowLaunchRequest;
+    return Constants.LoadPipeline(pipeline, env) as WorkflowLaunchRequest;
   }
 
   public async launch(launchOptions: WorkflowLaunchRequest): Promise<string> {

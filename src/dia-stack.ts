@@ -28,7 +28,7 @@ export interface DiaStackProps extends StackProps {
 
 export class DiaStack extends Stack {
 
-  public static defaultProps(context: any = {}): DiaStackProps {
+  public static DefaultProps(context: any = {}): DiaStackProps {
     const cc = new Constants(context);
     const props = cc.defaultProps();
     props.bucketURI = cc.get('TOWER_OUTPUT_BUCKET');

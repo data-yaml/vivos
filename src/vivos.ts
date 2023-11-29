@@ -4,7 +4,7 @@ import { Constants } from './constants';
 
 export class Vivos {
 
-  public static env = [
+  public static ENVARS = [
     'OPEN_API_FILE',
     'OPEN_API_KEY',
     'OPEN_API_URL',
@@ -67,7 +67,7 @@ export class Vivos {
   }
 
   public loadApi(filename: string): OpenAPIClientAxios {
-    const yaml_doc = Constants.loadObjectFile(filename) as Document;
+    const yaml_doc = Constants.LoadObjectFile(filename) as Document;
     let options = {
       definition: yaml_doc,
       axiosConfigDefaults: {},

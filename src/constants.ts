@@ -25,11 +25,11 @@ export class Constants {
   };
 
 
-  public static async loadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {
+  public static async LoadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {
     const split = uri.split('://');
     const scheme = split[0];
     if (!scheme || scheme === '' || scheme === 'file') {
-      return Constants.loadObjectFile(uri, env);
+      return Constants.LoadObjectFile(uri, env);
     }
     if (scheme !== 's3') {
       throw new Error(`Unsupported scheme: ${scheme}`);
@@ -46,16 +46,16 @@ export class Constants {
     };
     const data = await s3.getObject(params).promise();
     const extension = file.split('.').pop()?.toLowerCase();
-    return Constants.loadObjectData(data.Body!.toString(), extension!, env);
+    return Constants.LoadObjectData(data.Body!.toString(), extension!, env);
   }
 
-  public static loadObjectFile(filePath: string, env: object = {}): KeyedConfig {
+  public static LoadObjectFile(filePath: string, env: object = {}): KeyedConfig {
     var fileData = readFileSync(filePath, 'utf-8');
     const fileExtension = filePath.split('.').pop()?.toLowerCase();
-    return Constants.loadObjectData(fileData, fileExtension!, env);
+    return Constants.LoadObjectData(fileData, fileExtension!, env);
   }
 
-  public static loadObjectData(data: string, extension: string, env: object = {}): KeyedConfig {
+  public static LoadObjectData(data: string, extension: string, env: object = {}): KeyedConfig {
     if (Object.keys(env).length > 0) {
       const template = handlebars.compile(data);
       data = template(env);
@@ -70,19 +70,19 @@ export class Constants {
     }
   }
 
-  public static loadPipeline(pipeline: string, env: any = {}) {
+  public static LoadPipeline(pipeline: string, env: any = {}) {
     if (typeof env.package !== 'string' || env.package === '') {
       env.package = pipeline;
     }
     const paramsFile = `./config/${pipeline}/params.json`;
     const launchFile = `./config/${pipeline}/launch.json`;
-    const params = Constants.loadObjectFile(paramsFile, env);
-    const launch = Constants.loadObjectFile(launchFile, env);
+    const params = Constants.LoadObjectFile(paramsFile, env);
+    const launch = Constants.LoadObjectFile(launchFile, env);
     launch.paramsText = JSON.stringify(params);
     return launch;
   }
 
-  public static getKeyPathFromObject(object: any, keyPath: string): any {
+  public static GetKeyPathFromObject(object: any, keyPath: string): any {
     const keys = keyPath.split('.');
     let value = object;
     for (const key of keys) {
@@ -94,10 +94,10 @@ export class Constants {
     return value;
   }
 
-  public static getKeyPathFromFile(filePath: string, keyPath: string): any {
+  public static GetKeyPathFromFile(filePath: string, keyPath: string): any {
     try {
-      const object = Constants.loadObjectFile(filePath);
-      return Constants.getKeyPathFromObject(object, keyPath);
+      const object = Constants.LoadObjectFile(filePath);
+      return Constants.GetKeyPathFromObject(object, keyPath);
     } catch (e: any) {
       console.error(e.message);
       return undefined;

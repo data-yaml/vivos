@@ -16,31 +16,31 @@ describe('Constants', () => {
     };
   });
 
-  describe('loadObjectURI', () => {
+  describe('LoadObjectURI', () => {
     it('should load object URI correctly', async () => {
       const uri = 's3://quilt-example/akarve/covid-directory/vega.json';
-      const result = await Constants.loadObjectURI(uri);
+      const result = await Constants.LoadObjectURI(uri);
       expect(result).toBeDefined();
       expect(result).toHaveProperty('config');
     });
 
     it('should throw an error if the object URI is invalid', async () => {
       const nonExistentURI = 'https://quilt-example.com';
-      await expect(Constants.loadObjectURI(nonExistentURI)).rejects.toThrow();
+      await expect(Constants.LoadObjectURI(nonExistentURI)).rejects.toThrow();
     });
   });
 
-  describe('loadObjectFile', () => {
+  describe('LoadObjectFile', () => {
     it('should load object file correctly', () => {
-      const result = Constants.loadObjectFile(param_file);
+      const result = Constants.LoadObjectFile(param_file);
       expect(result.outdir).toContain('{{ bucket }}');
     });
     it('should expand environment variables', () => {
-      const result = Constants.loadObjectFile(param_file, env);
+      const result = Constants.LoadObjectFile(param_file, env);
       expect(result.outdir).toContain(env.bucket);
     });
     it('should load the pipeline correctly', () => {
-      const result = Constants.loadPipeline(pipeline, env);
+      const result = Constants.LoadPipeline(pipeline, env);
       expect(result).toBeDefined();
       expect(result.pipeline).toContain(pipeline);
       expect(result.computeEnvId).toContain(env.computeEnvId);
@@ -48,7 +48,7 @@ describe('Constants', () => {
     });
     it('should throw an error if the pipeline is not found', () => {
       const non_pipeline = 'nonexistent-pipeline';
-      const action = () => Constants.loadPipeline(non_pipeline, env);
+      const action = () => Constants.LoadPipeline(non_pipeline, env);
       expect(action).toThrow();
     });
   });
@@ -71,10 +71,10 @@ describe('Constants', () => {
     expect(result).toEqual(value);
   });
 
-  describe('getKeyPathFromFile', () => {
+  describe('GetKeyPathFromFile', () => {
     function checkKeyPathValue(keyPath: string, value: string) {
       const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
-      const result = Constants.getKeyPathFromFile(filePath, keyPath);
+      const result = Constants.GetKeyPathFromFile(filePath, keyPath);
       expect(result).toEqual(value);
     }
 
@@ -86,14 +86,14 @@ describe('Constants', () => {
     it('should return undefined if the key path does not exist', () => {
       const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
       const keyPath = 'undefined.Pipeline.value';
-      const result = Constants.getKeyPathFromFile(filePath, keyPath);
+      const result = Constants.GetKeyPathFromFile(filePath, keyPath);
       expect(result).toBeUndefined();
     });
 
     it('should return undefined if the file does not exist', () => {
       const filePath = './test/data/nonExistentFile.json';
       const keyPath = 'id';
-      const result = Constants.getKeyPathFromFile(filePath, keyPath);
+      const result = Constants.GetKeyPathFromFile(filePath, keyPath);
       expect(result).toBeUndefined();
     });
   });

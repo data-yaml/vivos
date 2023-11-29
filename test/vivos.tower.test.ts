@@ -11,7 +11,7 @@ describe('VivosTower', () => {
   });
 
   it('should be able to get envars', async () => {
-    for (const key of VivosTower.env) {
+    for (const key of VivosTower.ENVARS) {
       expect(vivos.get(key)).toBeDefined();
     }
   });

@@ -9,7 +9,7 @@ export type Field = Components.Schemas.Field;
 
 export class VivosBenchling extends Vivos {
 
-  public static env = [
+  public static ENVARS = [
     'BENCHLING_ACCESS_TOKEN',
     'BENCHLING_TENANT',
     'BENCHLING_OUTPUT_BUCKET',
@@ -23,8 +23,8 @@ export class VivosBenchling extends Vivos {
     context.OPEN_API_URL = Constants.DEFAULTS.BENCHLING_API_URL;
     super(event, context);
     this.api_key = this.get('BENCHLING_ACCESS_TOKEN');
-    this.event_bucket = this.cc.getKeyPathFromObject(event, 'Records[0].s3.bucket.name');
-    this.event_object = this.cc.getKeyPathFromObject(event, 'Records[0].s3.object.key');
+    this.event_bucket = Constants.GetKeyPathFromObject(event, 'Records[0].s3.bucket.name');
+    this.event_object = Constants.GetKeyPathFromObject(event, 'Records[0].s3.object.key');
   }
 
   public async getBenchlingClient(): Promise<BenchlingClient> {
