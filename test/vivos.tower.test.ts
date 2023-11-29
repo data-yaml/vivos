@@ -41,7 +41,7 @@ describe('VivosTower', () => {
   });
 
   it('should generate valid launch_options', async () => {
-    const pipeline = vivos.get('TOWER_TEST_PIPELINE');
+    const pipeline = vivos.get('TOWER_DEFAULT_PIPELINE');
     const bucket = 's3://quilt-example';
     const launchOptions = vivos.launch_options(pipeline, bucket);
     expect(launchOptions).toBeDefined();
@@ -65,7 +65,7 @@ describe('VivosTower', () => {
 
   // itif(hasOutput)
   it.skip('should launch a workflow', async () => {
-    const pipeline = vivos.get('TOWER_TEST_PIPELINE'); // 'nf-core/hlatyping'; // 'quiltdata/nf-quilt';
+    const pipeline = vivos.get('TOWER_DEFAULT_PIPELINE'); // 'nf-core/hlatyping'; // 'quiltdata/nf-quilt';
     const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
     const launchOptions = vivos.launch_options(pipeline, bucket);
     const workflowId = await vivos.launch(launchOptions);

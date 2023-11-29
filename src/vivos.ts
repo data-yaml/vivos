@@ -42,6 +42,9 @@ export class Vivos {
 
   // log message to STATUS_TOPIC_ARN if defined
   public async log(message: string): Promise<void> {
+    if (typeof message !== 'string' || message === '') {
+      return;
+    }
     console.debug(`log[${message}]`);
     const topic_arn = this.cc.get('STATUS_TOPIC_ARN');
     if (typeof topic_arn !== 'string' || topic_arn === '') {

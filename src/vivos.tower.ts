@@ -86,6 +86,10 @@ export class VivosTower extends Vivos {
   }
 
   public getPipeline(bucket: string): string {
+    if (!this.event_object || this.event_object === '') {
+      console.warn('Event object not specified');
+      return this.get('TOWER_DEFAULT_PIPELINE');
+    }
     const packageName = this.getPackageFromFilename(this.event_object);
     const entry_uri = `s3://${bucket}/${packageName}/entry.json`;
     const pipeline = this.cc.getKeyPathFromFile(entry_uri, 'fields.Pipeline.value');

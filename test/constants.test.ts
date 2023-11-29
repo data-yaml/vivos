@@ -8,7 +8,7 @@ describe('Constants', () => {
 
   beforeEach(() => {
     constants = new Constants({});
-    pipeline = Constants.DEFAULTS.TOWER_TEST_PIPELINE;
+    pipeline = Constants.DEFAULTS.TOWER_DEFAULT_PIPELINE;
     param_file = `./config/${pipeline}/params.json`;
     env = {
       bucket: 's3://quilt-example',

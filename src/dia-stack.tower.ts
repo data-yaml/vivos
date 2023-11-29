@@ -5,7 +5,7 @@ export async function handler(event: any, context: any) {
 
   try {
     // Submit the workflow using Axios
-    const options = vivos.launch_options('quiltdata/nf-quilt', vivos.get('TOWER_OUTPUT_BUCKET'));
+    const options = vivos.launch_options();
     await vivos.log(`VivosTower.handler.options: ${JSON.stringify(options)}`);
 
     const workflowId = await vivos.launch(options);
