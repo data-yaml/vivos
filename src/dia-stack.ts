@@ -129,7 +129,7 @@ export class DiaStack extends Stack {
       ],
     });
     console.debug(lambdaS3Policy.sid);
-    //lambdaRole.addToPolicy(lambdaS3Policy);
+    lambdaRole.addToPolicy(lambdaS3Policy);
     return lambdaRole;
   }
 
