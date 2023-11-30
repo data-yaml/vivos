@@ -98,6 +98,7 @@ export class DiaStack extends Stack {
       ...env,
     };
     return new NodejsFunction(this, name, {
+      description: `VIVOS ${name} Lambda`,
       runtime: Runtime.NODEJS_18_X,
       role: this.lambdaRole,
       timeout: Duration.seconds(60),
