@@ -1,6 +1,6 @@
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { Document, OpenAPIClientAxios, OpenAPIClient } from 'openapi-client-axios';
-import { Constants } from './constants';
+import { Constants, KeyedConfig } from './constants';
 
 export class Vivos {
 
@@ -43,6 +43,11 @@ export class Vivos {
 
   public client(): Promise<OpenAPIClient> {
     return this.api().getClient();
+  }
+
+  public async getEventObject(): Promise<KeyedConfig> {
+    const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
+    return Constants.LoadObjectURI(entry_uri);
   }
 
   // log message to STATUS_TOPIC_ARN if defined

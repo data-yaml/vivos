@@ -57,7 +57,6 @@ describe('VivosTower', () => {
     const pipeline = 'nf-core/hlatyping';
     const bucket = evivos.event_bucket;
     const launchOptions = await evivos.launch_options();
-    console.info(`Launch options: ${JSON.stringify(launchOptions)}`);
     expect(launchOptions).toBeDefined();
     expect(launchOptions.computeEnvId).toBe(evivos.get('TOWER_COMPUTE_ENV_ID'));
     expect(launchOptions.configProfiles).toEqual(['test_full']);

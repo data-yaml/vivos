@@ -36,9 +36,9 @@ export class VivosBenchling extends Vivos {
     return client;
   }
 
-  public getParams(): KeyedConfig {
+  public async getParams(): Promise<KeyedConfig> {
     if (this.event_object.includes(this.get('TOWER_OUTPUT_FILE'))) {
-      return Constants.LoadObjectFile(this.event_object);
+      return this.getEventObject();
     }
     throw `getParams not found in: ${this.event_object}`;
   }

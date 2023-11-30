@@ -8,8 +8,27 @@ describe('VivosBenchling', () => {
   let entry: Entry;
 
   beforeEach(() => {
-    vivos = new VivosBenchling({}, {});
+    const event = Constants.LoadObjectFile('test/data/event-params.json');
+    vivos = new VivosBenchling(event, {});
     entry = Constants.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
+  });
+
+  it('should getParams', async () => {
+    const params = await vivos.getParams();
+    expect(params).toBeDefined();
+    expect(params).toHaveProperty('outdir');
+  });
+
+  it('should getReportURL', () => {
+    const url = vivos.getReportURL();
+    expect(url).toBeDefined();
+    expect(url).toEqual('https://demo.quiltdata.com/b/nf-core-gallery/packages/quiltdata/nf-quilt/latest/tree/multiqc/multiqc_report.html');
+  });
+
+  it('should return toDict', () => {
+    const dict = vivos.toDict();
+    expect(dict).toBeDefined();
+    expect(dict).toHaveProperty('event_object');
   });
 
   describe('getEntry', () => {

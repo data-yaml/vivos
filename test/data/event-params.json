@@ -9,11 +9,11 @@
             "s3": {
                 "s3SchemaVersion": "1.0",
                 "bucket": {
-                    "name": "bucket-name",
+                    "name": "nf-core-gallery",
                     "arn": "bucket-ARN"
                 },
                 "object": {
-                    "key": "pkg/name/nf-quilt/params.json",
+                    "key": "quiltdata/nf-quilt/nf-quilt/params.json",
                     "size": 12345,
                     "eTag": "object-eTag",
                     "versionId": "object-version-id"
