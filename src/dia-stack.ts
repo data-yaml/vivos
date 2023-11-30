@@ -16,7 +16,9 @@ import {
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
-import { Constants } from './constants';
+import { Constants, KeyedConfig } from './constants';
+import { VivosBenchling } from './vivos.benchling';
+import { VivosTower } from './vivos.tower';
 
 
 export interface DiaStackProps extends StackProps {
@@ -28,7 +30,7 @@ export interface DiaStackProps extends StackProps {
 
 export class DiaStack extends Stack {
 
-  public static defaultProps(context: any = {}): DiaStackProps {
+  public static DefaultProps(context: any = {}): DiaStackProps {
     const cc = new Constants(context);
     const props = cc.defaultProps();
     props.bucketURI = cc.get('TOWER_OUTPUT_BUCKET');
@@ -59,24 +61,35 @@ export class DiaStack extends Stack {
     this.statusTopic.grantPublish(servicePrincipal);
     this.statusTopic.grantPublish(this.principal);
 
-    const eventSource = new S3EventSource(this.bucket, {
+    const inputSource = new S3EventSource(this.bucket, {
       events: [EventType.OBJECT_CREATED],
-      filters: [{ prefix: Constants.DEFAULTS.TOWER_INPUT_PREFIX }],
+      filters: [{ suffix: Constants.DEFAULTS.TOWER_INPUT_FILE }],
     });
-    const towerLambda = this.makeLambda('tower', {});
-    console.debug(towerLambda.stack.templateFile);
-    console.debug(eventSource);
-    towerLambda.addEventSource(eventSource);
+    const launchLambda = this.makeLambda('launch', {});
+    launchLambda.addEventSource(inputSource);
+
+    const outputSource = new S3EventSource(this.bucket, {
+      events: [EventType.OBJECT_CREATED],
+      filters: [{ suffix: Constants.DEFAULTS.TOWER_OUTPUT_FILE }],
+    });
+
+    const successLambda = this.makeLambda('success', {});
+    successLambda.addEventSource(outputSource);
   }
 
   private makeLambda(name: string, env: object) {
-    const default_env = {
+    const default_env: KeyedConfig = {
+      LOG_LEVEL: 'ALL',
       STATUS_TOPIC_ARN: this.statusTopic.topicArn,
       TOWER_OUTPUT_BUCKET: this.bucketURI,
-      LOG_LEVEL: 'ALL',
     };
     // create merged env
-    const final_env = Object.assign(default_env, env);
+    const final_env = {
+      ...default_env,
+      ...Constants.MapEnvars(VivosTower.ENVARS),
+      ...Constants.MapEnvars(VivosBenchling.ENVARS),
+      ...env,
+    };
     return new NodejsFunction(this, name, {
       runtime: Runtime.NODEJS_18_X,
       role: this.lambdaRole,
@@ -98,13 +111,14 @@ export class DiaStack extends Stack {
     });
 
     const lambdaS3Policy = new PolicyStatement({
+      sid: 'VivosLambdaS3Policy',
       actions: ['s3:ListBucket', 's3:GetObject', 's3:PutObject'],
       resources: [
         this.bucket.bucketArn,
         this.bucket.bucketArn + '/*',
       ],
     });
-    console.debug(lambdaS3Policy);
+    console.debug(lambdaS3Policy.sid);
     //lambdaRole.addToPolicy(lambdaS3Policy);
     return lambdaRole;
   }

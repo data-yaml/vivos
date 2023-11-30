@@ -1,16 +1,18 @@
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { Document, OpenAPIClientAxios, OpenAPIClient } from 'openapi-client-axios';
-import { Constants } from './constants';
+import { Constants, KeyedConfig } from './constants';
 
 export class Vivos {
 
-  public static env = [
+  public static ENVARS = [
     'OPEN_API_FILE',
     'OPEN_API_KEY',
     'OPEN_API_URL',
     'STATUS_TOPIC_ARN',
   ];
 
+  public readonly event_bucket: string;
+  public readonly event_object: string;
   protected event: any;
   protected cc: Constants;
   protected api_file: string;
@@ -21,6 +23,9 @@ export class Vivos {
 
   constructor(event: any, context: any) {
     this.event = event;
+    const records = event.Records;
+    this.event_bucket = (records) ? records[0].s3.bucket.name : '';
+    this.event_object = (records) ? records[0].s3.object.key : '';
     this.cc = new Constants(context);
     this._api = undefined;
     this.api_file = this.get('OPEN_API_FILE');
@@ -40,8 +45,16 @@ export class Vivos {
     return this.api().getClient();
   }
 
+  public async getEventObject(): Promise<KeyedConfig> {
+    const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
+    return Constants.LoadObjectURI(entry_uri);
+  }
+
   // log message to STATUS_TOPIC_ARN if defined
   public async log(message: string): Promise<void> {
+    if (typeof message !== 'string' || message === '') {
+      return;
+    }
     console.debug(`log[${message}]`);
     const topic_arn = this.cc.get('STATUS_TOPIC_ARN');
     if (typeof topic_arn !== 'string' || topic_arn === '') {
@@ -52,8 +65,7 @@ export class Vivos {
       TopicArn: topic_arn,
     };
     const command = new PublishCommand(params);
-    const response = await this.sns_client.send(command);
-    console.debug(response);
+    await this.sns_client.send(command);
   }
 
   public get(key: string): string {
@@ -64,8 +76,12 @@ export class Vivos {
     return value;
   }
 
+  protected tokenType(): string {
+    return 'Bearer';
+  }
+
   public loadApi(filename: string): OpenAPIClientAxios {
-    const yaml_doc = Constants.loadObjectFile(filename) as Document;
+    const yaml_doc = Constants.LoadObjectFile(filename) as Document;
     let options = {
       definition: yaml_doc,
       axiosConfigDefaults: {},
@@ -74,7 +90,7 @@ export class Vivos {
       options.axiosConfigDefaults= {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${this.api_key}`,
+          Authorization: `${this.tokenType()} ${this.api_key}`,
         },
       };
     }
@@ -95,7 +111,7 @@ export class Vivos {
       const response = await client.post(path, params);
       return response;
     } catch (e: any) {
-      console.log(this, e);
+      console.error(this, e);
       throw `Failed to invoke POST ${path} with ${params}`;
     }
   }
@@ -106,7 +122,7 @@ export class Vivos {
       const response = await client.get(path);
       return response;
     } catch (e: any) {
-      console.log(this, e);
+      console.error(this, e);
       throw `Failed to invoke GET ${path}`;
     }
   }

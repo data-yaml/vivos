@@ -4,7 +4,7 @@ import { DiaStack } from '../src/dia-stack';
 
 test('Snapshot', () => {
   const app = new App();
-  const stack = new DiaStack(app, 'test', DiaStack.defaultProps());
+  const stack = new DiaStack(app, 'test', DiaStack.DefaultProps());
 
   const template = Template.fromStack(stack);
   expect(template.toJSON()).toMatchSnapshot();

@@ -29,16 +29,21 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 });
 project.tryFindObjectFile('.github/workflows/build.yml')!.addOverride('jobs.build.env', {
   CI: 'true',
-  TOWER_ACCESS_TOKEN: '${{ secrets.TOWER_ACCESS_TOKEN }}',
-  TOWER_COMPUTE_ENV_ID: '${{ secrets.TOWER_COMPUTE_ENV_ID }}',
-  TOWER_WORKSPACE_ID: '${{ secrets.TOWER_WORKSPACE_ID }}',
-  TOWER_OUTPUT_BUCKET: '${{ secrets.TOWER_OUTPUT_BUCKET }}',
   AWS_ACCESS_KEY_ID: '${{ secrets.AWS_ACCESS_KEY_ID }}',
   AWS_SECRET_ACCESS_KEY: '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
   AWS_DEFAULT_REGION: '${{ secrets.AWS_DEFAULT_REGION }}',
+  BENCHLING_ACCESS_KEY: '${{ secrets.BENCHLING_ACCESS_KEY }}',
+  BENCHLING_TENANT: '${{ secrets.BENCHLING_TENANT }}',
   CDK_DEFAULT_ACCOUNT: '${{ secrets.AWS_ACCOUNT_ID }}',
   CDK_DEFAULT_REGION: '${{ secrets.AWS_DEFAULT_REGION }}',
   CDK_DEFAULT_EMAIL: '${{ secrets.CDK_DEFAULT_EMAIL }}',
+  TOWER_ACCESS_TOKEN: '${{ secrets.TOWER_ACCESS_TOKEN }}',
+  TOWER_COMPUTE_ENV_ID: '${{ secrets.TOWER_COMPUTE_ENV_ID }}',
+  TOWER_OUTPUT_BUCKET: '${{ secrets.TOWER_OUTPUT_BUCKET }}',
+  TOWER_ORG: '${{ secrets.TOWER_ORG }}',
+  TOWER_WORKSPACE: '${{ secrets.TOWER_WORKSPACE }}',
+  TOWER_WORKSPACE_ID: '${{ secrets.TOWER_WORKSPACE_ID }}',
+  QUILT_CATALOG_DOMAIN: '${{ secrets.QUILT_CATALOG_DOMAIN }}',
 });
 // Fix Jest 29 warning about deprecated config in `globals`
 project.jest!.config.transform ??= {};

@@ -1,17 +1,28 @@
+import { IT } from './helpers';
+import { Constants } from '../src/constants';
 import { VivosTower } from '../src/vivos.tower';
-
-const itif = (condition: boolean) => condition ? it : it.skip;
-const itifhas = (key: string) => itif(process.env[key] !== undefined);
 
 describe('VivosTower', () => {
   let vivos: VivosTower;
 
   beforeEach(() => {
-    vivos = new VivosTower({ name: 'VivosTowerTest' }, {});
+    vivos = new VivosTower({
+      name: 'VivosTowerTest',
+    }, {
+      TOWER_ORG: 'nf-core',
+      TOWER_WORKSPACE: 'hackathon',
+    });
+  });
+
+  it('should get the Tower URL', async () => {
+    const id = '1234567890';
+    const url = vivos.getTowerURL(id);
+    expect(url).toBeDefined();
+    expect(url).toEqual(`https://tower.nf/orgs/nf-core/workspaces/hackathon/watch/${id}`);
   });
 
   it('should be able to get envars', async () => {
-    for (const key of VivosTower.env) {
+    for (const key of VivosTower.ENVARS) {
       expect(vivos.get(key)).toBeDefined();
     }
   });
@@ -33,44 +44,47 @@ describe('VivosTower', () => {
     expect(workflows.length).toBeGreaterThan(0);
   });
 
-  itifhas('TOWER_TEST_WORKFLOW_ID')('should describe a workflow', async () => {
-    const workflowId = vivos.get('TOWER_TEST_WORKFLOW_ID');
+  IT.ifhas('TOWER_WORKFLOW_TEST')('should describe a workflow', async () => {
+    const workflowId = vivos.get('TOWER_WORKFLOW_TEST');
     const description = await vivos.describe(workflowId);
     expect(description).toBeDefined();
     expect(description.workflow.id).toBe(workflowId);
   });
 
   it('should generate valid launch_options', async () => {
-    const pipeline = vivos.get('TOWER_TEST_PIPELINE');
-    const bucket = 's3://quilt-example';
-    const launchOptions = vivos.launch_options(pipeline, bucket);
+    const event = Constants.LoadObjectFile('test/data/event-entry.json');
+    const evivos = new VivosTower(event, {});
+    const pipeline = 'nf-core/hlatyping';
+    const bucket = evivos.event_bucket;
+    const launchOptions = await evivos.launch_options();
     expect(launchOptions).toBeDefined();
-    expect(launchOptions.computeEnvId).toBe(vivos.get('TOWER_COMPUTE_ENV_ID'));
-    expect(launchOptions.configProfiles).toEqual(['standard']);
+    expect(launchOptions.computeEnvId).toBe(evivos.get('TOWER_COMPUTE_ENV_ID'));
+    expect(launchOptions.configProfiles).toEqual(['test_full']);
     expect(launchOptions.configText).toBe("plugins = ['nf-quilt']");
     expect(launchOptions.pipeline).toContain(pipeline);
-    expect(launchOptions.revision).toBe('main');
-    expect(launchOptions.workDir).toEqual(bucket);
+    expect(launchOptions.revision).toBe('master');
+    expect(launchOptions.workDir).toContain(bucket);
 
     const params = launchOptions.paramsText!;
     expect(params).toContain(bucket);
     expect(params).toContain(pipeline);
-  });
 
-  it('should return the package name from the filename', () => {
-    const filename = '.quilt/named_packages/a/b/c';
-    const packageName = vivos.getPackageFromFilename(filename);
-    expect(packageName).toBe('a/b');
+    const status = await evivos.getStatus();
+    expect(status).toBeDefined();
+
+    const dict = evivos.toDict();
+    expect(dict).toBeDefined();
+    expect(dict.event).toEqual(event);
   });
 
   // itif(hasOutput)
-  it.skip('should launch a workflow', async () => {
-    const pipeline = vivos.get('TOWER_TEST_PIPELINE'); // 'nf-core/hlatyping'; // 'quiltdata/nf-quilt';
+  IT.ifhas('LAUNCH_WORKFLOWS')('should launch a workflow', async () => {
+    const pipeline = vivos.get('TOWER_DEFAULT_PIPELINE'); // 'nf-core/hlatyping'; // 'quiltdata/nf-quilt';
     const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
-    const launchOptions = vivos.launch_options(pipeline, bucket);
+    const launchOptions = await vivos.launch_options(pipeline, bucket);
     const workflowId = await vivos.launch(launchOptions);
     expect(workflowId).toBeDefined();
-    console.debug(`Launched workflow: ${workflowId}`);
+    console.info(`Launched workflow: ${workflowId}`);
     /*
     const status = await vivos.cancel(workflowId);
     expect(status).toBeDefined();
