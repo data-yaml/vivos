@@ -98,14 +98,18 @@ export class Constants {
     }
   }
 
-  public static async LoadPipeline(pipeline: string, env: any = {}, base = './config') {
+  public static async LoadPipeline(pipeline: string, env: any = {}) {
+    var base = './config'
     if (typeof env.package !== 'string' || env.package === '') {
       env.package = pipeline;
     }
+    if (typeof env.base_config === 'string' && env.base_config !== '') {
+      base = env.base_config;
+    }
     const paramsFile = `${base}/${pipeline}/params.json`;
     const launchFile = `${base}/${pipeline}/launch.json`;
-    const params = Constants.LoadObjectFile(paramsFile, env);
-    const launch = Constants.LoadObjectFile(launchFile, env);
+    const params = await Constants.LoadObjectURI(paramsFile, env);
+    const launch = await Constants.LoadObjectURI(launchFile, env);
     launch.paramsText = JSON.stringify(params);
     return launch;
   }
