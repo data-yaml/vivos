@@ -31,8 +31,8 @@ describe('VivosTower', () => {
     expect(workflows.length).toBeGreaterThan(0);
   });
 
-  IT.ifhas('TOWER_TEST_WORKFLOW_ID')('should describe a workflow', async () => {
-    const workflowId = vivos.get('TOWER_TEST_WORKFLOW_ID');
+  IT.ifhas('TOWER_WORKFLOW_TEST')('should describe a workflow', async () => {
+    const workflowId = vivos.get('TOWER_WORKFLOW_TEST');
     const description = await vivos.describe(workflowId);
     expect(description).toBeDefined();
     expect(description.workflow.id).toBe(workflowId);

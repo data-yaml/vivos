@@ -6,8 +6,10 @@ import { Vivos } from './vivos';
 export type Entry = Components.Schemas.Entry;
 export type EntryById = Components.Schemas.EntryById;
 export type EntrySchema = Components.Schemas.EntrySchema;
+export type EntryUpdate = Components.Schemas.EntryUpdate;
 export type Field = Components.Schemas.Field;
 export type TokenResponse = Components.Schemas.TokenResponse;
+export type KeyedFields = { [name: string]: Field };
 
 export class VivosBenchling extends Vivos {
 
@@ -50,10 +52,26 @@ export class VivosBenchling extends Vivos {
     }
   }
 
+  public mapFields(fields: KeyedConfig): KeyedFields {
+    const values: KeyedFields = {};
+    for (const key in fields) {
+      const value = fields[key];
+      const item = { value: value } as Field;
+      values[key] = item;
+    }
+    return values;
+  }
+
   public async updateEntry(entry: Entry, fields: KeyedConfig): Promise<Entry> {
-    const client = await this.getBenchlingClient();
-    const updated = await client.updateEntry(entry.id, fields) as AxiosResponse<Entry>;
-    return updated.data;
+    try {
+      const client = await this.getBenchlingClient();
+      const update: EntryUpdate = { fields: this.mapFields(fields) };
+      const updated = await client.updateEntry(entry.id, update) as AxiosResponse<Entry>;
+      return updated.data;
+    } catch (e: any) {
+      console.error(e);
+      throw `Failed to update entry ${entry.id}`;
+    }
   }
 
   public toDict() {

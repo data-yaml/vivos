@@ -7,7 +7,6 @@ import yaml from 'js-yaml';
 export type KeyedConfig = {
   [key: string]: any;
 };
-
 export class Constants {
 
   public static DEFAULTS: { [key: string]: any } = {
