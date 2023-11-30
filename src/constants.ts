@@ -27,19 +27,22 @@ export class Constants {
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
 
-  public static MapEnvars(envars: string[]): KeyedConfig {
+  public static GET(key: string): any {
     const cc = new Constants({});
+    return cc.get(key);
+  }
+
+  public static MapEnvars(envars: string[]): KeyedConfig {
     const envs: KeyedConfig = {};
     envars.forEach((key: string) => {
-      envs[key] = cc.get(key);
+      envs[key] = Constants.GET(key);
     });
     return envs;
   }
 
   public static DefaultS3(region: string = '') {
-    const cc = new Constants({});
     if (region === '') {
-      region = cc.get('CDK_DEFAULT_REGION');
+      region = Constants.GET('CDK_DEFAULT_REGION');
     }
     const s3 = new S3Client({ region: region });
     return s3;

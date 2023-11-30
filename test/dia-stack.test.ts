@@ -3,7 +3,6 @@ import { Template } from 'aws-cdk-lib/assertions';
 import { ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { DiaStack, DiaStackProps } from '../src/dia-stack';
 
-
 describe('DiaStack', () => {
   test('Snapshot', () => {
     const app = new App();
@@ -54,4 +53,18 @@ describe('DiaStack', () => {
 
     expect(lambdaRole.assumeRoleAction).toEqual('sts:AssumeRole');
   });
+  test('statusTopic', () => {
+    const app = new App();
+    const stackProps: DiaStackProps = {
+      account: '123456789012',
+      region: 'us-east-1',
+      bucketURI: 's3://my-bucket',
+      email: ' ', // intentionally blank
+    };
+    const stack = new DiaStack(app, 'test', stackProps);
+    expect(stack.statusTopic).toBeDefined();
+    const topic = stack.statusTopic;
+    expect(topic.topicArn).toBeDefined();
+  });
+
 });

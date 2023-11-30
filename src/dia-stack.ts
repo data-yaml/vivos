@@ -46,8 +46,8 @@ export class DiaStack extends Stack {
   private readonly lambdaRole: Role;
   private readonly principal: AccountPrincipal;
   public readonly principals: { [key: string]: ServicePrincipal };
-  private readonly assets: { [key: string]: Asset };
-  private readonly statusTopic: Topic;
+  public readonly assets: { [key: string]: Asset };
+  public readonly statusTopic: Topic;
 
   constructor(scope: Construct, id: string, props: DiaStackProps) {
     super(scope, id, props);
@@ -137,10 +137,11 @@ export class DiaStack extends Stack {
         ),
       ],
     });
+    console.log(this.statusTopic);
     const lambdaSNSPolicy = new PolicyStatement({
       sid: 'VivosLambdaSNSPolicy',
       actions: ['sns:Publish'],
-      resources: [this.statusTopic.topicArn],
+      resources: [Constants.GET('STATUS_TOPIC_ARN')],
     });
     lambdaRole.addToPolicy(lambdaSNSPolicy);
     const lambdaS3Policy = new PolicyStatement({
