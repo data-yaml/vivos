@@ -16,6 +16,18 @@ describe('Constants', () => {
     };
   });
 
+  describe('GetPackageName', () => {
+    it('should return the package name from an absolute path', () => {
+      const filePath = '/GitHub/vivos/src/constants.ts';
+      const packageName = Constants.GetPackageName(filePath);
+      expect(packageName).toEqual('GitHub/vivos');
+    });
+    it('should return the package name from a relative path', () => {
+      const filePath = 'GitHub/vivos/src/constants.ts';
+      const packageName = Constants.GetPackageName(filePath);
+      expect(packageName).toEqual('GitHub/vivos');
+    });
+  });
   describe('LoadObjectURI', () => {
     it('should load object URI correctly', async () => {
       const uri = 's3://quilt-example/akarve/covid-directory/vega.json';

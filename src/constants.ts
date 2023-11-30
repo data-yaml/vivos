@@ -36,7 +36,8 @@ export class Constants {
 
   public static GetPackageName(filePath: string): string {
     // first two components, joined by a slash
-    const components = filePath.split('/').slice(0, 2);
+    const base = filePath.startsWith('/') ? 1 : 0;
+    const components = filePath.split('/').slice(base, base+2);
     return components.join('/');
   }
 
