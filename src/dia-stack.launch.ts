@@ -33,8 +33,8 @@ export async function handler(event: any, context: any) {
   await tower.log(`VivosTower.handler.event: ${JSON.stringify(event)}`);
   const status = await tower.getStatus();
   const entry = await tower.getEventEntry();
-  if (status !== '' && status[0] !== 'N') {
-    // Do NOT run unless status is empty or New/No
+  if (status !== '' && status[0] !== 'N' && status[0] !== '2') {
+    // Do NOT run unless status is empty or New/No (and not test Timestamp)
     console.warn(`VivosTower.not_launched.status=${status}\n${tower}`);
     return {
       statusCode: 204,

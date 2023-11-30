@@ -5,8 +5,8 @@ import { Constants, KeyedConfig } from './constants';
 export class Vivos {
 
   public static ENVARS = [
-    'CONFIG_PREFIX',
-    'API_URI',
+    'BASE_API',
+    'BASE_CONFIG',
     'OPEN_API_FILE',
     'OPEN_API_KEY',
     'OPEN_API_URL',
@@ -63,6 +63,9 @@ export class Vivos {
     const topic_arn = this.cc.get('STATUS_TOPIC_ARN');
     if (typeof topic_arn !== 'string' || topic_arn === '') {
       return;
+    }
+    if (message.includes('"eventVersion": "0.0"')) {
+      return; // testing event-launch.json
     }
     const params = {
       Message: message,

@@ -55,8 +55,7 @@ export class Constants {
   public static async LoadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {
     const split = uri.split('://');
     const scheme = split[0];
-    const start = uri[0];
-    if (!scheme || scheme === '' || scheme === 'file' || start === '/' || start == '.' ) {
+    if (!scheme || scheme === '' || scheme === 'file' || scheme[0] === '/' || scheme[0] == '.' ) {
       return Constants.LoadObjectFile(uri, env);
     }
     if (scheme !== 's3') {
@@ -99,12 +98,12 @@ export class Constants {
     }
   }
 
-  public static LoadPipeline(pipeline: string, env: any = {}) {
+  public static async LoadPipeline(pipeline: string, env: any = {}, base = './config') {
     if (typeof env.package !== 'string' || env.package === '') {
       env.package = pipeline;
     }
-    const paramsFile = `./config/${pipeline}/params.json`;
-    const launchFile = `./config/${pipeline}/launch.json`;
+    const paramsFile = `${base}/${pipeline}/params.json`;
+    const launchFile = `${base}/${pipeline}/launch.json`;
     const params = Constants.LoadObjectFile(paramsFile, env);
     const launch = Constants.LoadObjectFile(launchFile, env);
     launch.paramsText = JSON.stringify(params);

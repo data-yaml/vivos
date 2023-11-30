@@ -33,7 +33,7 @@ describe('Vivos', () => {
   });
 
   it('should load the config from a file', async () => {
-    const api_path = `${Constants.DEFAULTS.BASE_API}/${Constants.DEFAULTS.PETSTORE_API_FILE}}`;
+    const api_path = `${Constants.DEFAULTS.BASE_API}/${Constants.DEFAULTS.PETSTORE_API_FILE}`;
     const config = await Constants.LoadObjectURI(api_path);
     // Assert that the config is loaded correctly
     expect(config.info.title).toContain('Petstore');

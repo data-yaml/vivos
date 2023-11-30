@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { Duration, Stack, type StackProps } from 'aws-cdk-lib';
 import {
   AccountPrincipal,
@@ -13,13 +14,14 @@ import {
   Bucket,
   EventType,
 } from 'aws-cdk-lib/aws-s3';
+import { Asset } from 'aws-cdk-lib/aws-s3-assets';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
 import { Constants, KeyedConfig } from './constants';
+import { Vivos } from './vivos';
 import { VivosBenchling } from './vivos.benchling';
 import { VivosTower } from './vivos.tower';
-
 
 export interface DiaStackProps extends StackProps {
   readonly account: string;
@@ -43,7 +45,6 @@ export class DiaStack extends Stack {
   private readonly lambdaRole: Role;
   private readonly principal: AccountPrincipal;
   private readonly principals: { [key: string]: ServicePrincipal };
-  ;
   private readonly statusTopic: Topic;
 
   constructor(scope: Construct, id: string, props: DiaStackProps) {
@@ -57,6 +58,14 @@ export class DiaStack extends Stack {
     );
     this.lambdaRole = this.makeLambdaRole(this.principals.lambda);
 
+    const configAsset = new Asset(this, 'VivosConfigAsset', {
+      path: path.join(__dirname, '..', 'config'),
+    });
+    const apiAsset = new Asset(this, 'VivosApiAsset', {
+      path: path.join(__dirname, '..', 'api'),
+    });
+    console.debug(`apiAsset: ${apiAsset} vs configAsset: ${configAsset}`);
+
     this.statusTopic = new Topic(this, 'VivosStatusTopic', {
       displayName: 'VIVOS Status Topic',
     });
@@ -65,6 +74,7 @@ export class DiaStack extends Stack {
     );
     this.statusTopic.grantPublish(this.principal);
     for (const principal of Object.values(this.principals)) {
+      console.debug(`statusTopic.grantPublish ${principal.service}`);
       this.statusTopic.grantPublish(principal);
     }
 
@@ -93,6 +103,7 @@ export class DiaStack extends Stack {
     // create merged env
     const final_env = {
       ...default_env,
+      ...Constants.MapEnvars(Vivos.ENVARS),
       ...Constants.MapEnvars(VivosTower.ENVARS),
       ...Constants.MapEnvars(VivosBenchling.ENVARS),
       ...env,
@@ -123,7 +134,7 @@ export class DiaStack extends Stack {
 
     const lambdaS3Policy = new PolicyStatement({
       sid: 'VivosLambdaS3Policy',
-      actions: ['s3:ListBucket', 's3:GetObject', 's3:PutObject'],
+      actions: ['s3:ListBucket', 's3:GetObject', 's3:PutObject', 'SNS:Publish'],
       resources: [
         this.bucket.bucketArn,
         this.bucket.bucketArn + '/*',

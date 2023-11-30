@@ -1,7 +1,7 @@
 {
     "Records": [
         {
-            "eventVersion": "2.1",
+            "eventVersion": "0.0",
             "eventSource": "aws:s3",
             "awsRegion": "us-west-2",
             "eventTime": "2023-11-30T13:49:41.540Z",

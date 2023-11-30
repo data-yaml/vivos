@@ -132,7 +132,7 @@ export class VivosTower extends Vivos {
       computeEnvId: this.computeEnvId,
       benchling: await this.getBenchlingInfo(),
     };
-    return Constants.LoadPipeline(pipeline, env) as WorkflowLaunchRequest;
+    return await Constants.LoadPipeline(pipeline, env) as WorkflowLaunchRequest;
   }
 
   public async launch(launchOptions: WorkflowLaunchRequest): Promise<string> {
