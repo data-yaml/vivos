@@ -134,7 +134,7 @@ export class VivosTower extends Vivos {
     };
     const base_config = this.cc.get('BASE_CONFIG');
     if (typeof base_config === 'string') {
-      env['base_config'] = base_config;
+      env.base_config = base_config;
     }
     return await Constants.LoadPipeline(pipeline, env) as WorkflowLaunchRequest;
   }
