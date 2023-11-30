@@ -39,16 +39,23 @@ export class DiaStack extends Stack {
     return props as DiaStackProps;
   }
 
+  protected static ASSET_KEYS = ['config', 'api'];
   protected static PRINCIPAL_KEYS = ['events', 'lambda'];
   private readonly bucket: Bucket;
   private readonly bucketURI: string;
   private readonly lambdaRole: Role;
   private readonly principal: AccountPrincipal;
   private readonly principals: { [key: string]: ServicePrincipal };
+  private readonly assets: { [key: string]: Asset };
   private readonly statusTopic: Topic;
 
   constructor(scope: Construct, id: string, props: DiaStackProps) {
     super(scope, id, props);
+    this.assets = Object.fromEntries(
+      DiaStack.ASSET_KEYS.map(x => [x, new Asset(this, `Vivos_${x}_Asset`, {
+        path: path.join(__dirname, '..', x),
+      })]),
+    );
     this.bucketURI = props.bucketURI;
     const bucketName = this.bucketURI.split('/').pop()!;
     this.bucket = Bucket.fromBucketName(this, 'VivosOutputBucket', bucketName) as Bucket;
@@ -57,14 +64,6 @@ export class DiaStack extends Stack {
       DiaStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
     );
     this.lambdaRole = this.makeLambdaRole(this.principals.lambda);
-
-    const configAsset = new Asset(this, 'VivosConfigAsset', {
-      path: path.join(__dirname, '..', 'config'),
-    });
-    const apiAsset = new Asset(this, 'VivosApiAsset', {
-      path: path.join(__dirname, '..', 'api'),
-    });
-    console.debug(`apiAsset: ${apiAsset} vs configAsset: ${configAsset}`);
 
     this.statusTopic = new Topic(this, 'VivosStatusTopic', {
       displayName: 'VIVOS Status Topic',
@@ -100,9 +99,13 @@ export class DiaStack extends Stack {
       STATUS_TOPIC_ARN: this.statusTopic.topicArn,
       TOWER_OUTPUT_BUCKET: this.bucketURI,
     };
+    const asset_env: KeyedConfig = Object.fromEntries(
+      DiaStack.ASSET_KEYS.map(x => [x.toUpperCase(), this.assets[x].s3ObjectUrl]),
+    );
     // create merged env
     const final_env = {
       ...default_env,
+      ...asset_env,
       ...Constants.MapEnvars(Vivos.ENVARS),
       ...Constants.MapEnvars(VivosTower.ENVARS),
       ...Constants.MapEnvars(VivosBenchling.ENVARS),
