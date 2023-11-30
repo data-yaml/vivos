@@ -66,6 +66,10 @@ export class Vivos {
     return value;
   }
 
+  protected tokenType(): string {
+    return 'Bearer';
+  }
+
   public loadApi(filename: string): OpenAPIClientAxios {
     const yaml_doc = Constants.LoadObjectFile(filename) as Document;
     let options = {
@@ -76,7 +80,7 @@ export class Vivos {
       options.axiosConfigDefaults= {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${this.api_key}`,
+          Authorization: `${this.tokenType()} ${this.api_key}`,
         },
       };
     }

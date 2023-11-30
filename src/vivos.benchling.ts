@@ -4,6 +4,7 @@ import type { Client as BenchlingClient, Components } from './types/benchling';
 import { Vivos } from './vivos';
 
 export type Entry = Components.Schemas.Entry;
+export type EntryById = Components.Schemas.EntryById;
 export type EntrySchema = Components.Schemas.EntrySchema;
 export type Field = Components.Schemas.Field;
 export type TokenResponse = Components.Schemas.TokenResponse;
@@ -33,12 +34,16 @@ export class VivosBenchling extends Vivos {
     return client;
   }
 
+  protected tokenType(): string {
+    return 'Basic';
+  }
+
   // get an entry by id
   public async getEntry(id: string): Promise<Entry> {
     try {
       const client = await this.getBenchlingClient();
-      const response = await client.getEntry(id) as AxiosResponse<Entry>;
-      return response.data;
+      const response = await client.getEntry(id) as AxiosResponse<EntryById>;
+      return response.data.entry!;
     } catch (e: any) {
       console.error(e);
       throw `Failed to retrieve entry ${id}`;
