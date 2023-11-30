@@ -21,6 +21,7 @@ export class Constants {
     TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
     TOWER_INPUT_FILE: 'entry.json',
     TOWER_OUTPUT_FILE: 'nf-quilt/params.json',
+    TOWER_REPORT_FILE: 'multiqc/multiqc_report.html',
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
 
@@ -33,6 +34,11 @@ export class Constants {
     return envs;
   }
 
+  public static GetPackageName(filePath: string): string {
+    // first two components, joined by a slash
+    const components = filePath.split('/').slice(0, 2);
+    return components.join('/');
+  }
 
   public static async LoadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {
     const split = uri.split('://');

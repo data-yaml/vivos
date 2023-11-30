@@ -17,6 +17,7 @@ export class VivosBenchling extends Vivos {
     'BENCHLING_ACCESS_TOKEN',
     'BENCHLING_TENANT',
     'BENCHLING_OUTPUT_BUCKET',
+    'QUILT_CATALOG_DOMAIN',
   ];
 
   public static readonly FLD_TOWER_URL = 'Tower URL';
@@ -38,6 +39,19 @@ export class VivosBenchling extends Vivos {
   public async getBenchlingClient(): Promise<BenchlingClient> {
     const client = await this.api(true).init<BenchlingClient>();
     return client;
+  }
+
+  public getParams(): KeyedConfig {
+    if (this.event_object.includes(this.get('TOWER_OUTPUT_FILE'))) {
+      return Constants.LoadObjectFile(this.event_object);
+    }
+    throw `getParams not found in: ${this.event_object}`;
+  }
+
+  public getReportURL(): string {
+    const catalog = `https://${this.get('QUILT_CATALOG_DOMAIN')}`;
+    const pkg = Constants.GetPackageName(this.event_object);
+    return `${catalog}/b/${this.event_bucket}/packages/${pkg}/latest/tree/${this.get('TOWER_REPORT_FILE')}`;
   }
 
   protected tokenType(): string {

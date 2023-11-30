@@ -61,12 +61,20 @@ export class DiaStack extends Stack {
     this.statusTopic.grantPublish(servicePrincipal);
     this.statusTopic.grantPublish(this.principal);
 
-    const eventSource = new S3EventSource(this.bucket, {
+    const inputSource = new S3EventSource(this.bucket, {
       events: [EventType.OBJECT_CREATED],
       filters: [{ suffix: Constants.DEFAULTS.TOWER_INPUT_FILE }],
     });
-    const towerLambda = this.makeLambda('launch', {});
-    towerLambda.addEventSource(eventSource);
+    const launchLambda = this.makeLambda('launch', {});
+    launchLambda.addEventSource(inputSource);
+
+    const outputSource = new S3EventSource(this.bucket, {
+      events: [EventType.OBJECT_CREATED],
+      filters: [{ suffix: Constants.DEFAULTS.TOWER_OUTPUT_FILE }],
+    });
+
+    const successLambda = this.makeLambda('success', {});
+    successLambda.addEventSource(outputSource);
   }
 
   private makeLambda(name: string, env: object) {
