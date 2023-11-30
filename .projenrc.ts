@@ -43,6 +43,7 @@ project.tryFindObjectFile('.github/workflows/build.yml')!.addOverride('jobs.buil
   TOWER_ORG: '${{ secrets.TOWER_ORG }}',
   TOWER_WORKSPACE: '${{ secrets.TOWER_WORKSPACE }}',
   TOWER_WORKSPACE_ID: '${{ secrets.TOWER_WORKSPACE_ID }}',
+  QUILT_CATALOG_DOMAIN: '${{ secrets.QUILT_CATALOG_DOMAIN }}',
 });
 // Fix Jest 29 warning about deprecated config in `globals`
 project.jest!.config.transform ??= {};

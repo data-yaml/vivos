@@ -27,6 +27,7 @@ jobs:
       TOWER_ORG: ${{ secrets.TOWER_ORG }}
       TOWER_WORKSPACE: ${{ secrets.TOWER_WORKSPACE }}
       TOWER_WORKSPACE_ID: ${{ secrets.TOWER_WORKSPACE_ID }}
+      QUILT_CATALOG_DOMAIN: ${{ secrets.QUILT_CATALOG_DOMAIN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
