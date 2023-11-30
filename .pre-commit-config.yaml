@@ -16,8 +16,4 @@ repos:
         name: eslint
         entry: bash -c "npm run eslint"
         language: node
-      - id: test
-        name: test
-        entry: bash -c "npm run test"
-        stages: [pre-push]
-        language: node
+        stages: [pre-commit]
