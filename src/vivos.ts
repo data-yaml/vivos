@@ -5,8 +5,8 @@ import { Constants, KeyedConfig } from './constants';
 export class Vivos {
 
   public static ENVARS = [
-    'BASE_API',
-    'BASE_CONFIG',
+    //'BASE_API',
+    //'BASE_CONFIG',
     'OPEN_API_FILE',
     'OPEN_API_KEY',
     'OPEN_API_URL',

@@ -65,6 +65,8 @@ export class DiaStack extends Stack {
     this.statusTopic = new Topic(this, 'VivosStatusTopic', {
       displayName: 'VIVOS Status Topic',
     });
+    console.info(this.statusTopic);
+
     this.principal = new AccountPrincipal(props.account);
     this.principals = Object.fromEntries(
       DiaStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
@@ -78,7 +80,6 @@ export class DiaStack extends Stack {
       this.statusTopic.grantPublish(principal);
     }
 
-    console.info(this.statusTopic);
     this.lambdaRole = this.makeLambdaRole(this.principals.lambda);
     const inputSource = new S3EventSource(this.bucket, {
       events: [EventType.OBJECT_CREATED],
@@ -97,6 +98,9 @@ export class DiaStack extends Stack {
   }
 
   public makeEnvars(env: object): KeyedConfig {
+    if (!this.statusTopic || !this.statusTopic.topicArn) {
+      throw new Error('statusTopic is required');
+    }
     const default_env: KeyedConfig = {
       LOG_LEVEL: 'ALL',
       STATUS_TOPIC_ARN: this.statusTopic.topicArn,
@@ -152,7 +156,7 @@ export class DiaStack extends Stack {
         ),
       ],
     });
-    console.log(this.statusTopic);
+    console.debug(this.statusTopic);
     const lambdaSNSPolicy = new PolicyStatement({
       sid: 'VivosLambdaSNSPolicy',
       actions: ['sns:Publish'],
@@ -160,6 +164,7 @@ export class DiaStack extends Stack {
         this.statusTopic.topicArn,
       ],
     });
+    console.debug(lambdaSNSPolicy);
     lambdaRole.addToPolicy(lambdaSNSPolicy);
 
     const lambdaS3Policy = new PolicyStatement({
