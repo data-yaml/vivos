@@ -1,4 +1,3 @@
-import * as path from 'path';
 import { Duration, Stack, type StackProps } from 'aws-cdk-lib';
 import {
   AccountPrincipal,
@@ -14,7 +13,6 @@ import {
   Bucket,
   EventType,
 } from 'aws-cdk-lib/aws-s3';
-import { Asset } from 'aws-cdk-lib/aws-s3-assets';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
@@ -46,18 +44,10 @@ export class DiaStack extends Stack {
   private readonly lambdaRole: Role;
   private readonly principal: AccountPrincipal;
   public readonly principals: { [key: string]: ServicePrincipal };
-  public readonly assets: { [key: string]: Asset };
   public readonly statusTopic: Topic;
 
   constructor(scope: Construct, id: string, props: DiaStackProps) {
     super(scope, id, props);
-
-    this.assets = Object.fromEntries(
-      DiaStack.ASSET_KEYS.map(x => [x, new Asset(this, `Vivos_${x}_Asset`, {
-        path: path.join(__dirname, '..', x),
-      })]),
-    );
-
     this.bucketURI = props.bucketURI;
     const bucketName = this.bucketURI.split('/').pop()!;
     this.bucket = Bucket.fromBucketName(this, 'VivosOutputBucket', bucketName) as Bucket;
@@ -65,7 +55,7 @@ export class DiaStack extends Stack {
     this.statusTopic = new Topic(this, 'VivosStatusTopic', {
       displayName: 'VIVOS Status Topic',
     });
-    console.info(this.statusTopic);
+    console.info('VivosStatusTopic', this.statusTopic.topicArn);
 
     this.principal = new AccountPrincipal(props.account);
     this.principals = Object.fromEntries(
@@ -106,16 +96,12 @@ export class DiaStack extends Stack {
       STATUS_TOPIC_ARN: this.statusTopic.topicArn,
       TOWER_OUTPUT_BUCKET: this.bucketURI,
     };
-    const asset_env: KeyedConfig = Object.fromEntries(
-      DiaStack.ASSET_KEYS.map(x => [`BASE_${x.toUpperCase()}`, this.assets[x].s3ObjectUrl]),
-    );
     // create merged env
     return {
       ...default_env,
       ...Constants.MapEnvars(Vivos.ENVARS),
       ...Constants.MapEnvars(VivosTower.ENVARS),
       ...Constants.MapEnvars(VivosBenchling.ENVARS),
-      ...asset_env,
       ...env,
     };
   }
@@ -156,7 +142,6 @@ export class DiaStack extends Stack {
         ),
       ],
     });
-    console.debug(this.statusTopic);
     const lambdaSNSPolicy = new PolicyStatement({
       sid: 'VivosLambdaSNSPolicy',
       actions: ['sns:Publish'],
@@ -173,10 +158,6 @@ export class DiaStack extends Stack {
       resources: [
         this.bucket.bucketArn,
         this.bucket.bucketArn + '/*',
-        this.assets.config.bucket.bucketArn,
-        this.assets.config.bucket.bucketArn + '/*',
-        this.assets.api.bucket.bucketArn,
-        this.assets.api.bucket.bucketArn + '/*',
       ],
     });
     lambdaRole.addToPolicy(lambdaS3Policy);
