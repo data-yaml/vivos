@@ -7,7 +7,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   projenrcTs: true,
   deps: [
     'aws-lambda',
-    'aws-sdk',
+    '@aws-sdk/client-s3',
     '@aws-sdk/client-sns',
     'axios',
     'dotenv',

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { readFileSync } from 'fs';
-import { S3 } from 'aws-sdk';
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import handlebars from 'handlebars';
 import yaml from 'js-yaml';
 
@@ -34,6 +34,15 @@ export class Constants {
     return envs;
   }
 
+  public static DefaultS3(region: string = '') {
+    const cc = new Constants({});
+    if (region === '') {
+      region = cc.get('CDK_DEFAULT_REGION');
+    }
+    const s3 = new S3Client({ region: region });
+    return s3;
+  }
+
   public static GetPackageName(filePath: string): string {
     // first two components, joined by a slash
     const base = filePath.startsWith('/') ? 1 : 0;
@@ -51,18 +60,19 @@ export class Constants {
       throw new Error(`Unsupported scheme: ${scheme}`);
     }
     const paths = split[1].split('/');
-    const s3 = new S3();
+    const s3 = Constants.DefaultS3();
     const bucket = paths[0];
     const file = paths.slice(-1)[0];
     const key = paths.slice(1).join('/');
     console.info(`Loading ${file} from ${bucket} in ${key}`);
-    const params = {
+    const command = new GetObjectCommand({
       Bucket: bucket,
       Key: key,
-    };
-    const data = await s3.getObject(params).promise();
+    });
+    const response = await s3.send(command);
+    const contents = await response.Body!.transformToString();
     const extension = file.split('.').pop()?.toLowerCase();
-    return Constants.LoadObjectData(data.Body!.toString(), extension!, env);
+    return Constants.LoadObjectData(contents, extension!, env);
   }
 
   public static LoadObjectFile(filePath: string, env: object = {}): KeyedConfig {
