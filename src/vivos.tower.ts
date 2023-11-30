@@ -113,7 +113,8 @@ export class VivosTower extends Vivos {
     const env = {
       bucket: bucket,
       computeEnvId: this.computeEnvId,
-      workspaceId: this.workspaceId,
+      entry_id: this.entry.id,
+      // workspaceId: this.workspaceId,
     };
     return Constants.LoadPipeline(pipeline, env) as WorkflowLaunchRequest;
   }

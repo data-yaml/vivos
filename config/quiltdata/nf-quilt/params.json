@@ -1,5 +1,8 @@
 {
     "outdir": "quilt+{{ bucket }}#package={{ package }}",
+    "benchling": {
+        "entry_id": "{{ entry_id }}"
+    },
     "help": true,
     "publish_dir_mode": "copy",
     "tracedir": "${params.outdir}/pipeline_info",

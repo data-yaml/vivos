@@ -1,6 +1,9 @@
 {
     "input": "https://raw.githubusercontent.com/nf-core/test-datasets/hlatyping/samplesheets/samplesheet_full.csv",
     "outdir": "quilt+{{ bucket }}#package={{ package }}",
+    "benchling": {
+        "entry_id": "{{ entry_id }}"
+    },
     "solver": "glpk",
     "enumerations": 1,
     "beta": 0.009,
