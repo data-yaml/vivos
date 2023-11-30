@@ -19,8 +19,12 @@ export class VivosBenchling extends Vivos {
     'BENCHLING_OUTPUT_BUCKET',
   ];
 
-  private event_bucket: string;
-  private event_object: string;
+  public static readonly FLD_TOWER_URL = 'Tower URL';
+  public static readonly FLD_STATUS = 'Status';
+  public static readonly FLD_MULTIQC = 'MultiQC Report';
+
+  private readonly event_bucket: string;
+  private readonly event_object: string;
 
   constructor(event: any, context: any) {
     context.OPEN_API_FILE = Constants.DEFAULTS.BENCHLING_API_FILE;

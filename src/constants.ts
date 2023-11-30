@@ -20,8 +20,18 @@ export class Constants {
     TOWER_API_URL: 'https://api.tower.nf',
     TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
     TOWER_INPUT_FILE: 'entry.json',
+    TOWER_OUTPUT_FILE: 'nf-quilt/params.json',
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
+
+  public static MapEnvars(envars: string[]): KeyedConfig {
+    const cc = new Constants({});
+    const envs: KeyedConfig = {};
+    envars.forEach((key: string) => {
+      envs[key] = cc.get(key);
+    });
+    return envs;
+  }
 
 
   public static async LoadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {

@@ -17,6 +17,8 @@ export class VivosTower extends Vivos {
     'TOWER_ACCESS_TOKEN',
     'TOWER_COMPUTE_ENV_ID',
     'TOWER_OUTPUT_BUCKET',
+    'TOWER_ORG',
+    'TOWER_WORKSPACE',
     'TOWER_WORKSPACE_ID',
   ];
 
@@ -24,7 +26,7 @@ export class VivosTower extends Vivos {
   private computeEnvId: string;
   private event_bucket: string;
   private event_object: string;
-  private entry_data: KeyedConfig;
+  public readonly entry: KeyedConfig;
 
 
   constructor(event: any, context: any) {
@@ -37,12 +39,18 @@ export class VivosTower extends Vivos {
     this.event_bucket = Constants.GetKeyPathFromObject(event, 'Records[0].s3.bucket.name');
     this.event_object = Constants.GetKeyPathFromObject(event, 'Records[0].s3.object.key');
     const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
-    this.entry_data = this.event_object ? Constants.LoadObjectURI(entry_uri) : {};
+    this.entry = this.event_object ? Constants.LoadObjectURI(entry_uri) : {};
   }
 
   public async getTowerClient(): Promise<TowerClient> {
     const client = await this.api(true).init<TowerClient>();
     return client;
+  }
+
+  public getTowerURL(workflowId: string): string {
+    const org = this.get('TOWER_ORG');
+    const workspace = this.get('TOWER_WORKSPACE');
+    return `https://tower.nf/orgs/${org}/workspaces/${workspace}/watch/${workflowId}`;
   }
 
   public async info(): Promise<ServiceInfo> {
@@ -82,12 +90,12 @@ export class VivosTower extends Vivos {
   }
 
   public getPipeline(): string {
-    const pipeline = Constants.GetKeyPathFromObject(this.entry_data, 'fields.Pipeline.value');
+    const pipeline = Constants.GetKeyPathFromObject(this.entry, 'fields.Pipeline.value');
     return pipeline || this.get('TOWER_DEFAULT_PIPELINE');
   }
 
   public getStatus(): string {
-    const status = Constants.GetKeyPathFromObject(this.entry_data, 'fields.Status.value');
+    const status = Constants.GetKeyPathFromObject(this.entry, 'fields.Status.value');
     return status || 'unknown';
   }
 
@@ -150,7 +158,7 @@ export class VivosTower extends Vivos {
       computeEnvId: this.computeEnvId,
       event_bucket: this.event_bucket,
       event_object: this.event_object,
-      entry_data: this.entry_data,
+      entry_data: this.entry,
     };
   }
 }

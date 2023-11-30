@@ -16,7 +16,9 @@ import {
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
-import { Constants } from './constants';
+import { Constants, KeyedConfig } from './constants';
+import { VivosBenchling } from './vivos.benchling';
+import { VivosTower } from './vivos.tower';
 
 
 export interface DiaStackProps extends StackProps {
@@ -68,13 +70,18 @@ export class DiaStack extends Stack {
   }
 
   private makeLambda(name: string, env: object) {
-    const default_env = {
+    const default_env: KeyedConfig = {
+      LOG_LEVEL: 'ALL',
       STATUS_TOPIC_ARN: this.statusTopic.topicArn,
       TOWER_OUTPUT_BUCKET: this.bucketURI,
-      LOG_LEVEL: 'ALL',
     };
     // create merged env
-    const final_env = Object.assign(default_env, env);
+    const final_env = {
+      ...default_env,
+      ...Constants.MapEnvars(VivosTower.ENVARS),
+      ...Constants.MapEnvars(VivosBenchling.ENVARS),
+      ...env,
+    };
     return new NodejsFunction(this, name, {
       runtime: Runtime.NODEJS_18_X,
       role: this.lambdaRole,
