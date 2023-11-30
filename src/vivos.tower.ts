@@ -49,17 +49,17 @@ export class VivosTower extends Vivos {
     return `https://tower.nf/orgs/${org}/workspaces/${workspace}/watch/${workflowId}`;
   }
 
-  public async getBenchlingInfo(): Promise<string> {
+  public async getBenchlingInfo(): Promise<object> {
     const entry = await this.getEntry();
     const info = {
-      'id': entry.id!,
-      'name': entry.name!,
-      'displayId': entry.displayId!,
-      'apiURL': entry.apiURL!,
-      'creator.name': entry.creator!.name!,
-      'webURL': entry.webURL!,
+      id: entry.id!,
+      name: entry.name!,
+      displayId: entry.displayId!,
+      apiURL: entry.apiURL!,
+      creator: entry.creator!,
+      webURL: entry.webURL!,
     };
-    return JSON.stringify(info);
+    return info;
   }
 
   public async getEntry(): Promise<Benchling.Schemas.Entry> {
@@ -128,7 +128,7 @@ export class VivosTower extends Vivos {
     const env = {
       bucket: bucket,
       computeEnvId: this.computeEnvId,
-      benchling: this.getBenchlingInfo(),
+      benchling: await this.getBenchlingInfo(),
     };
     return Constants.LoadPipeline(pipeline, env) as WorkflowLaunchRequest;
   }
@@ -171,8 +171,6 @@ export class VivosTower extends Vivos {
       ...super.toDict(),
       workspaceId: this.workspaceId,
       computeEnvId: this.computeEnvId,
-      event_bucket: this.event_bucket,
-      event_object: this.event_object,
     };
   }
 }

@@ -11,9 +11,9 @@ export class Vivos {
     'STATUS_TOPIC_ARN',
   ];
 
+  public readonly event_bucket: string;
+  public readonly event_object: string;
   protected event: any;
-  protected event_bucket: string;
-  protected event_object: string;
   protected cc: Constants;
   protected api_file: string;
   protected api_key: string;
