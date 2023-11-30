@@ -69,17 +69,17 @@ export class DiaStack extends Stack {
     this.principals = Object.fromEntries(
       DiaStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
     );
-    this.lambdaRole = this.makeLambdaRole(this.principals.lambda);
 
     this.statusTopic.addSubscription(
       new EmailSubscription(props.email),
     );
     this.statusTopic.grantPublish(this.principal);
     for (const principal of Object.values(this.principals)) {
-      console.debug(`statusTopic.grantPublish ${principal.service}`);
       this.statusTopic.grantPublish(principal);
     }
 
+    console.info(this.statusTopic);
+    this.lambdaRole = this.makeLambdaRole(this.principals.lambda);
     const inputSource = new S3EventSource(this.bucket, {
       events: [EventType.OBJECT_CREATED],
       filters: [{ suffix: Constants.DEFAULTS.TOWER_INPUT_FILE }],
@@ -144,9 +144,14 @@ export class DiaStack extends Stack {
     const lambdaSNSPolicy = new PolicyStatement({
       sid: 'VivosLambdaSNSPolicy',
       actions: ['sns:Publish'],
-      resources: [this.statusTopic.topicArn],
+      resources: [
+        this.statusTopic.topicArn,
+        Constants.GET('STATUS_TOPIC_ARN'),
+        'arn:aws:sns:us-west-2:850787717197:vivos-dev-VivosStatusTopicA15DB4F3-Max3zUxnKt9q',
+      ],
     });
     lambdaRole.addToPolicy(lambdaSNSPolicy);
+
     const lambdaS3Policy = new PolicyStatement({
       sid: 'VivosLambdaS3Policy',
       actions: ['s3:ListBucket', 's3:GetObject', 's3:PutObject', 'SNS:Publish'],
