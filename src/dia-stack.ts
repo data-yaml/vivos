@@ -45,7 +45,7 @@ export class DiaStack extends Stack {
   private readonly bucketURI: string;
   private readonly lambdaRole: Role;
   private readonly principal: AccountPrincipal;
-  private readonly principals: { [key: string]: ServicePrincipal };
+  public readonly principals: { [key: string]: ServicePrincipal };
   private readonly assets: { [key: string]: Asset };
   private readonly statusTopic: Topic;
 
@@ -93,35 +93,38 @@ export class DiaStack extends Stack {
     successLambda.addEventSource(outputSource);
   }
 
-  private makeLambda(name: string, env: object) {
+  public makeEnvars(env: object): KeyedConfig {
     const default_env: KeyedConfig = {
       LOG_LEVEL: 'ALL',
       STATUS_TOPIC_ARN: this.statusTopic.topicArn,
       TOWER_OUTPUT_BUCKET: this.bucketURI,
     };
     const asset_env: KeyedConfig = Object.fromEntries(
-      DiaStack.ASSET_KEYS.map(x => [x.toUpperCase(), this.assets[x].s3ObjectUrl]),
+      DiaStack.ASSET_KEYS.map(x => [`BASE_${x.toUpperCase()}`, this.assets[x].s3ObjectUrl]),
     );
     // create merged env
-    const final_env = {
+    return {
       ...default_env,
-      ...asset_env,
       ...Constants.MapEnvars(Vivos.ENVARS),
       ...Constants.MapEnvars(VivosTower.ENVARS),
       ...Constants.MapEnvars(VivosBenchling.ENVARS),
+      ...asset_env,
       ...env,
     };
+  }
+
+  public makeLambda(name: string, env: object) {
     return new NodejsFunction(this, name, {
       description: `VIVOS ${name} Lambda`,
       runtime: Runtime.NODEJS_18_X,
       role: this.lambdaRole,
       timeout: Duration.seconds(60),
       retryAttempts: 1,
-      environment: final_env,
+      environment: this.makeEnvars(env),
     });
   }
 
-  private makeLambdaRole(lambdaPrincipal: ServicePrincipal) {
+  public makeLambdaRole(lambdaPrincipal: ServicePrincipal) {
     if (!lambdaPrincipal) {
       throw new Error('lambdaPrincipal is required');
     }

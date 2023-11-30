@@ -99,7 +99,7 @@ export class Constants {
   }
 
   public static async LoadPipeline(pipeline: string, env: any = {}) {
-    var base = './config'
+    var base = './config';
     if (typeof env.package !== 'string' || env.package === '') {
       env.package = pipeline;
     }
