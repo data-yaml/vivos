@@ -37,10 +37,13 @@ export class DiaStack extends Stack {
     return props as DiaStackProps;
   }
 
+  protected static PRINCIPAL_KEYS = ['events', 'lambda'];
   private readonly bucket: Bucket;
   private readonly bucketURI: string;
   private readonly lambdaRole: Role;
   private readonly principal: AccountPrincipal;
+  private readonly principals: { [key: string]: ServicePrincipal };
+  ;
   private readonly statusTopic: Topic;
 
   constructor(scope: Construct, id: string, props: DiaStackProps) {
@@ -48,8 +51,11 @@ export class DiaStack extends Stack {
     this.bucketURI = props.bucketURI;
     const bucketName = this.bucketURI.split('/').pop()!;
     this.bucket = Bucket.fromBucketName(this, 'VivosOutputBucket', bucketName) as Bucket;
-    this.lambdaRole = this.makeLambdaRole();
     this.principal = new AccountPrincipal(props.account);
+    this.principals = Object.fromEntries(
+      DiaStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
+    );
+    this.lambdaRole = this.makeLambdaRole(this.principals.lambda);
 
     this.statusTopic = new Topic(this, 'VivosStatusTopic', {
       displayName: 'VIVOS Status Topic',
@@ -57,9 +63,10 @@ export class DiaStack extends Stack {
     this.statusTopic.addSubscription(
       new EmailSubscription(props.email),
     );
-    const servicePrincipal = new ServicePrincipal('events.amazonaws.com');
-    this.statusTopic.grantPublish(servicePrincipal);
     this.statusTopic.grantPublish(this.principal);
+    for (const principal of Object.values(this.principals)) {
+      this.statusTopic.grantPublish(principal);
+    }
 
     const inputSource = new S3EventSource(this.bucket, {
       events: [EventType.OBJECT_CREATED],
@@ -99,10 +106,13 @@ export class DiaStack extends Stack {
     });
   }
 
-  private makeLambdaRole() {
+  private makeLambdaRole(lambdaPrincipal: ServicePrincipal) {
+    if (!lambdaPrincipal) {
+      throw new Error('lambdaPrincipal is required');
+    }
     const APP_NAME = Constants.DEFAULTS.APP_NAME;
     const lambdaRole = new Role(this, `${APP_NAME}-lambda-role`, {
-      assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+      assumedBy: lambdaPrincipal,
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName(
           'service-role/AWSLambdaBasicExecutionRole',
