@@ -36,11 +36,11 @@ export class VivosBenchling extends Vivos {
     return client;
   }
 
-  public async getParams(): Promise<KeyedConfig> {
-    if (this.event_object.includes(this.get('TOWER_OUTPUT_FILE'))) {
+  public async getEventParams(): Promise<KeyedConfig> {
+    if (this.event_object && this.event_object.includes(this.get('TOWER_OUTPUT_FILE'))) {
       return this.getEventObject();
     }
-    throw `getParams not found in: ${this.event_object}`;
+    throw `gegetEventParamstParams not found in: ${this.event_object}`;
   }
 
   public getReportURL(): string {

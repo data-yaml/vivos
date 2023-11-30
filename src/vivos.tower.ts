@@ -48,7 +48,10 @@ export class VivosTower extends Vivos {
   }
 
   public async getEventEntry(): Promise<Benchling.Schemas.Entry> {
-    return await super.getEventObject() as Benchling.Schemas.Entry;
+    if (this.event_object && this.event_object.includes(Constants.DEFAULTS.TOWER_INPUT_FILE)) {
+      return await super.getEventObject() as Benchling.Schemas.Entry;
+    }
+    return {} as Benchling.Schemas.Entry;
   }
 
   public async getBenchlingInfo(): Promise<object> {

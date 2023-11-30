@@ -13,8 +13,8 @@ describe('VivosBenchling', () => {
     entry = Constants.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
   });
 
-  it('should getParams', async () => {
-    const params = await vivos.getParams();
+  it('should getEventParams', async () => {
+    const params = await vivos.getEventParams();
     expect(params).toBeDefined();
     expect(params).toHaveProperty('outdir');
   });
