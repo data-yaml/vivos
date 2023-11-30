@@ -51,23 +51,26 @@ export class DiaStack extends Stack {
 
   constructor(scope: Construct, id: string, props: DiaStackProps) {
     super(scope, id, props);
+
     this.assets = Object.fromEntries(
       DiaStack.ASSET_KEYS.map(x => [x, new Asset(this, `Vivos_${x}_Asset`, {
         path: path.join(__dirname, '..', x),
       })]),
     );
+
     this.bucketURI = props.bucketURI;
     const bucketName = this.bucketURI.split('/').pop()!;
     this.bucket = Bucket.fromBucketName(this, 'VivosOutputBucket', bucketName) as Bucket;
+
+    this.statusTopic = new Topic(this, 'VivosStatusTopic', {
+      displayName: 'VIVOS Status Topic',
+    });
     this.principal = new AccountPrincipal(props.account);
     this.principals = Object.fromEntries(
       DiaStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
     );
     this.lambdaRole = this.makeLambdaRole(this.principals.lambda);
 
-    this.statusTopic = new Topic(this, 'VivosStatusTopic', {
-      displayName: 'VIVOS Status Topic',
-    });
     this.statusTopic.addSubscription(
       new EmailSubscription(props.email),
     );
@@ -141,7 +144,7 @@ export class DiaStack extends Stack {
     const lambdaSNSPolicy = new PolicyStatement({
       sid: 'VivosLambdaSNSPolicy',
       actions: ['sns:Publish'],
-      resources: [Constants.GET('STATUS_TOPIC_ARN')],
+      resources: [this.statusTopic.topicArn],
     });
     lambdaRole.addToPolicy(lambdaSNSPolicy);
     const lambdaS3Policy = new PolicyStatement({
