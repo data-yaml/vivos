@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
-import { Constants, KeyedConfig } from './constants';
+import { Constants } from './constants';
+import type { Components as Benchling } from './types/benchling';
 import type { Client as TowerClient, Components } from './types/tower';
 import { Vivos } from './vivos';
 
@@ -24,9 +25,7 @@ export class VivosTower extends Vivos {
 
   private workspaceId: string;
   private computeEnvId: string;
-  private event_bucket: string;
-  private event_object: string;
-  public readonly entry: KeyedConfig;
+  public readonly entry_uri: string;
 
 
   constructor(event: any, context: any) {
@@ -36,10 +35,7 @@ export class VivosTower extends Vivos {
     this.api_url = this.get('TOWER_API_URL');
     this.workspaceId = this.get('TOWER_WORKSPACE_ID');
     this.computeEnvId = this.get('TOWER_COMPUTE_ENV_ID');
-    this.event_bucket = Constants.GetKeyPathFromObject(event, 'Records[0].s3.bucket.name');
-    this.event_object = Constants.GetKeyPathFromObject(event, 'Records[0].s3.object.key');
-    const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
-    this.entry = this.event_object ? Constants.LoadObjectURI(entry_uri) : {};
+    this.entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
   }
 
   public async getTowerClient(): Promise<TowerClient> {
@@ -51,6 +47,23 @@ export class VivosTower extends Vivos {
     const org = this.get('TOWER_ORG');
     const workspace = this.get('TOWER_WORKSPACE');
     return `https://tower.nf/orgs/${org}/workspaces/${workspace}/watch/${workflowId}`;
+  }
+
+  public async getBenchlingInfo(): Promise<string> {
+    const entry = await this.getEntry();
+    const info = {
+      'id': entry.id!,
+      'name': entry.name!,
+      'displayId': entry.displayId!,
+      'apiURL': entry.apiURL!,
+      'creator.name': entry.creator!.name!,
+      'webURL': entry.webURL!,
+    };
+    return JSON.stringify(info);
+  }
+
+  public async getEntry(): Promise<Benchling.Schemas.Entry> {
+    return Constants.LoadObjectURI(this.entry_uri);
   }
 
   public async info(): Promise<ServiceInfo> {
@@ -89,22 +102,24 @@ export class VivosTower extends Vivos {
     }
   }
 
-  public getPipeline(): string {
-    const pipeline = Constants.GetKeyPathFromObject(this.entry, 'fields.Pipeline.value');
-    return pipeline || this.get('TOWER_DEFAULT_PIPELINE');
+  public async getPipeline(): Promise<string> {
+    const entry = await this.getEntry();
+    const pipeline = entry.fields?.Pipeline?.value;
+    return pipeline || '';
   }
 
-  public getStatus(): string {
-    const status = Constants.GetKeyPathFromObject(this.entry, 'fields.Status.value');
-    return status || 'unknown';
+  public async getStatus(): Promise<string> {
+    const entry = await this.getEntry();
+    const status = entry.fields?.Status?.value;
+    return status || 'None';
   }
 
-  public launch_options(pipeline: string = '', bucket: string = ''): WorkflowLaunchRequest {
+  public async launch_options(pipeline: string = '', bucket: string = ''): Promise<WorkflowLaunchRequest> {
     if (bucket === '') {
       bucket = this.get('TOWER_OUTPUT_BUCKET');
     };
     if (pipeline === '') {
-      pipeline = this.getPipeline();
+      pipeline = await this.getPipeline() || this.get('TOWER_DEFAULT_PIPELINE');
       if (pipeline === '') {
         console.warn('Pipeline not specified');
         return {} as WorkflowLaunchRequest;
@@ -113,8 +128,7 @@ export class VivosTower extends Vivos {
     const env = {
       bucket: bucket,
       computeEnvId: this.computeEnvId,
-      entry_id: this.entry.id,
-      // workspaceId: this.workspaceId,
+      benchling: this.getBenchlingInfo(),
     };
     return Constants.LoadPipeline(pipeline, env) as WorkflowLaunchRequest;
   }
@@ -159,7 +173,6 @@ export class VivosTower extends Vivos {
       computeEnvId: this.computeEnvId,
       event_bucket: this.event_bucket,
       event_object: this.event_object,
-      entry_data: this.entry,
     };
   }
 }

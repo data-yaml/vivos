@@ -1,4 +1,5 @@
 import { IT } from './helpers';
+import { Constants } from '../src/constants';
 import { VivosTower } from '../src/vivos.tower';
 
 describe('VivosTower', () => {
@@ -39,11 +40,13 @@ describe('VivosTower', () => {
   });
 
   it('should generate valid launch_options', async () => {
-    const pipeline = vivos.get('TOWER_DEFAULT_PIPELINE');
-    const bucket = 's3://quilt-example';
-    const launchOptions = vivos.launch_options(pipeline, bucket);
+    const event = Constants.LoadObjectFile('test/data/event-entry.json');
+    const evivos = new VivosTower(event, {});
+    const pipeline = evivos.get('TOWER_DEFAULT_PIPELINE');
+    const bucket = 's3://nf-core-gallery';
+    const launchOptions = await evivos.launch_options(pipeline, bucket);
     expect(launchOptions).toBeDefined();
-    expect(launchOptions.computeEnvId).toBe(vivos.get('TOWER_COMPUTE_ENV_ID'));
+    expect(launchOptions.computeEnvId).toBe(evivos.get('TOWER_COMPUTE_ENV_ID'));
     expect(launchOptions.configProfiles).toEqual(['standard']);
     expect(launchOptions.configText).toBe("plugins = ['nf-quilt']");
     expect(launchOptions.pipeline).toContain(pipeline);
@@ -59,7 +62,7 @@ describe('VivosTower', () => {
   IT.ifhas('LAUNCH_WORKFLOWS')('should launch a workflow', async () => {
     const pipeline = vivos.get('TOWER_DEFAULT_PIPELINE'); // 'nf-core/hlatyping'; // 'quiltdata/nf-quilt';
     const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
-    const launchOptions = vivos.launch_options(pipeline, bucket);
+    const launchOptions = await vivos.launch_options(pipeline, bucket);
     const workflowId = await vivos.launch(launchOptions);
     expect(workflowId).toBeDefined();
     console.info(`Launched workflow: ${workflowId}`);

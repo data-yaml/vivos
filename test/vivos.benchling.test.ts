@@ -22,7 +22,7 @@ describe('VivosBenchling', () => {
   describe('updateEntry', () => {
     IT.ifhas('BENCHLING_ACCESS_TOKEN')('should update an entry with the given fields', async () => {
       const timestamp = new Date().toISOString();
-      const updatedEntry = await vivos.updateEntry(entry, { Status: timestamp });
+      const updatedEntry = await vivos.updateEntry(entry.id!, { Status: timestamp });
       const status = updatedEntry.fields?.Status?.value;
       expect(status).toEqual(timestamp);
     });

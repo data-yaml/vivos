@@ -11,7 +11,7 @@ function update_options(benchling: VivosBenchling) {
 export async function handler(event: any, context: any) {
   const benchling = new VivosBenchling(event, context);
   const updates = update_options(benchling);
-  const entry_id = benchling.getParams().benchling!.entry_id!;
+  const entry_id = benchling.getParams().benchling!.id!;
   const updated = await benchling.updateEntry(entry_id, updates);
   return {
     statusCode: 200,

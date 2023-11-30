@@ -24,16 +24,11 @@ export class VivosBenchling extends Vivos {
   public static readonly FLD_STATUS = 'Status';
   public static readonly FLD_MULTIQC = 'MultiQC Report';
 
-  private readonly event_bucket: string;
-  private readonly event_object: string;
-
   constructor(event: any, context: any) {
     context.OPEN_API_FILE = Constants.DEFAULTS.BENCHLING_API_FILE;
     super(event, context);
     this.api_key = this.cc.get('BENCHLING_ACCESS_TOKEN');
     this.api_url = `https://${this.cc.get('BENCHLING_TENANT')}.benchling.com/api/v2`;
-    this.event_bucket = Constants.GetKeyPathFromObject(event, 'Records[0].s3.bucket.name');
-    this.event_object = Constants.GetKeyPathFromObject(event, 'Records[0].s3.object.key');
   }
 
   public async getBenchlingClient(): Promise<BenchlingClient> {
@@ -80,15 +75,15 @@ export class VivosBenchling extends Vivos {
     return values;
   }
 
-  public async updateEntry(entry: Entry, fields: KeyedConfig): Promise<Entry> {
+  public async updateEntry(entry_id: string, fields: KeyedConfig): Promise<Entry> {
     try {
       const client = await this.getBenchlingClient();
       const update: EntryUpdate = { fields: this.mapFields(fields) };
-      const updated = await client.updateEntry(entry.id, update) as AxiosResponse<Entry>;
+      const updated = await client.updateEntry(entry_id, update) as AxiosResponse<Entry>;
       return updated.data;
     } catch (e: any) {
       console.error(e);
-      throw `Failed to update entry ${entry.id}`;
+      throw `Failed to update entry ${entry_id}`;
     }
   }
 

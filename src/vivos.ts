@@ -12,6 +12,8 @@ export class Vivos {
   ];
 
   protected event: any;
+  protected event_bucket: string;
+  protected event_object: string;
   protected cc: Constants;
   protected api_file: string;
   protected api_key: string;
@@ -21,6 +23,9 @@ export class Vivos {
 
   constructor(event: any, context: any) {
     this.event = event;
+    const records = event.Records;
+    this.event_bucket = (records) ? records[0].s3.bucket.name : '';
+    this.event_object = (records) ? records[0].s3.object.key : '';
     this.cc = new Constants(context);
     this._api = undefined;
     this.api_file = this.get('OPEN_API_FILE');

@@ -30,10 +30,10 @@ describe('Constants', () => {
   });
   describe('LoadObjectURI', () => {
     it('should load object URI correctly', async () => {
-      const uri = 's3://quilt-example/akarve/covid-directory/vega.json';
+      const uri = 's3://nf-core-gallery/benchling/EXP23000052/entry.json';
       const result = await Constants.LoadObjectURI(uri);
       expect(result).toBeDefined();
-      expect(result).toHaveProperty('config');
+      expect(result).toHaveProperty('id');
     });
 
     it('should throw an error if the object URI is invalid', async () => {
