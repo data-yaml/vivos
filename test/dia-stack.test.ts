@@ -1,7 +1,7 @@
 import { App } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { DiaStack, DiaStackProps } from '../src/dia-stack';
 import { ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { DiaStack, DiaStackProps } from '../src/dia-stack';
 
 
 describe('DiaStack', () => {

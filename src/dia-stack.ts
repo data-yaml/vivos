@@ -129,7 +129,7 @@ export class DiaStack extends Stack {
       throw new Error('lambdaPrincipal is required');
     }
     const APP_NAME = Constants.DEFAULTS.APP_NAME;
-    const lambdaRole = new Role(this, `${APP_NAME}-lambda-role`, {
+    const lambdaRole = new Role(this, `${APP_NAME}-${lambdaPrincipal.service}-role`, {
       assumedBy: lambdaPrincipal,
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName(
