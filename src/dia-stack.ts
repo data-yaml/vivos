@@ -117,6 +117,9 @@ export class DiaStack extends Stack {
   }
 
   public makeLambda(name: string, env: object) {
+    if (!this.lambdaRole) {
+      throw new Error('lambdaRole is required');
+    }
     return new NodejsFunction(this, name, {
       description: `VIVOS ${name} Lambda`,
       runtime: Runtime.NODEJS_18_X,
@@ -130,6 +133,12 @@ export class DiaStack extends Stack {
   public makeLambdaRole(lambdaPrincipal: ServicePrincipal) {
     if (!lambdaPrincipal) {
       throw new Error('lambdaPrincipal is required');
+    }
+    if (!this.statusTopic || !this.statusTopic.topicArn) {
+      throw new Error('statusTopic is required');
+    }
+    if (!this.bucket) {
+      throw new Error('bucket is required');
     }
     const APP_NAME = Constants.DEFAULTS.APP_NAME;
     const lambdaRole = new Role(this, `${APP_NAME}-${lambdaPrincipal.service}-role`, {
@@ -146,8 +155,6 @@ export class DiaStack extends Stack {
       actions: ['sns:Publish'],
       resources: [
         this.statusTopic.topicArn,
-        Constants.GET('STATUS_TOPIC_ARN'),
-        'arn:aws:sns:us-west-2:850787717197:vivos-dev-VivosStatusTopicA15DB4F3-Max3zUxnKt9q',
       ],
     });
     lambdaRole.addToPolicy(lambdaSNSPolicy);
