@@ -32,7 +32,8 @@ export class VivosBenchling extends Vivos {
   }
 
   public async getBenchlingClient(): Promise<BenchlingClient> {
-    const client = await this.api(true).init<BenchlingClient>();
+    const this_api = await this.api(true);
+    const client = this_api.init<BenchlingClient>();
     return client;
   }
 

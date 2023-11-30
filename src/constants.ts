@@ -11,12 +11,14 @@ export class Constants {
 
   public static DEFAULTS: { [key: string]: any } = {
     APP_NAME: 'vivos',
-    BENCHLING_API_FILE: './api/benchling.yaml',
+    BASE_API: './api',
+    BASE_CONFIG: './config',
+    BENCHLING_API_FILE: 'benchling.yaml',
     BENCHLING_API_URL: 'https://quilt-dtt.benchling.com/api/v2',
-    PETSTORE_API_FILE: './api/petstore.yaml',
+    PETSTORE_API_FILE: 'petstore.yaml',
     PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
     TEST_ENTRY_FILE: './test/data/entry.json',
-    TOWER_API_FILE: './api/tower.yaml',
+    TOWER_API_FILE: 'tower.yaml',
     TOWER_API_URL: 'https://api.tower.nf',
     TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
     TOWER_INPUT_FILE: 'entry.json',
@@ -53,7 +55,8 @@ export class Constants {
   public static async LoadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {
     const split = uri.split('://');
     const scheme = split[0];
-    if (!scheme || scheme === '' || scheme === 'file') {
+    const start = uri[0];
+    if (!scheme || scheme === '' || scheme === 'file' || start === '/' || start == '.' ) {
       return Constants.LoadObjectFile(uri, env);
     }
     if (scheme !== 's3') {

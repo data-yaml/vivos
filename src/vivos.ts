@@ -5,6 +5,8 @@ import { Constants, KeyedConfig } from './constants';
 export class Vivos {
 
   public static ENVARS = [
+    'CONFIG_PREFIX',
+    'API_URI',
     'OPEN_API_FILE',
     'OPEN_API_KEY',
     'OPEN_API_URL',
@@ -34,15 +36,17 @@ export class Vivos {
     this.sns_client = new SNSClient({});
   }
 
-  public api(reset: boolean = false): OpenAPIClientAxios {
+
+  public async api(reset: boolean = false): Promise<OpenAPIClientAxios> {
     if (reset || this._api === undefined) {
-      this._api = this.loadApi(this.api_file);
+      this._api = await this.loadApi(this.api_file);
     }
     return this._api;
   }
 
-  public client(): Promise<OpenAPIClient> {
-    return this.api().getClient();
+  public async client(): Promise<OpenAPIClient> {
+    const this_api = await this.api();
+    return this_api.getClient();
   }
 
   public async getEventObject(): Promise<KeyedConfig> {
@@ -80,8 +84,9 @@ export class Vivos {
     return 'Bearer';
   }
 
-  public loadApi(filename: string): OpenAPIClientAxios {
-    const yaml_doc = Constants.LoadObjectFile(filename) as Document;
+  public async loadApi(filename: string): Promise<OpenAPIClientAxios> {
+    const api_path = `${this.get('BASE_API')}/${filename}`;
+    const yaml_doc = await Constants.LoadObjectURI(api_path) as Document;
     let options = {
       definition: yaml_doc,
       axiosConfigDefaults: {},

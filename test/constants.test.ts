@@ -35,7 +35,12 @@ describe('Constants', () => {
       expect(result).toBeDefined();
       expect(result).toHaveProperty('id');
     });
-
+    it('should local relative path correctly', async () => {
+      const uri = './test/data/entry.json';
+      const result = await Constants.LoadObjectURI(uri);
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('id');
+    });
     it('should throw an error if the object URI is invalid', async () => {
       const nonExistentURI = 'https://quilt-example.com';
       await expect(Constants.LoadObjectURI(nonExistentURI)).rejects.toThrow();

@@ -37,7 +37,8 @@ export class VivosTower extends Vivos {
   }
 
   public async getTowerClient(): Promise<TowerClient> {
-    const client = await this.api(true).init<TowerClient>();
+    const this_api = await this.api(true);
+    const client = this_api.init<TowerClient>();
     return client;
   }
 

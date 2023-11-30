@@ -32,8 +32,9 @@ describe('Vivos', () => {
     }).toThrow('get[OPEN_API_FILE] not a valid string: undefined');
   });
 
-  it('should load the config from a file', () => {
-    const config = Constants.LoadObjectFile(Constants.DEFAULTS.PETSTORE_API_FILE);
+  it('should load the config from a file', async () => {
+    const api_path = `${Constants.DEFAULTS.BASE_API}/${Constants.DEFAULTS.PETSTORE_API_FILE}}`;
+    const config = await Constants.LoadObjectURI(api_path);
     // Assert that the config is loaded correctly
     expect(config.info.title).toContain('Petstore');
   });
