@@ -147,6 +147,9 @@ export class DiaStack extends Stack {
         ManagedPolicy.fromAwsManagedPolicyName(
           'service-role/AWSLambdaBasicExecutionRole',
         ),
+        ManagedPolicy.fromAwsManagedPolicyName(
+          'AmazonSNSFullAccess',
+        ),
       ],
     });
     console.log(this.statusTopic);
@@ -165,6 +168,10 @@ export class DiaStack extends Stack {
       resources: [
         this.bucket.bucketArn,
         this.bucket.bucketArn + '/*',
+        this.assets.config.bucket.bucketArn,
+        this.assets.config.bucket.bucketArn + '/*',
+        this.assets.api.bucket.bucketArn,
+        this.assets.api.bucket.bucketArn + '/*',
       ],
     });
     lambdaRole.addToPolicy(lambdaS3Policy);
