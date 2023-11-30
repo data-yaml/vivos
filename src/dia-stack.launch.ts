@@ -1,3 +1,4 @@
+import { KeyedConfig } from './constants';
 import { VivosBenchling } from './vivos.benchling';
 import { VivosTower } from './vivos.tower';
 
@@ -22,10 +23,12 @@ async function launch(tower: VivosTower) {
 }
 
 function update_options(response: any) {
-  return {
-    'VivosBenchling.FLD_TOWER_URL': response.url,
-    'VivosBenchling.FLD_STATUS': 'Launched',
-  };
+  const result: KeyedConfig = {};
+  const tower_url = VivosBenchling.FLD_TOWER_URL;
+  const status = VivosBenchling.FLD_STATUS;
+  result[tower_url] = response.url;
+  result[status] = 'Launched';
+  return result;
 }
 
 export async function handler(event: any, context: any) {

@@ -149,7 +149,7 @@ export class DiaStack extends Stack {
         this.statusTopic.topicArn,
       ],
     });
-    console.debug(lambdaSNSPolicy);
+    // console.debug(lambdaSNSPolicy);
     lambdaRole.addToPolicy(lambdaSNSPolicy);
 
     const lambdaS3Policy = new PolicyStatement({
