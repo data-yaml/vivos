@@ -63,7 +63,7 @@ export class DiaStack extends Stack {
       events: [EventType.OBJECT_CREATED],
       filters: [{ suffix: Constants.DEFAULTS.TOWER_INPUT_FILE }],
     });
-    const towerLambda = this.makeLambda('tower', {});
+    const towerLambda = this.makeLambda('launch', {});
     towerLambda.addEventSource(eventSource);
   }
 

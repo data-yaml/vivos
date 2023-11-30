@@ -1,9 +1,9 @@
 // import { Constants } from '../src/constants';
 import { IT } from './helpers';
-import { handler } from '../src/dia-stack.tower';
+import { handler } from '../src/dia-stack.launch';
 
 
-describe('dia-stack.tower.handler', () => {
+describe('dia-stack.launch.handler', () => {
   IT.ifhas('LAUNCH_WORKFLOWS')('should return 200 when launched', async () => {
     // Mock the event and context objects
     const event = {};
