@@ -137,7 +137,12 @@ export class DiaStack extends Stack {
         ),
       ],
     });
-
+    const lambdaSNSPolicy = new PolicyStatement({
+      sid: 'VivosLambdaSNSPolicy',
+      actions: ['sns:Publish'],
+      resources: [this.statusTopic.topicArn],
+    });
+    lambdaRole.addToPolicy(lambdaSNSPolicy);
     const lambdaS3Policy = new PolicyStatement({
       sid: 'VivosLambdaS3Policy',
       actions: ['s3:ListBucket', 's3:GetObject', 's3:PutObject', 'SNS:Publish'],
@@ -146,7 +151,6 @@ export class DiaStack extends Stack {
         this.bucket.bucketArn + '/*',
       ],
     });
-    console.debug(lambdaS3Policy.sid);
     lambdaRole.addToPolicy(lambdaS3Policy);
     return lambdaRole;
   }
