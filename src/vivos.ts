@@ -60,7 +60,6 @@ export class Vivos {
       return;
     }
     const topic_arn = this.cc.get('STATUS_TOPIC_ARN');
-    console.debug(`log[${message}] to ${topic_arn}`);
     if (typeof topic_arn !== 'string' || topic_arn === '') {
       return;
     }
@@ -71,11 +70,12 @@ export class Vivos {
       Message: message,
       TopicArn: topic_arn,
     };
+    console.debug(`log: ${JSON.stringify(params)}`);
     try {
       const command = new PublishCommand(params);
       await this.sns_client.send(command);
     } catch (e: any) {
-      console.error(e);
+      console.error(params, e);
     }
   }
 

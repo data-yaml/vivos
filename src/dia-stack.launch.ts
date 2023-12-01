@@ -6,7 +6,7 @@ async function launch(tower: VivosTower) {
   try {
     // Submit the workflow using NextFlow Tower
     const options = await tower.launch_options();
-    await tower.log(`VivosTower.handler.options: ${JSON.stringify(options)}`);
+    await tower.log(`VivosTower.launch_options: ${JSON.stringify(options)}`);
     const workflowId = await tower.launch(options);
     return {
       statusCode: 200,
@@ -24,10 +24,8 @@ async function launch(tower: VivosTower) {
 
 function update_options(response: any) {
   const result: KeyedConfig = {};
-  const tower_url = VivosBenchling.FLD_TOWER_URL;
-  const status = VivosBenchling.FLD_STATUS;
-  result[tower_url] = response.url;
-  result[status] = 'Launched';
+  result[VivosBenchling.FLD_TOWER_URL] = response.url;
+  result[VivosBenchling.FLD_STATUS] = 'Launched';
   return result;
 }
 
