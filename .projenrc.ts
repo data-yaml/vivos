@@ -4,6 +4,11 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   defaultReleaseBranch: 'main',
   description: 'AWS CDK project for VIVOS',
   name: 'vivos',
+  versionrcOptions: {
+    releaseBranches: [
+      'main',
+    ],
+  },
   projenrcTs: true,
   deps: [
     'aws-lambda',
@@ -32,7 +37,7 @@ project.tryFindObjectFile('.github/workflows/build.yml')!.addOverride('jobs.buil
   AWS_ACCESS_KEY_ID: '${{ secrets.AWS_ACCESS_KEY_ID }}',
   AWS_SECRET_ACCESS_KEY: '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
   AWS_DEFAULT_REGION: '${{ secrets.AWS_DEFAULT_REGION }}',
-  BENCHLING_ACCESS_KEY: '${{ secrets.BENCHLING_ACCESS_KEY }}',
+  BENCHLING_ACCESS_TOKEN: '${{ secrets.BENCHLING_ACCESS_TOKEN }}',
   BENCHLING_TENANT: '${{ secrets.BENCHLING_TENANT }}',
   CDK_DEFAULT_ACCOUNT: '${{ secrets.AWS_ACCOUNT_ID }}',
   CDK_DEFAULT_REGION: '${{ secrets.AWS_DEFAULT_REGION }}',
