@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { Constants } from './constants';
+import { Constants, KeyedConfig } from './constants';
 import type { Components as Benchling } from './types/benchling';
 import type { Client as TowerClient, Components } from './types/tower';
 import { Vivos } from './vivos';
@@ -37,7 +37,8 @@ export class VivosTower extends Vivos {
   }
 
   public async getTowerClient(): Promise<TowerClient> {
-    const client = await this.api(true).init<TowerClient>();
+    const this_api = await this.api(true);
+    const client = this_api.init<TowerClient>();
     return client;
   }
 
@@ -126,12 +127,16 @@ export class VivosTower extends Vivos {
         return {} as WorkflowLaunchRequest;
       }
     }
-    const env = {
+    const env: KeyedConfig = {
       bucket: bucket,
       computeEnvId: this.computeEnvId,
       benchling: await this.getBenchlingInfo(),
     };
-    return Constants.LoadPipeline(pipeline, env) as WorkflowLaunchRequest;
+    const base_config = this.cc.get('BASE_CONFIG');
+    if (typeof base_config === 'string') {
+      env.base_config = base_config;
+    }
+    return await Constants.LoadPipeline(pipeline, env) as WorkflowLaunchRequest;
   }
 
   public async launch(launchOptions: WorkflowLaunchRequest): Promise<string> {

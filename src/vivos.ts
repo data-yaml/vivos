@@ -5,6 +5,8 @@ import { Constants, KeyedConfig } from './constants';
 export class Vivos {
 
   public static ENVARS = [
+    //'BASE_API',
+    //'BASE_CONFIG',
     'OPEN_API_FILE',
     'OPEN_API_KEY',
     'OPEN_API_URL',
@@ -34,15 +36,17 @@ export class Vivos {
     this.sns_client = new SNSClient({});
   }
 
-  public api(reset: boolean = false): OpenAPIClientAxios {
+
+  public async api(reset: boolean = false): Promise<OpenAPIClientAxios> {
     if (reset || this._api === undefined) {
-      this._api = this.loadApi(this.api_file);
+      this._api = await this.loadApi(this.api_file);
     }
     return this._api;
   }
 
-  public client(): Promise<OpenAPIClient> {
-    return this.api().getClient();
+  public async client(): Promise<OpenAPIClient> {
+    const this_api = await this.api();
+    return this_api.getClient();
   }
 
   public async getEventObject(): Promise<KeyedConfig> {
@@ -55,17 +59,24 @@ export class Vivos {
     if (typeof message !== 'string' || message === '') {
       return;
     }
-    console.debug(`log[${message}]`);
     const topic_arn = this.cc.get('STATUS_TOPIC_ARN');
     if (typeof topic_arn !== 'string' || topic_arn === '') {
       return;
+    }
+    if (message.includes('"eventVersion": "0.0"')) {
+      return; // testing event-launch.json
     }
     const params = {
       Message: message,
       TopicArn: topic_arn,
     };
-    const command = new PublishCommand(params);
-    await this.sns_client.send(command);
+    console.debug(`log: ${JSON.stringify(params)}`);
+    try {
+      const command = new PublishCommand(params);
+      await this.sns_client.send(command);
+    } catch (e: any) {
+      console.error(params, e);
+    }
   }
 
   public get(key: string): string {
@@ -80,8 +91,9 @@ export class Vivos {
     return 'Bearer';
   }
 
-  public loadApi(filename: string): OpenAPIClientAxios {
-    const yaml_doc = Constants.LoadObjectFile(filename) as Document;
+  public async loadApi(filename: string): Promise<OpenAPIClientAxios> {
+    const api_path = `${this.get('BASE_API')}/${filename}`;
+    const yaml_doc = await Constants.LoadObjectURI(api_path) as Document;
     let options = {
       definition: yaml_doc,
       axiosConfigDefaults: {},

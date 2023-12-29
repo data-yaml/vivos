@@ -11,12 +11,14 @@ export class Constants {
 
   public static DEFAULTS: { [key: string]: any } = {
     APP_NAME: 'vivos',
-    BENCHLING_API_FILE: './api/benchling.yaml',
+    BASE_API: 's3://quilt-vivos/api',
+    BASE_CONFIG: 's3://quilt-vivos/config',
+    BENCHLING_API_FILE: 'benchling.yaml',
     BENCHLING_API_URL: 'https://quilt-dtt.benchling.com/api/v2',
-    PETSTORE_API_FILE: './api/petstore.yaml',
+    PETSTORE_API_FILE: 'petstore.yaml',
     PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
     TEST_ENTRY_FILE: './test/data/entry.json',
-    TOWER_API_FILE: './api/tower.yaml',
+    TOWER_API_FILE: 'tower.yaml',
     TOWER_API_URL: 'https://api.tower.nf',
     TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
     TOWER_INPUT_FILE: 'entry.json',
@@ -25,19 +27,22 @@ export class Constants {
     VIVOS_CONFIG_FILE: './test/data/vivos.json',
   };
 
-  public static MapEnvars(envars: string[]): KeyedConfig {
+  public static GET(key: string): any {
     const cc = new Constants({});
+    return cc.get(key);
+  }
+
+  public static MapEnvars(envars: string[]): KeyedConfig {
     const envs: KeyedConfig = {};
     envars.forEach((key: string) => {
-      envs[key] = cc.get(key);
+      envs[key] = Constants.GET(key);
     });
     return envs;
   }
 
   public static DefaultS3(region: string = '') {
-    const cc = new Constants({});
     if (region === '') {
-      region = cc.get('CDK_DEFAULT_REGION');
+      region = Constants.GET('CDK_DEFAULT_REGION');
     }
     const s3 = new S3Client({ region: region });
     return s3;
@@ -53,7 +58,7 @@ export class Constants {
   public static async LoadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {
     const split = uri.split('://');
     const scheme = split[0];
-    if (!scheme || scheme === '' || scheme === 'file') {
+    if (!scheme || scheme === '' || scheme === 'file' || scheme[0] === '/' || scheme[0] == '.' ) {
       return Constants.LoadObjectFile(uri, env);
     }
     if (scheme !== 's3') {
@@ -96,14 +101,18 @@ export class Constants {
     }
   }
 
-  public static LoadPipeline(pipeline: string, env: any = {}) {
+  public static async LoadPipeline(pipeline: string, env: any = {}) {
+    var base = './config';
     if (typeof env.package !== 'string' || env.package === '') {
       env.package = pipeline;
     }
-    const paramsFile = `./config/${pipeline}/params.json`;
-    const launchFile = `./config/${pipeline}/launch.json`;
-    const params = Constants.LoadObjectFile(paramsFile, env);
-    const launch = Constants.LoadObjectFile(launchFile, env);
+    if (typeof env.base_config === 'string' && env.base_config !== '') {
+      base = env.base_config;
+    }
+    const paramsFile = `${base}/${pipeline}/params.json`;
+    const launchFile = `${base}/${pipeline}/launch.json`;
+    const params = await Constants.LoadObjectURI(paramsFile, env);
+    const launch = await Constants.LoadObjectURI(launchFile, env);
     launch.paramsText = JSON.stringify(params);
     return launch;
   }

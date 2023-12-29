@@ -13,19 +13,19 @@ describe('VivosBenchling', () => {
     entry = Constants.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
   });
 
-  it('should getEventParams', async () => {
+  IT.ifhas('BENCHLING_ACCESS_TOKEN')('should getEventParams', async () => {
     const params = await vivos.getEventParams();
     expect(params).toBeDefined();
     expect(params).toHaveProperty('outdir');
   });
 
-  it('should getReportURL', () => {
+  IT.ifhas('BENCHLING_ACCESS_TOKEN')('should getReportURL', () => {
     const url = vivos.getReportURL();
     expect(url).toBeDefined();
     expect(url).toEqual('https://demo.quiltdata.com/b/nf-core-gallery/packages/quiltdata/nf-quilt/latest/tree/multiqc/multiqc_report.html');
   });
 
-  it('should return toDict', () => {
+  IT.ifhas('BENCHLING_ACCESS_TOKEN')('should return toDict', () => {
     const dict = vivos.toDict();
     expect(dict).toBeDefined();
     expect(dict).toHaveProperty('event_object');

@@ -27,12 +27,13 @@ export class VivosBenchling extends Vivos {
   constructor(event: any, context: any) {
     context.OPEN_API_FILE = Constants.DEFAULTS.BENCHLING_API_FILE;
     super(event, context);
-    this.api_key = this.cc.get('BENCHLING_ACCESS_TOKEN');
-    this.api_url = `https://${this.cc.get('BENCHLING_TENANT')}.benchling.com/api/v2`;
+    this.api_key = this.get('BENCHLING_ACCESS_TOKEN');
+    this.api_url = `https://${this.get('BENCHLING_TENANT')}.benchling.com/api/v2`;
   }
 
   public async getBenchlingClient(): Promise<BenchlingClient> {
-    const client = await this.api(true).init<BenchlingClient>();
+    const this_api = await this.api(true);
+    const client = this_api.init<BenchlingClient>();
     return client;
   }
 

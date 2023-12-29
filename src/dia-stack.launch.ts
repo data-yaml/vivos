@@ -1,3 +1,4 @@
+import { KeyedConfig } from './constants';
 import { VivosBenchling } from './vivos.benchling';
 import { VivosTower } from './vivos.tower';
 
@@ -5,7 +6,7 @@ async function launch(tower: VivosTower) {
   try {
     // Submit the workflow using NextFlow Tower
     const options = await tower.launch_options();
-    await tower.log(`VivosTower.handler.options: ${JSON.stringify(options)}`);
+    await tower.log(`VivosTower.launch_options: ${JSON.stringify(options)}`);
     const workflowId = await tower.launch(options);
     return {
       statusCode: 200,
@@ -22,10 +23,10 @@ async function launch(tower: VivosTower) {
 }
 
 function update_options(response: any) {
-  return {
-    'VivosBenchling.FLD_TOWER_URL': response.url,
-    'VivosBenchling.FLD_STATUS': 'Launched',
-  };
+  const result: KeyedConfig = {};
+  result[VivosBenchling.FLD_TOWER_URL] = response.url;
+  result[VivosBenchling.FLD_STATUS] = 'Launched';
+  return result;
 }
 
 export async function handler(event: any, context: any) {
@@ -33,8 +34,8 @@ export async function handler(event: any, context: any) {
   await tower.log(`VivosTower.handler.event: ${JSON.stringify(event)}`);
   const status = await tower.getStatus();
   const entry = await tower.getEventEntry();
-  if (status !== '' && status[0] !== 'N') {
-    // Do NOT run unless status is empty or New/No
+  if (status !== '' && status[0] !== 'N' && status[0] !== '2') {
+    // Do NOT run unless status is empty or New/No (and not test Timestamp)
     console.warn(`VivosTower.not_launched.status=${status}\n${tower}`);
     return {
       statusCode: 204,
