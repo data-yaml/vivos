@@ -9,7 +9,7 @@
             "s3": {
                 "s3SchemaVersion": "1.0",
                 "bucket": {
-                    "name": "nf-core-gallery",
+                    "name": "quilt-demos",
                     "arn": "bucket-ARN"
                 },
                 "object": {

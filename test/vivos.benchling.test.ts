@@ -22,7 +22,7 @@ describe('VivosBenchling', () => {
   IT.ifhas('BENCHLING_ACCESS_TOKEN')('should getReportURL', () => {
     const url = vivos.getReportURL();
     expect(url).toBeDefined();
-    expect(url).toEqual('https://demo.quiltdata.com/b/nf-core-gallery/packages/quiltdata/nf-quilt/latest/tree/multiqc/multiqc_report.html');
+    expect(url).toEqual('https://demo.quiltdata.com/b/quilt-demos/packages/quiltdata/nf-quilt/latest/tree/multiqc/multiqc_report.html');
   });
 
   IT.ifhas('BENCHLING_ACCESS_TOKEN')('should return toDict', () => {

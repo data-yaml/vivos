@@ -30,7 +30,7 @@ describe('Constants', () => {
   });
   describe('LoadObjectURI', () => {
     it('should load object URI correctly', async () => {
-      const uri = 's3://nf-core-gallery/benchling/EXP23000052/entry.json';
+      const uri = 's3://quilt-demos/benchling/EXP23000052/entry.json';
       const result = await Constants.LoadObjectURI(uri);
       expect(result).toBeDefined();
       expect(result).toHaveProperty('id');
