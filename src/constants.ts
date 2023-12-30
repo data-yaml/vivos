@@ -73,7 +73,6 @@ export class Constants {
       Bucket: bucket,
       Key: key,
     });
-    console.info(`Sending command: ${JSON.stringify(command)}`);
     const response = await s3.send(command);
     const contents = await response.Body!.transformToString();
     const extension = file.split('.').pop()?.toLowerCase();

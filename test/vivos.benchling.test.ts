@@ -16,7 +16,6 @@ describe('VivosBenchling', () => {
   it.skip('should getEventParams', async () => {
     const params = await vivos.getEventParams();
     expect(params).toBeDefined();
-    console.log(params);
     expect(params).toHaveProperty('outdir');
   });
 
