@@ -23,7 +23,7 @@ export class LogStack extends Stack {
   public static DefaultProps(context: any = {}): LogStackProps {
     const cc = new Constants(context);
     const props = cc.defaultProps();
-    props.buckets = cc.get('TOWER_OUTPUT_BUCKET');
+    props.buckets = [cc.get('TOWER_OUTPUT_BUCKET')];
     props.email = cc.get('CDK_LOG_EMAIL');
     props.suffix = cc.get('VIVOS_CONFIG_SUFFIX');
     console.info('LogStackProps', props);
@@ -32,6 +32,7 @@ export class LogStack extends Stack {
 
   constructor(scope: Construct, id: string, props: LogStackProps) {
     super(scope, id, props);
+
     const bucketArnList = props.buckets.map(bucket => `arn:aws:s3:::${bucket}`);
     console.info('bucketArnList', bucketArnList);
 
@@ -59,11 +60,11 @@ export class LogStack extends Stack {
     const topic = new Topic(this, 'VivosLogTopic', {
       displayName: 'VIVOS Log Topic',
     });
-
-    const emailSubscription = new EmailSubscription(props.email);
-    topic.addSubscription(emailSubscription);
-
-    // Link the topic to the eventRule
     eventRule.addTarget(new SnsTopic(topic));
+    if (props.email) {
+      topic.addSubscription(new EmailSubscription(props.email));
+    } else {
+      console.warn('No `CDK_LOG_EMAIL` provided for log notifications');
+    }
   }
 };
