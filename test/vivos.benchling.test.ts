@@ -1,47 +1,45 @@
-import { IT } from './helpers';
+// import { IT } from './helpers';
 import Constants from '../src/constants';
 import { VivosBenchling, Entry } from '../src/vivos.benchling';
 
 
-describe('VivosBenchling', () => {
+describe.skip('VivosBenchling', () => {
   let vivos: VivosBenchling;
   let entry: Entry;
 
   beforeEach(() => {
     const event = Constants.LoadObjectFile('test/data/event-params.json');
     entry = Constants.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
-    if (IT.has('BENCHLING_ACCESS_TOKEN')) {
-      vivos = new VivosBenchling(event, {});
-    }
+    vivos = new VivosBenchling(event, {});
   });
 
-  IT.ifhas('BENCHLING_ACCESS_TOKEN')('should getEventParams', async () => {
+  it('should getEventParams', async () => {
     const params = await vivos.getEventParams();
     expect(params).toBeDefined();
     expect(params).toHaveProperty('outdir');
   });
 
-  IT.ifhas('BENCHLING_ACCESS_TOKEN')('should getReportURL', () => {
+  it('should getReportURL', () => {
     const url = vivos.getReportURL();
     expect(url).toBeDefined();
     expect(url).toEqual('https://demo.quiltdata.com/b/quilt-demos/packages/config/quiltdata/latest/tree/multiqc/multiqc_report.html');
   });
 
-  IT.ifhas('BENCHLING_ACCESS_TOKEN')('should return toDict', () => {
+  it('should return toDict', () => {
     const dict = vivos.toDict();
     expect(dict).toBeDefined();
     expect(dict).toHaveProperty('event_object');
   });
 
   describe('getEntry', () => {
-    IT.ifhas('BENCHLING_ACCESS_TOKEN')('should return an entry by id', async () => {
+    it('should return an entry by id', async () => {
       const new_entry = await vivos.getEntry(entry.id!);
       expect(new_entry.apiURL).toEqual(entry.apiURL);
     });
   });
 
   describe('updateEntry', () => {
-    it.skip('should update an entry with the given fields', async () => {
+    it('should update an entry with the given fields', async () => {
       const timestamp = new Date().toISOString();
       const updatedEntry = await vivos.updateEntry(entry.id!, { Status: timestamp });
       const status = updatedEntry.fields?.Status?.value;

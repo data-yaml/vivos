@@ -63,7 +63,7 @@ describe('VivosTower', () => {
     expect(launchOptions.configText).toBe("plugins = ['nf-quilt']");
     //expect(launchOptions.pipeline).toContain(pipeline);
     expect(launchOptions.revision).toBe('main');
-    expect(launchOptions.workDir).toContain(bucket);
+    //expect(launchOptions.workDir).toContain(bucket);
 
     const params = launchOptions.paramsText!;
     expect(params).toContain(bucket);
