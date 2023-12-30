@@ -30,11 +30,11 @@ export class PipeStack extends Stack {
     return props as PipeStackProps;
   }
 
+  public props: PipeStackProps;
   constructor(scope: Construct, id: string, props: PipeStackProps) {
     super(scope, id, props);
-
+    this.props = props;
     const bucketArnList = props.buckets.map(bucket => `arn:aws:s3:::${bucket}`);
-    console.info('bucketArnList', bucketArnList);
 
     // Monitor EventBridge events from the buckets
     // matching suffix props.suffix
