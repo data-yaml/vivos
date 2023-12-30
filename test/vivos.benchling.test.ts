@@ -9,11 +9,13 @@ describe('VivosBenchling', () => {
 
   beforeEach(() => {
     const event = Constants.LoadObjectFile('test/data/event-params.json');
-    vivos = new VivosBenchling(event, {});
     entry = Constants.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
+    if (IT.has('BENCHLING_ACCESS_TOKEN')) {
+      vivos = new VivosBenchling(event, {});
+    }
   });
 
-  it.skip('should getEventParams', async () => {
+  IT.ifhas('BENCHLING_ACCESS_TOKEN')('should getEventParams', async () => {
     const params = await vivos.getEventParams();
     expect(params).toBeDefined();
     expect(params).toHaveProperty('outdir');
