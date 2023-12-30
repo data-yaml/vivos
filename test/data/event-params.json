@@ -13,7 +13,7 @@
                     "arn": "bucket-ARN"
                 },
                 "object": {
-                    "key": "quiltdata/nf-quilt/nf-quilt/params.json",
+                    "key": "config/quiltdata/nf-quilt/launch.json",
                     "size": 12345,
                     "eTag": "object-eTag",
                     "versionId": "object-version-id"

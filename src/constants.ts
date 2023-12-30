@@ -69,11 +69,11 @@ export class Constants {
     const bucket = paths[0];
     const file = paths.slice(-1)[0];
     const key = paths.slice(1).join('/');
-    console.info(`Loading ${file} from ${bucket} in ${key}`);
     const command = new GetObjectCommand({
       Bucket: bucket,
       Key: key,
     });
+    console.info(`Sending command: ${JSON.stringify(command)}`);
     const response = await s3.send(command);
     const contents = await response.Body!.transformToString();
     const extension = file.split('.').pop()?.toLowerCase();
