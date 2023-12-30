@@ -54,7 +54,7 @@ describe('VivosTower', () => {
   it('should generate valid launch_options', async () => {
     const event = Constants.LoadObjectFile('test/data/event-entry.json');
     const evivos = new VivosTower(event, {});
-    const pipeline = 'wfquiltdata/nf-quilt';
+    const pipeline = 'quiltdata/nf-quilt';
     const bucket = evivos.event_bucket;
     const launchOptions = await evivos.launch_options();
     expect(launchOptions).toBeDefined();
