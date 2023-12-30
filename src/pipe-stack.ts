@@ -1,4 +1,4 @@
-/// LogStackProps contain a list of Buckets to monitor
+/// PipeStackProps contain a list of Buckets to monitor
 /// and an email address to notify
 /// whenever a file with Constants.VIVOS_CONFIG_SUFFIX is uploaded
 /// to one of the buckets.
@@ -13,24 +13,24 @@ import { Construct } from 'constructs';
 import { Constants } from './constants';
 
 
-export interface LogStackProps extends StackProps {
+export interface PipeStackProps extends StackProps {
   buckets: string[];
   email: string;
   suffix: string;
 }
 
-export class LogStack extends Stack {
-  public static DefaultProps(context: any = {}): LogStackProps {
+export class PipeStack extends Stack {
+  public static DefaultProps(context: any = {}): PipeStackProps {
     const cc = new Constants(context);
     const props = cc.defaultProps();
     props.buckets = [cc.get('TOWER_OUTPUT_BUCKET')];
     props.email = cc.get('CDK_LOG_EMAIL');
     props.suffix = cc.get('VIVOS_CONFIG_SUFFIX');
-    console.info('LogStackProps', props);
-    return props as LogStackProps;
+    console.info('PipeStackProps', props);
+    return props as PipeStackProps;
   }
 
-  constructor(scope: Construct, id: string, props: LogStackProps) {
+  constructor(scope: Construct, id: string, props: PipeStackProps) {
     super(scope, id, props);
 
     const bucketArnList = props.buckets.map(bucket => `arn:aws:s3:::${bucket}`);
