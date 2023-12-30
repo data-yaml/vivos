@@ -19,10 +19,10 @@
                 "s3SchemaVersion": "1.0",
                 "configurationId": "arn:aws:cloudformation:us-west-2:850787717197:stack/vivos-dev/b4c795d0-8d90-11ee-a3be-026280702b43-4041400875903124910",
                 "bucket": {
-                    "name": "nf-core-gallery",
+                    "name": "quilt-demos",
                     "ownerIdentity": {
                     },
-                    "arn": "arn:aws:s3:::nf-core-gallery"
+                    "arn": "arn:aws:s3:::quilt-demos"
                 },
                 "object": {
                     "key": "benchling/EXP23000052/entry.json",

@@ -34,6 +34,7 @@ export class DiaStack extends Stack {
     const cc = new Constants(context);
     const props = cc.defaultProps();
     props.bucketURI = cc.get('TOWER_OUTPUT_BUCKET');
+    console.info('DiaStackProps', props);
     return props as DiaStackProps;
   }
 

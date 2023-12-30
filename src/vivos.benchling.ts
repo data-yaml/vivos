@@ -41,7 +41,7 @@ export class VivosBenchling extends Vivos {
     if (this.event_object && this.event_object.includes(this.get('TOWER_OUTPUT_FILE'))) {
       return this.getEventObject();
     }
-    throw `gegetEventParamstParams not found in: ${this.event_object}`;
+    throw `getEventParams:${this.get('TOWER_OUTPUT_FILE')} not found in: ${this.event_object}`;
   }
 
   public getReportURL(): string {

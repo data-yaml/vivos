@@ -30,10 +30,10 @@ describe('Constants', () => {
   });
   describe('LoadObjectURI', () => {
     it('should load object URI correctly', async () => {
-      const uri = 's3://nf-core-gallery/benchling/EXP23000052/entry.json';
+      const uri = 's3://quilt-demos/config/quiltdata/nf-quilt/launch.json';
       const result = await Constants.LoadObjectURI(uri);
       expect(result).toBeDefined();
-      expect(result).toHaveProperty('id');
+      expect(result).toHaveProperty('revision');
     });
     it('should local relative path correctly', async () => {
       const uri = './test/data/entry.json';

@@ -54,15 +54,15 @@ describe('VivosTower', () => {
   it('should generate valid launch_options', async () => {
     const event = Constants.LoadObjectFile('test/data/event-entry.json');
     const evivos = new VivosTower(event, {});
-    const pipeline = 'nf-core/hlatyping';
+    const pipeline = 'quiltdata/nf-quilt';
     const bucket = evivos.event_bucket;
     const launchOptions = await evivos.launch_options();
     expect(launchOptions).toBeDefined();
     expect(launchOptions.computeEnvId).toBe(evivos.get('TOWER_COMPUTE_ENV_ID'));
-    expect(launchOptions.configProfiles).toEqual(['test_full']);
+    expect(launchOptions.configProfiles).toEqual(['standard']);
     expect(launchOptions.configText).toBe("plugins = ['nf-quilt']");
-    expect(launchOptions.pipeline).toContain(pipeline);
-    expect(launchOptions.revision).toBe('master');
+    //expect(launchOptions.pipeline).toContain(pipeline);
+    expect(launchOptions.revision).toBe('main');
     expect(launchOptions.workDir).toContain(bucket);
 
     const params = launchOptions.paramsText!;

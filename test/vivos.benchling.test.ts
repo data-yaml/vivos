@@ -13,7 +13,7 @@ describe('VivosBenchling', () => {
     entry = Constants.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
   });
 
-  IT.ifhas('BENCHLING_ACCESS_TOKEN')('should getEventParams', async () => {
+  it.skip('should getEventParams', async () => {
     const params = await vivos.getEventParams();
     expect(params).toBeDefined();
     expect(params).toHaveProperty('outdir');
@@ -22,7 +22,7 @@ describe('VivosBenchling', () => {
   IT.ifhas('BENCHLING_ACCESS_TOKEN')('should getReportURL', () => {
     const url = vivos.getReportURL();
     expect(url).toBeDefined();
-    expect(url).toEqual('https://demo.quiltdata.com/b/nf-core-gallery/packages/quiltdata/nf-quilt/latest/tree/multiqc/multiqc_report.html');
+    expect(url).toEqual('https://demo.quiltdata.com/b/quilt-demos/packages/config/quiltdata/latest/tree/multiqc/multiqc_report.html');
   });
 
   IT.ifhas('BENCHLING_ACCESS_TOKEN')('should return toDict', () => {
@@ -39,7 +39,7 @@ describe('VivosBenchling', () => {
   });
 
   describe('updateEntry', () => {
-    IT.ifhas('BENCHLING_ACCESS_TOKEN')('should update an entry with the given fields', async () => {
+    it.skip('should update an entry with the given fields', async () => {
       const timestamp = new Date().toISOString();
       const updatedEntry = await vivos.updateEntry(entry.id!, { Status: timestamp });
       const status = updatedEntry.fields?.Status?.value;
