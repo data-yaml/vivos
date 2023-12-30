@@ -11,8 +11,8 @@ export class Constants {
 
   public static DEFAULTS: { [key: string]: any } = {
     APP_NAME: 'vivos',
-    BASE_API: 's3://quilt-vivos/api',
-    BASE_CONFIG: 's3://quilt-vivos/config',
+    BASE_API: 's3://quilt-demos/api',
+    BASE_CONFIG: 's3://quilt-demos/config',
     BENCHLING_API_FILE: 'benchling.yaml',
     BENCHLING_API_URL: 'https://quilt-dtt.benchling.com/api/v2',
     PETSTORE_API_FILE: 'petstore.yaml',
