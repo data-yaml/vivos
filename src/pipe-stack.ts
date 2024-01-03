@@ -40,6 +40,7 @@ export class PipeStack extends Stack {
 
     // Monitor EventBridge events from the buckets
     // matching suffix props.suffix
+    // https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_events.EventPattern.html
     const eventRule = new Rule(this, 'VivosLogBucketRule', {
       description: 'VIVOS Log Bucket Rule',
       eventPattern: {
@@ -47,6 +48,11 @@ export class PipeStack extends Stack {
         source: ['aws.s3'],
         resources: bucketArnList,
         detail: {
+          object: {
+            key: [
+              { suffix: props.suffix },
+            ],
+          },
           reason: ['PutObject'],
         },
       },
