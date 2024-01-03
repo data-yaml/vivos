@@ -23,7 +23,9 @@ export class PipeStack extends Stack {
   public static DefaultProps(context: any = {}): PipeStackProps {
     const cc = new Constants(context);
     const props = cc.defaultProps();
-    props.buckets = [cc.get('TOWER_OUTPUT_BUCKET')];
+    props.buckets = [
+      cc.get('TOWER_OUTPUT_BUCKET').split('//')[1],
+    ];
     props.email = cc.get('CDK_LOG_EMAIL');
     props.suffix = cc.get('VIVOS_CONFIG_SUFFIX');
     console.info('PipeStackProps', props);
@@ -41,17 +43,11 @@ export class PipeStack extends Stack {
     const eventRule = new Rule(this, 'VivosLogBucketRule', {
       description: 'VIVOS Log Bucket Rule',
       eventPattern: {
+        detailType: ['Object Created'],
         source: ['aws.s3'],
-        detailType: ['AWS API Call via CloudTrail'],
+        resources: bucketArnList,
         detail: {
-          eventSource: ['s3.amazonaws.com'],
-          eventName: ['PutObject'],
-          requestParameters: {
-            bucketName: props.buckets,
-          },
-          resources: {
-            ARN: bucketArnList,
-          },
+          reason: ['PutObject'],
         },
       },
     });
