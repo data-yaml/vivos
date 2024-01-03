@@ -1,3 +1,4 @@
+import { GetObjectAttributesCommand, GetObjectAttributesRequest } from '@aws-sdk/client-s3';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { Document, OpenAPIClientAxios, OpenAPIClient } from 'openapi-client-axios';
 import { Constants, KeyedConfig } from './constants';
@@ -49,15 +50,34 @@ export class Vivos {
     return this_api.getClient();
   }
 
+  public getEventObjectURI(): string {
+    return `s3://${this.event_bucket}/${this.event_object}`;
+  }
+
+  public getEventObjectFolder(): string {
+    const entry_uri = this.getEventObjectURI();
+    const entry_parent = entry_uri.split('/').slice(0, -1).join('/');
+    return entry_parent;
+  }
+
   public async getEventObject(): Promise<KeyedConfig> {
-    const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
+    const entry_uri = this.getEventObjectURI();
     return Constants.LoadObjectURI(entry_uri);
   }
 
-  public async getEventFolder(): Promise<String> {
-    const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
-    const entry_parent = entry_uri.split('/').slice(0, -1).join('/');
-    return entry_parent;
+  public async getEventObjectAttributes(key = ''): Promise<KeyedConfig> {
+    // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/GetObjectAttributesCommand/
+    const options: GetObjectAttributesRequest = {
+      Bucket: this.event_bucket,
+      Key: key || this.event_object,
+      ObjectAttributes: [ // ObjectAttributesList // required
+        'ETag' || 'Checksum' || 'LastModified' || 'DeleteMarker' || 'ObjectSize' || 'VersionId',
+      ],
+    };
+    const s3 = Constants.DefaultS3();
+    const command = new GetObjectAttributesCommand(options);
+    const response = await s3.send(command);
+    return response;
   }
 
   // log message to STATUS_TOPIC_ARN if defined

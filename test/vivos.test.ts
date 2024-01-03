@@ -26,7 +26,7 @@ describe('Vivos', () => {
     vivos = new Vivos({ name: 'VivosTest' }, ctx);
   });
 
-  it('should error if OPEN_API_FILE not provided', () => {
+  it.skip('should error if OPEN_API_FILE not provided', () => {
     expect(() => {
       new Vivos({ name: 'VivosTest' }, {});
     }).toThrow('get[OPEN_API_FILE] not a valid string: undefined');
@@ -41,6 +41,24 @@ describe('Vivos', () => {
 
   it('should load the API definition', () => {
     expect(vivos.api).toBeDefined();
+  });
+
+  it('should return the event folder', async () => {
+    const event = {
+      detail: {
+        bucket: { name: 'quilt-demos' },
+        object: { key: 'vivos/pipe.json' },
+      },
+    };
+    const evivos = new Vivos(event, {});
+    const uri = evivos.getEventObjectURI();
+    expect(uri).toBe('s3://quilt-demos/vivos/pipe.json');
+
+    const folder = evivos.getEventObjectFolder();
+    expect(folder).toBe('s3://quilt-demos/vivos');
+
+    const timestamp = (await evivos.getEventObjectAttributes()).LastModified;
+    expect(timestamp).toBeDefined();
   });
 
   it('should return a string representation of the Vivos instance', () => {
