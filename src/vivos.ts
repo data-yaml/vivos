@@ -14,6 +14,11 @@ export class Vivos {
     'STATUS_TOPIC_ARN',
   ];
 
+  public static getStem(filename: string): string {
+    const stem = filename.split('.').slice(0, -1).join('.');
+    return stem;
+  }
+
   public readonly event_bucket: string;
   public readonly event_object: string;
   protected event: any;
@@ -52,12 +57,6 @@ export class Vivos {
 
   public getEventObjectURI(): string {
     return `s3://${this.event_bucket}/${this.event_object}`;
-  }
-
-  public getEventObjectFolder(): string {
-    const entry_uri = this.getEventObjectURI();
-    const entry_parent = entry_uri.split('/').slice(0, -1).join('/');
-    return entry_parent;
   }
 
   public async getEventObject(): Promise<KeyedConfig> {

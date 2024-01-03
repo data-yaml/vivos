@@ -54,8 +54,8 @@ describe('Vivos', () => {
     const uri = evivos.getEventObjectURI();
     expect(uri).toBe('s3://quilt-demos/vivos/pipe.json');
 
-    const folder = evivos.getEventObjectFolder();
-    expect(folder).toBe('s3://quilt-demos/vivos');
+    const folder = Vivos.getStem(uri);
+    expect(folder).toBe('s3://quilt-demos/vivos/pipe');
 
     const timestamp = (await evivos.getEventObjectAttributes()).LastModified;
     expect(timestamp).toBeDefined();
