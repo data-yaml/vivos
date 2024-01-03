@@ -89,15 +89,15 @@ describe('Constants', () => {
   });
 
   describe('GetKeyPathFromFile', () => {
-    function checkKeyPathValue(keyPath: string, value: string) {
+    function checkKeyPathValue(keyPath: string, value: any) {
       const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
       const result = Constants.GetKeyPathFromFile(filePath, keyPath);
       expect(result).toEqual(value);
     }
 
     it('should return the value for a given key path', () => {
-      checkKeyPathValue('id', 'etr_ehERLyf6');
-      checkKeyPathValue('fields.Pipeline.value', 'nf-core/hlatyping');
+      checkKeyPathValue('version', '0');
+      checkKeyPathValue('detail.object.size', 39500);
     });
 
     it('should return undefined if the key path does not exist', () => {

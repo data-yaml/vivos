@@ -25,12 +25,12 @@ export class Vivos {
 
   constructor(event: any, context: any) {
     this.event = event;
-    const records = event.Records;
-    this.event_bucket = (records) ? records[0].s3.bucket.name : '';
-    this.event_object = (records) ? records[0].s3.object.key : '';
+    const detail = event.detail;
+    this.event_bucket = (detail) ? detail.bucket.name : '';
+    this.event_object = (detail) ? detail.object.key : '';
     this.cc = new Constants(context);
     this._api = undefined;
-    this.api_file = this.get('OPEN_API_FILE');
+    this.api_file = this.cc.get('OPEN_API_FILE');
     this.api_key = this.cc.get('OPEN_API_KEY');
     this.api_url = this.cc.get('OPEN_API_URL');
     this.sns_client = new SNSClient({});
@@ -52,6 +52,12 @@ export class Vivos {
   public async getEventObject(): Promise<KeyedConfig> {
     const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
     return Constants.LoadObjectURI(entry_uri);
+  }
+
+  public async getEventFolder(): Promise<String> {
+    const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
+    const entry_parent = entry_uri.split('/').slice(0, -1).join('/');
+    return entry_parent;
   }
 
   // log message to STATUS_TOPIC_ARN if defined

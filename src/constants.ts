@@ -17,7 +17,7 @@ export class Constants {
     BENCHLING_API_URL: 'https://quilt-dtt.benchling.com/api/v2',
     PETSTORE_API_FILE: 'petstore.yaml',
     PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
-    TEST_ENTRY_FILE: './test/data/entry.json',
+    TEST_ENTRY_FILE: './test/data/PutObject.json',
     TOWER_API_FILE: 'tower.yaml',
     TOWER_API_URL: 'https://api.tower.nf',
     TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
