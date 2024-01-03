@@ -3,21 +3,26 @@ import { PipeOmics } from './pipe.omics';
 import { PipeQuilt } from './pipe.quilt';
 import { PipeTower } from './pipe.tower';
 
-function getSubclass(pipe: Pipe) {
-  const subclass = pipe.findPrefix();
-  switch (subclass) {
-    case 'omics':
-      return PipeOmics;
-    case 'quilt':
-      return PipeQuilt;
-    case 'tower':
-      return PipeTower;
+export const PIPE_CLASSES = [PipeOmics, PipeQuilt, PipeTower, Pipe];
+
+export function getSubclass(prefix: string) {
+  for (const cls of PIPE_CLASSES) {
+    if (cls.getPrefix() === prefix) {
+      return cls;
+    }
   }
-  throw new Error('No subclass found');
+  return undefined;
 }
+
 export async function handler(event: any, context: any) {
   const pipe = new Pipe(event, context);
-  const subclass = getSubclass(pipe);
-  const child = new subclass(event, context);
-  await child.exec();
+  const subclass = getSubclass(pipe.findPrefix());
+  if (!subclass) {
+    return {
+      status: 'error',
+      message: `No subclass found for ${pipe.findPrefix()}`,
+    };
+  }
+  const child: Pipe = new subclass(event, context);
+  return child.exec();
 }

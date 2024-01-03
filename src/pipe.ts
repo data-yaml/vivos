@@ -1,3 +1,10 @@
+/// Parent class for all pipes
+/// Pipes are triggered by a file being uploaded to S3
+/// and end by writing a sentinel file (to prevent re-running)
+/// (including for non-retriable errors)
+
+// TODO: implement "test" pipe that just writes a sentinel file
+
 import { Vivos } from './vivos';
 
 export class Pipe extends Vivos {
@@ -5,8 +12,11 @@ export class Pipe extends Vivos {
     return 'test';
   }
 
+  public event_sentinel: string;
+
   constructor(event: any, context: any) {
     super(event, context);
+    this.event_sentinel = Vivos.getStem(this.event_object) + '.md';
   }
 
   public findPrefix(): string {
@@ -26,11 +36,14 @@ export class Pipe extends Vivos {
 
   public async exec(): Promise<any> {
     if (await this.sentinel_newer()) {
-      console.error('Sentinel is newer');
-      return;
+      return {
+        status: 'ignore',
+        message: 'Sentinel file newer than event file',
+      };
     }
     await this.run();
     await this.write_sentinel();
+    return { status: 'success' };
   }
 
   public async run(): Promise<any> {
