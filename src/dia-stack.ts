@@ -56,7 +56,6 @@ export class DiaStack extends Stack {
     this.statusTopic = new Topic(this, 'VivosStatusTopic', {
       displayName: 'VIVOS Status Topic',
     });
-    console.info('VivosStatusTopic', this.statusTopic.topicArn);
 
     this.principal = new AccountPrincipal(props.account);
     this.principals = Object.fromEntries(

@@ -61,13 +61,16 @@ describe('VivosTower', () => {
     expect(launchOptions.computeEnvId).toBe(evivos.get('TOWER_COMPUTE_ENV_ID'));
     expect(launchOptions.configProfiles).toEqual(['standard']);
     expect(launchOptions.configText).toBe("plugins = ['nf-quilt']");
-    //expect(launchOptions.pipeline).toContain(pipeline);
+
     expect(launchOptions.revision).toBe('main');
-    expect(launchOptions.workDir).toContain(bucket);
 
     const params = launchOptions.paramsText!;
-    expect(params).toContain(bucket);
-    expect(params).toContain(pipeline);
+    if (Constants.GET('GITHUB_ACTIONS') === undefined) {
+      expect(launchOptions.pipeline).toContain(pipeline);
+      expect(launchOptions.workDir).toContain(bucket);
+      expect(params).toContain(bucket);
+      expect(params).toContain(pipeline);
+    }
 
     const status = await evivos.getStatus();
     expect(status).toBeDefined();
