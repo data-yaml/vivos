@@ -1,8 +1,5 @@
 import 'dotenv/config';
-import { readFileSync } from 'fs';
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import handlebars from 'handlebars';
-import yaml from 'js-yaml';
+import { UPath } from './upath';
 
 export type KeyedConfig = {
   [key: string]: any;
@@ -41,64 +38,11 @@ export class Constants {
     return envs;
   }
 
-  public static DefaultS3(region: string = '') {
-    if (region === '') {
-      region = Constants.GET('CDK_DEFAULT_REGION');
-    }
-    const s3 = new S3Client({ region: region });
-    return s3;
-  }
-
   public static GetPackageName(filePath: string): string {
     // first two components, joined by a slash
     const base = filePath.startsWith('/') ? 1 : 0;
     const components = filePath.split('/').slice(base, base+2);
     return components.join('/');
-  }
-
-  public static async LoadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {
-    const split = uri.split('://');
-    const scheme = split[0];
-    if (!scheme || scheme === '' || scheme === 'file' || scheme[0] === '/' || scheme[0] == '.' ) {
-      return Constants.LoadObjectFile(uri, env);
-    }
-    if (scheme !== 's3') {
-      throw new Error(`Unsupported scheme: ${scheme}`);
-    }
-    const paths = split[1].split('/');
-    const s3 = Constants.DefaultS3();
-    const bucket = paths[0];
-    const file = paths.slice(-1)[0];
-    const key = paths.slice(1).join('/');
-    const command = new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-    });
-    const response = await s3.send(command);
-    const contents = await response.Body!.transformToString();
-    const extension = file.split('.').pop()?.toLowerCase();
-    return Constants.LoadObjectData(contents, extension!, env);
-  }
-
-  public static LoadObjectFile(filePath: string, env: object = {}): KeyedConfig {
-    var fileData = readFileSync(filePath, 'utf-8');
-    const fileExtension = filePath.split('.').pop()?.toLowerCase();
-    return Constants.LoadObjectData(fileData, fileExtension!, env);
-  }
-
-  public static LoadObjectData(data: string, extension: string, env: object = {}): KeyedConfig {
-    if (Object.keys(env).length > 0) {
-      const template = handlebars.compile(data);
-      data = template(env);
-    }
-
-    if (extension === 'yaml' || extension === 'yml') {
-      return yaml.load(data) as KeyedConfig;
-    } else if (extension === 'json') {
-      return JSON.parse(data);
-    } else {
-      throw new Error(`Unsupported file extension: ${extension}`);
-    }
   }
 
   public static async LoadPipeline(pipeline: string, env: any = {}) {
@@ -111,8 +55,8 @@ export class Constants {
     }
     const paramsFile = `${base}/${pipeline}/params.json`;
     const launchFile = `${base}/${pipeline}/launch.json`;
-    const params = await Constants.LoadObjectURI(paramsFile, env);
-    const launch = await Constants.LoadObjectURI(launchFile, env);
+    const params = await UPath.LoadObjectURI(paramsFile, env);
+    const launch = await UPath.LoadObjectURI(launchFile, env);
     launch.paramsText = JSON.stringify(params);
     return launch;
   }
@@ -131,7 +75,7 @@ export class Constants {
 
   public static GetKeyPathFromFile(filePath: string, keyPath: string): any {
     try {
-      const object = Constants.LoadObjectFile(filePath);
+      const object = UPath.LoadObjectFile(filePath);
       return Constants.GetKeyPathFromObject(object, keyPath);
     } catch (e: any) {
       console.error(e.message);

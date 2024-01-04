@@ -1,4 +1,5 @@
 import { Constants } from '../src/constants';
+import { UPath } from '../src/upath';
 import { Vivos } from '../src/vivos';
 
 const PETINFO = {
@@ -34,7 +35,7 @@ describe('Vivos', () => {
 
   it('should load the config from a file', async () => {
     const api_path = `${Constants.DEFAULTS.BASE_API}/${Constants.DEFAULTS.PETSTORE_API_FILE}`;
-    const config = await Constants.LoadObjectURI(api_path);
+    const config = await UPath.LoadObjectURI(api_path);
     // Assert that the config is loaded correctly
     expect(config.info.title).toContain('Petstore');
   });

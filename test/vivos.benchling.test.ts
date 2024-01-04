@@ -1,15 +1,15 @@
 // import { IT } from './helpers';
 import Constants from '../src/constants';
+import { UPath } from '../src/upath';
 import { VivosBenchling, Entry } from '../src/vivos.benchling';
-
 
 describe.skip('VivosBenchling', () => {
   let vivos: VivosBenchling;
   let entry: Entry;
 
   beforeEach(() => {
-    const event = Constants.LoadObjectFile('test/data/event-params.json');
-    entry = Constants.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
+    const event = UPath.LoadObjectFile('test/data/event-params.json');
+    entry = UPath.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
     vivos = new VivosBenchling(event, {});
   });
 

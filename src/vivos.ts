@@ -2,6 +2,7 @@ import { GetObjectAttributesCommand, GetObjectAttributesRequest } from '@aws-sdk
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { Document, OpenAPIClientAxios, OpenAPIClient } from 'openapi-client-axios';
 import { Constants, KeyedConfig } from './constants';
+import { UPath } from './upath';
 
 export class Vivos {
 
@@ -61,7 +62,7 @@ export class Vivos {
 
   public async getEventObject(): Promise<KeyedConfig> {
     const entry_uri = this.getEventObjectURI();
-    return Constants.LoadObjectURI(entry_uri);
+    return UPath.LoadObjectURI(entry_uri);
   }
 
   public async getEventObjectAttributes(key = ''): Promise<KeyedConfig> {
@@ -73,7 +74,7 @@ export class Vivos {
         'ETag' || 'Checksum' || 'LastModified' || 'DeleteMarker' || 'ObjectSize' || 'VersionId',
       ],
     };
-    const s3 = Constants.DefaultS3();
+    const s3 = UPath.DefaultS3();
     const command = new GetObjectAttributesCommand(options);
     const response = await s3.send(command);
     return response;
@@ -118,7 +119,7 @@ export class Vivos {
 
   public async loadApi(filename: string): Promise<OpenAPIClientAxios> {
     const api_path = `${this.get('BASE_API')}/${filename}`;
-    const yaml_doc = await Constants.LoadObjectURI(api_path) as Document;
+    const yaml_doc = await UPath.LoadObjectURI(api_path) as Document;
     let options = {
       definition: yaml_doc,
       axiosConfigDefaults: {},
