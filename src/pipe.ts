@@ -3,9 +3,8 @@
 /// and end by writing a sentinel file (to prevent re-running)
 /// (including for non-retriable errors)
 
-// TODO: implement "test" pipe that just writes a sentinel file
-
 import { KeyedConfig } from './constants';
+import { UPath } from './upath';
 import { Vivos } from './vivos';
 
 export class Pipe extends Vivos {
@@ -13,11 +12,11 @@ export class Pipe extends Vivos {
     return 'test';
   }
 
-  public event_sentinel: string;
+  public event_sentinel: UPath;
 
   constructor(event: any, context: any) {
     super(event, context);
-    this.event_sentinel = Vivos.getStem(this.event_object) + '.md';
+    this.event_sentinel = this.event_path.replaceExtension('md');
   }
 
   public findPrefix(): string {
@@ -32,7 +31,7 @@ export class Pipe extends Vivos {
   }
 
   public async write_sentinel(output: string): Promise<void> {
-    console.log(output);
+    await this.event_sentinel.save(output);
     return;
   }
 
