@@ -12,7 +12,7 @@ describe('PipeStack', () => {
     stack = new PipeStack(app, 'TestStack', {
       buckets: ['bucket1', 'bucket2'],
       email: 'test@example.com',
-      suffix: '.config',
+      vivos_stem: 'conf',
     });
     template = Template.fromStack(stack);
   });
@@ -26,6 +26,6 @@ describe('PipeStack', () => {
   it('should have the correct properties', () => {
     expect(stack.props.buckets).toEqual(['bucket1', 'bucket2']);
     expect(stack.props.email).toEqual('test@example.com');
-    expect(stack.props.suffix).toEqual('.config');
+    expect(stack.props.vivos_stem).toEqual('conf');
   });
 });

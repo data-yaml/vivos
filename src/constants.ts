@@ -26,7 +26,7 @@ export class Constants {
     TOWER_INPUT_FILE: 'entry.json',
     TOWER_OUTPUT_FILE: 'nf-quilt/params.json',
     TOWER_REPORT_FILE: 'multiqc/multiqc_report.html',
-    VIVOS_CONFIG_SUFFIX: 'pipe.json',
+    VIVOS_CONFIG_STEM: 'pipe',
   };
 
   public static GET(key: string): any {

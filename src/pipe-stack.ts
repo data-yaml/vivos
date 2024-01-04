@@ -16,7 +16,7 @@ import { Constants } from './constants';
 export interface PipeStackProps extends StackProps {
   buckets: string[];
   email: string;
-  suffix: string;
+  vivos_stem: string;
 }
 
 export class PipeStack extends Stack {
@@ -27,7 +27,7 @@ export class PipeStack extends Stack {
       cc.get('TOWER_OUTPUT_BUCKET').split('//')[1],
     ];
     props.email = cc.get('CDK_LOG_EMAIL');
-    props.suffix = cc.get('VIVOS_CONFIG_SUFFIX');
+    props.vivos_stem = cc.get('VIVOS_CONFIG_STEM');
     console.info('PipeStackProps', props);
     return props as PipeStackProps;
   }
@@ -39,7 +39,7 @@ export class PipeStack extends Stack {
     const bucketArnList = props.buckets.map(bucket => `arn:aws:s3:::${bucket}`);
 
     // Monitor EventBridge events from the buckets
-    // matching suffix props.suffix
+    // matching suffix props.stem.{json,yaml,yml}
     // https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_events.EventPattern.html
     const eventRule = new Rule(this, 'VivosLogBucketRule', {
       description: 'VIVOS Log Bucket Rule',
@@ -50,7 +50,9 @@ export class PipeStack extends Stack {
         detail: {
           object: {
             key: [
-              { suffix: props.suffix },
+              { suffix: `${props.vivos_stem}.json` },
+              { suffix: `${props.vivos_stem}.yaml` },
+              { suffix: `${props.vivos_stem}.yml` },
             ],
           },
           reason: ['PutObject'],

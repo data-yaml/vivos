@@ -31,7 +31,7 @@ export class Pipe extends Vivos {
     return false;
   }
 
-  public async write_sentinel(output: any): Promise<void> {
+  public async write_sentinel(output: string): Promise<void> {
     console.log(output);
     return;
   }
@@ -49,7 +49,7 @@ export class Pipe extends Vivos {
     return { status: 'success' };
   }
 
-  public async run(input: KeyedConfig): Promise<any> {
-    return input;
+  public async run(input: KeyedConfig): Promise<string> {
+    return input.toString();
   }
 }
