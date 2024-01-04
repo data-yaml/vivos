@@ -32,7 +32,7 @@ export class Pipe extends Vivos {
   }
 
   public async write_sentinel(output: any): Promise<void> {
-    console.log(output.toString());
+    console.log(output);
     return;
   }
 

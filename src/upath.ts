@@ -23,7 +23,7 @@ export class UPath {
     if (scheme === 's3') {
       const paths = split[1].split('/');
       const bucket = paths[0];
-      const key = paths.slice(1).join('/');
+      const key = paths.slice(1).join('/').replace(/^(\.)+\//, '');
       return new UPath(key, bucket, scheme, env);
     }
     if (!scheme || scheme === '' || scheme[0] === '/' || scheme[0] == '.') {

@@ -22,6 +22,7 @@ export class Vivos {
 
   public readonly event_bucket: string;
   public readonly event_object: string;
+  public readonly event_path: UPath;
   protected event: any;
   protected cc: Constants;
   protected api_file: string;
@@ -35,6 +36,7 @@ export class Vivos {
     const detail = event.detail;
     this.event_bucket = (detail) ? detail.bucket.name : '';
     this.event_object = (detail) ? detail.object.key : '';
+    this.event_path = new UPath(this.event_object, this.event_bucket, 's3', context);
     this.cc = new Constants(context);
     this._api = undefined;
     this.api_file = this.cc.get('OPEN_API_FILE');

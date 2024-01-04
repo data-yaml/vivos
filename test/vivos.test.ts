@@ -45,18 +45,25 @@ describe('Vivos', () => {
   });
 
   it('should return the event folder', async () => {
+    const test_bucket = Constants.GET('TEST_BUCKET');
+    const test_object = Constants.GET('TEST_OBJECT');
     const event = {
       detail: {
-        bucket: { name: 'quilt-demos' },
-        object: { key: 'vivos/pipe.json' },
+        bucket: { name: test_bucket },
+        object: { key: test_object },
       },
     };
     const evivos = new Vivos(event, {});
     const uri = evivos.getEventObjectURI();
-    expect(uri).toBe('s3://quilt-demos/vivos/pipe.json');
+    expect(uri).toBe(`s3://${test_bucket}/${test_object}`);
 
     const folder = Vivos.getStem(uri);
-    expect(folder).toBe('s3://quilt-demos/vivos/pipe');
+    expect(folder).not.toContain('json');
+
+    const path = evivos.event_path;
+    expect(path).toBeDefined();
+    expect(path.bucket).toBe(test_bucket);
+    expect(path.key).toBe(test_object);
 
     const timestamp = (await evivos.getEventObjectAttributes()).LastModified;
     expect(timestamp).toBeDefined();

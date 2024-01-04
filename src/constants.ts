@@ -4,24 +4,28 @@ import { UPath } from './upath';
 export type KeyedConfig = {
   [key: string]: any;
 };
+
+const TEST_BUCKET = 'quilt-demos';
+const TEST_OBJECT = 'vivos/test.pipe.json';
 export class Constants {
 
   public static DEFAULTS: { [key: string]: any } = {
     APP_NAME: 'vivos',
-    BASE_API: 's3://quilt-demos/api',
-    BASE_CONFIG: 's3://quilt-demos/config',
+    BASE_API: `s3://${TEST_BUCKET}/api`,
+    BASE_CONFIG: `s3://${TEST_BUCKET}/config`,
     BENCHLING_API_FILE: 'benchling.yaml',
     BENCHLING_API_URL: 'https://quilt-dtt.benchling.com/api/v2',
     PETSTORE_API_FILE: 'petstore.yaml',
     PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
+    TEST_BUCKET: TEST_BUCKET,
     TEST_ENTRY_FILE: './test/data/PutObject.json',
+    TEST_OBJECT: TEST_OBJECT,
     TOWER_API_FILE: 'tower.yaml',
     TOWER_API_URL: 'https://api.tower.nf',
     TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
     TOWER_INPUT_FILE: 'entry.json',
     TOWER_OUTPUT_FILE: 'nf-quilt/params.json',
     TOWER_REPORT_FILE: 'multiqc/multiqc_report.html',
-    VIVOS_CONFIG_FILE: './test/data/vivos.json',
     VIVOS_CONFIG_SUFFIX: 'pipe.json',
   };
 

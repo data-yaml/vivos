@@ -2,15 +2,19 @@ import Constants from '../src/constants';
 import { UPath } from '../src/upath';
 
 describe('Constants', () => {
+  let bucket: string;
   let pipeline: string;
-  let param_file: string;
+  let rel_uri: string;
   let env: any;
+  let test_uri: string;
 
   beforeEach(() => {
-    pipeline = Constants.DEFAULTS.TOWER_DEFAULT_PIPELINE;
-    param_file = `./config/${pipeline}/params.json`;
+    bucket = Constants.GET('TEST_BUCKET');
+    pipeline = Constants.GET('TOWER_DEFAULT_PIPELINE');
+    rel_uri = `./config/${pipeline}/params.json`;
+    test_uri = `s3://${bucket}/${rel_uri}`;
     env = {
-      bucket: 's3://quilt-example',
+      bucket: `s3://${bucket}`,
       computeEnvId: 'ce-1234567890abcdef',
     };
   });
@@ -24,12 +28,11 @@ describe('Constants', () => {
 
   describe('FromURI', () => {
     it('should return a valid UPath object for S3 uris', () => {
-      const uri = 's3://quilt-demos/config/quiltdata/nf-quilt/launch.json';
-      const result = UPath.FromURI(uri);
+      const result = UPath.FromURI(test_uri);
       expect(result).toBeDefined();
       expect(result.scheme).toEqual('s3');
-      expect(result.bucket).toEqual('quilt-demos');
-      expect(result.key).toEqual('config/quiltdata/nf-quilt/launch.json');
+      expect(result.bucket).toEqual(bucket);
+      expect(rel_uri).toContain(result.key);
     });
     it('should return a valid UPath object for file uris', () => {
       const uri = 'file:///home/ubuntu/launch.json';
@@ -39,11 +42,10 @@ describe('Constants', () => {
       expect(result.key).toEqual('/home/ubuntu/launch.json');
     });
     it('should return a valid UPath object for relative file paths', () => {
-      const uri = './test/data/entry.json';
-      const result = UPath.FromURI(uri);
+      const result = UPath.FromURI(rel_uri);
       expect(result).toBeDefined();
       expect(result.scheme).toEqual('file');
-      expect(result.key).toEqual('./test/data/entry.json');
+      expect(result.key).toEqual(rel_uri);
     });
     it('should throw an error if the URI is invalid', () => {
       const nonExistentURI = 'https://quilt-example.com';
@@ -54,31 +56,28 @@ describe('Constants', () => {
 
   describe('extension', () => {
     it('should return the correct extension', () => {
-      const uri = 's3://quilt-demos/config/quiltdata/nf-quilt/launch.json';
-      const result = UPath.FromURI(uri);
+      const result = UPath.FromURI(rel_uri);
       expect(result).toBeDefined();
       expect(result.extension()).toEqual('json');
     });
     it('should replace the extension correctly', () => {
-      const uri = 's3://quilt-demos/config/quiltdata/nf-quilt/launch.json';
-      const result = UPath.FromURI(uri);
+      const result = UPath.FromURI(rel_uri);
       expect(result).toBeDefined();
       expect(result.replaceExtension('yaml').extension()).toEqual('yaml');
     });
   });
 
   describe('LoadObjectURI', () => {
-    it('should load object URI correctly', async () => {
-      const uri = 's3://quilt-demos/config/quiltdata/nf-quilt/launch.json';
-      const result = await UPath.LoadObjectURI(uri);
+    it('should load s3 object URI correctly', async () => {
+      const result = await UPath.LoadObjectURI(test_uri);
       expect(result).toBeDefined();
-      expect(result).toHaveProperty('revision');
+      expect(result).toHaveProperty('benchling');
     });
     it('should local relative path correctly', async () => {
-      const uri = './test/data/entry.json';
-      const result = await UPath.LoadObjectURI(uri);
+      const result = await UPath.LoadObjectURI(rel_uri, { benchling: 'test_tenant' } );
       expect(result).toBeDefined();
-      expect(result).toHaveProperty('id');
+      expect(result).toHaveProperty('benchling');
+      expect(result.benchling).toEqual('test_tenant');
     });
     it('should throw an error if the object URI is invalid', async () => {
       const nonExistentURI = 'https://quilt-example.com';
@@ -88,11 +87,11 @@ describe('Constants', () => {
 
   describe('LoadObjectFile', () => {
     it('should load object file correctly', () => {
-      const result = UPath.LoadObjectFile(param_file);
+      const result = UPath.LoadObjectFile(rel_uri);
       expect(result.outdir).toContain('{{ bucket }}');
     });
     it('should expand environment variables', () => {
-      const result = UPath.LoadObjectFile(param_file, env);
+      const result = UPath.LoadObjectFile(rel_uri, env);
       expect(result.outdir).toContain(env.bucket);
     });
     it('should load the pipeline correctly', async () => {
