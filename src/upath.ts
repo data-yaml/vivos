@@ -1,7 +1,14 @@
-import { readFileSync } from 'fs';
-import { GetObjectCommand, S3Client, GetObjectAttributesCommand, GetObjectAttributesRequest } from '@aws-sdk/client-s3';
+import { readFileSync, writeFileSync } from 'fs';
+import {
+  GetObjectCommand,
+  GetObjectAttributesCommand,
+  GetObjectAttributesRequest,
+  S3Client,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3';
 import handlebars from 'handlebars';
 import yaml from 'js-yaml';
+import { fileSync } from 'tmp';
 import { Constants, KeyedConfig } from './constants';
 
 
@@ -30,6 +37,11 @@ export class UPath {
       return new UPath(scheme, '', 'file', env);
     }
     throw new Error(`Unsupported scheme: ${scheme}`);
+  }
+
+  public static TemporaryFile(): UPath {
+    const tmpobj = fileSync();
+    return new UPath(tmpobj.name, '', 'file');
   }
 
   public static async LoadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {
@@ -109,9 +121,33 @@ export class UPath {
     return contents;
   }
 
-  public async loadLocal(): Promise<string> {
+  public loadLocal(): string {
     const contents = readFileSync(this.key, 'utf-8');
     return contents.toString();
+  }
+
+  public async save(contents: string, region = ''): Promise<void> {
+    if (this.scheme === 's3') {
+      return this.saveS3(contents, region);
+    } else if (this.scheme === 'file') {
+      this.saveLocal(contents);
+    } else {
+      throw new Error(`Unsupported scheme: ${this.scheme}`);
+    }
+  }
+
+  public async saveS3(contents: string, region = ''): Promise<void> {
+    const s3 = UPath.DefaultS3(region);
+    const command = new PutObjectCommand({
+      Bucket: this.bucket,
+      Key: this.key,
+      Body: contents,
+    });
+    await s3.send(command);
+  }
+
+  public saveLocal(contents: string): void {
+    writeFileSync(this.key, contents);
   }
 
   public async getAttributes(region=''): Promise<KeyedConfig> {

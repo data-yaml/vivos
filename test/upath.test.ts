@@ -1,3 +1,4 @@
+import fs from 'fs';
 import Constants from '../src/constants';
 import { UPath } from '../src/upath';
 
@@ -105,6 +106,26 @@ describe('Constants', () => {
       const non_pipeline = 'nonexistent-pipeline';
       const action = async () => Constants.LoadPipeline(non_pipeline, env);
       expect(action).toThrow();
+    });
+  });
+
+  describe('save', () => {
+    it('should save contents to a local file', () => {
+      const contents = 'Hello, world!';
+      const temp_upath = UPath.TemporaryFile();
+      temp_upath.saveLocal(contents);
+
+      const savedContents = fs.readFileSync(temp_upath.key, 'utf8');
+      expect(savedContents).toEqual(contents);
+    });
+
+    it('should throw an error if saving to an invalid S3 object', async () => {
+      const bad_bucket = 'my-bucket';
+      const key = 'nonexistent-object.txt';
+      const contents = 'Hello, world!';
+      const upath = new UPath(key, bad_bucket);
+
+      await expect(upath.saveS3(contents)).rejects.toThrow();
     });
   });
 

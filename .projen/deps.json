@@ -5,8 +5,16 @@
       "type": "build"
     },
     {
+      "name": "@types/js-yaml",
+      "type": "build"
+    },
+    {
       "name": "@types/node",
       "version": "^18",
+      "type": "build"
+    },
+    {
+      "name": "@types/tmp",
       "type": "build"
     },
     {
@@ -75,10 +83,6 @@
       "type": "runtime"
     },
     {
-      "name": "@types/js-yaml",
-      "type": "runtime"
-    },
-    {
       "name": "aws-cdk-lib",
       "version": "^2.1.0",
       "type": "runtime"
@@ -118,6 +122,10 @@
     },
     {
       "name": "openapicmd",
+      "type": "runtime"
+    },
+    {
+      "name": "tmp",
       "type": "runtime"
     }
   ],

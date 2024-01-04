@@ -17,13 +17,15 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'axios',
     'dotenv',
     'handlebars',
+    'js-yaml',
     'openapicmd',
     'openapi-client-axios',
     'openapi-types',
-    'js-yaml',
-    '@types/js-yaml',
+    'tmp',
   ],
   devDeps: [
+    '@types/js-yaml',
+    '@types/tmp',
     'eslint',
   ],
   gitignore: [
