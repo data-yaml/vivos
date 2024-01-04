@@ -15,6 +15,58 @@ describe('Constants', () => {
     };
   });
 
+  describe('DefaultS3', () => {
+    it('should return a valid S3 client', () => {
+      const s3 = UPath.DefaultS3();
+      expect(s3).toBeDefined();
+    });
+  });
+
+  describe('FromURI', () => {
+    it('should return a valid UPath object for S3 uris', () => {
+      const uri = 's3://quilt-demos/config/quiltdata/nf-quilt/launch.json';
+      const result = UPath.FromURI(uri);
+      expect(result).toBeDefined();
+      expect(result.scheme).toEqual('s3');
+      expect(result.bucket).toEqual('quilt-demos');
+      expect(result.key).toEqual('config/quiltdata/nf-quilt/launch.json');
+    });
+    it('should return a valid UPath object for file uris', () => {
+      const uri = 'file:///home/ubuntu/launch.json';
+      const result = UPath.FromURI(uri);
+      expect(result).toBeDefined();
+      expect(result.scheme).toEqual('file');
+      expect(result.key).toEqual('/home/ubuntu/launch.json');
+    });
+    it('should return a valid UPath object for relative file paths', () => {
+      const uri = './test/data/entry.json';
+      const result = UPath.FromURI(uri);
+      expect(result).toBeDefined();
+      expect(result.scheme).toEqual('file');
+      expect(result.key).toEqual('./test/data/entry.json');
+    });
+    it('should throw an error if the URI is invalid', () => {
+      const nonExistentURI = 'https://quilt-example.com';
+      const action = () => UPath.FromURI(nonExistentURI);
+      expect(action).toThrow();
+    });
+  });
+
+  describe('extension', () => {
+    it('should return the correct extension', () => {
+      const uri = 's3://quilt-demos/config/quiltdata/nf-quilt/launch.json';
+      const result = UPath.FromURI(uri);
+      expect(result).toBeDefined();
+      expect(result.extension()).toEqual('json');
+    });
+    it('should replace the extension correctly', () => {
+      const uri = 's3://quilt-demos/config/quiltdata/nf-quilt/launch.json';
+      const result = UPath.FromURI(uri);
+      expect(result).toBeDefined();
+      expect(result.replaceExtension('yaml').extension()).toEqual('yaml');
+    });
+  });
+
   describe('LoadObjectURI', () => {
     it('should load object URI correctly', async () => {
       const uri = 's3://quilt-demos/config/quiltdata/nf-quilt/launch.json';

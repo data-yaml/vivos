@@ -75,6 +75,14 @@ export class UPath {
     return split.slice(-1)[0];
   }
 
+  public replaceExtension(extension: string): UPath {
+    const split = this.key.split('.');
+    split.pop();
+    split.push(extension);
+    const key = split.join('.');
+    return new UPath(key, this.bucket, this.scheme, this.params);
+  }
+
   public async load(region = ''): Promise<string> {
     if (this.scheme === 's3') {
       return this.loadS3(region);
