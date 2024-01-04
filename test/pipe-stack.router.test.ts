@@ -1,3 +1,4 @@
+import Constants from '../src/constants';
 import { getSubclass, handler, PIPE_CLASSES } from '../src/pipe-stack.router';
 
 describe('getSubclass', () => {
@@ -14,12 +15,14 @@ describe('handler', () => {
     const result = await handler({}, {});
     expect(result.status).toBe('error');
   });
+
   it('should handle the event and context correctly', async () => {
-    const event = { /* mock event data */ };
+    const event = Constants.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
+
     const context = { /* mock context data */ };
 
     // You can add your own assertions here to test the behavior of the handler function
     const result = await handler(event, context);
-    expect(result.status).toBe('error');
+    expect(result.status).toBe('success');
   });
 });

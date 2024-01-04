@@ -5,6 +5,7 @@
 
 // TODO: implement "test" pipe that just writes a sentinel file
 
+import { KeyedConfig } from './constants';
 import { Vivos } from './vivos';
 
 export class Pipe extends Vivos {
@@ -27,11 +28,12 @@ export class Pipe extends Vivos {
   }
 
   public async sentinel_newer(): Promise<boolean> {
-    throw new Error('Not implemented');
+    return false;
   }
 
-  public async write_sentinel(): Promise<void> {
-    throw new Error('Not implemented');
+  public async write_sentinel(output: any): Promise<void> {
+    console.log(output.toString());
+    return;
   }
 
   public async exec(): Promise<any> {
@@ -41,12 +43,13 @@ export class Pipe extends Vivos {
         message: 'Sentinel file newer than event file',
       };
     }
-    await this.run();
-    await this.write_sentinel();
+    const input = this.getEventObject();
+    const output = await this.run(input);
+    await this.write_sentinel(output);
     return { status: 'success' };
   }
 
-  public async run(): Promise<any> {
-    throw new Error('Not implemented');
+  public async run(input: KeyedConfig): Promise<any> {
+    return input;
   }
 }
