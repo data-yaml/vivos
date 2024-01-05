@@ -7,8 +7,7 @@ describe('Pipe', () => {
   let input: object;
 
   beforeEach(() => {
-    const event_file = helpers.get('TEST_EVENT_FILE');
-    const event = UPath.LoadObjectURI(event_file);
+    const event = helpers.event_data_local();
     pipe = new Pipe(event, {});
     input = { key: 'value' };
   });

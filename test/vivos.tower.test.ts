@@ -1,4 +1,4 @@
-import { IT } from './helpers';
+import { IT, helpers } from './helpers';
 import { Constants } from '../src/constants';
 import { UPath } from '../src/upath';
 import { VivosTower } from '../src/vivos.tower';

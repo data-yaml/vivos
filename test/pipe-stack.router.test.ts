@@ -1,6 +1,5 @@
 import { helpers } from './helpers';
 import { getSubclass, handler, PIPE_CLASSES } from '../src/pipe-stack.router';
-import { UPath } from '../src/upath';
 
 describe('getSubclass', () => {
   it('should return the correct subclass based on the pipe type', () => {
@@ -18,8 +17,7 @@ describe('handler', () => {
   });
 
   it('should handle the event and context correctly', async () => {
-    const event = UPath.LoadObjectFile(helpers.get('TEST_EVENT_FILE'));
-
+    const event = helpers.event_data_local();
     const context = { /* mock context data */ };
 
     // You can add your own assertions here to test the behavior of the handler function

@@ -1,4 +1,3 @@
-import { helpers } from './helpers';
 import Constants from '../src/constants';
 
 describe('Constants', () => {
@@ -37,33 +36,6 @@ describe('Constants', () => {
 
     const result = constants.get(key);
     expect(result).toEqual(value);
-  });
-
-  describe('GetKeyPathFromFile', () => {
-    function checkKeyPathValue(keyPath: string, value: any) {
-      const filePath = helpers.get('TEST_EVENT_FILE');
-      const result = Constants.GetKeyPathFromFile(filePath, keyPath);
-      expect(result).toEqual(value);
-    }
-
-    it('should return the value for a given key path', () => {
-      checkKeyPathValue('version', '0');
-      checkKeyPathValue('detail.object.size', 39500);
-    });
-
-    it('should return undefined if the key path does not exist', () => {
-      const filePath = helpers.get('TEST_EVENT_FILE');
-      const keyPath = 'undefined.Pipeline.value';
-      const result = Constants.GetKeyPathFromFile(filePath, keyPath);
-      expect(result).toBeUndefined();
-    });
-
-    it('should return undefined if the file does not exist', () => {
-      const filePath = './test/data/nonExistentFile.json';
-      const keyPath = 'id';
-      const result = Constants.GetKeyPathFromFile(filePath, keyPath);
-      expect(result).toBeUndefined();
-    });
   });
 
 });

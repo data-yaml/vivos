@@ -35,28 +35,24 @@ describe('Vivos', () => {
   });
 
   it('should load the config from a file', async () => {
-    const api_path = `${Constants.DEFAULTS.BASE_API}/${Constants.DEFAULTS.PETSTORE_API_FILE}`;
-    const config = await UPath.LoadObjectURI(api_path, { region: 'us-east-1' });
-    // Assert that the config is loaded correctly
-    expect(config.info.title).toContain('Petstore');
+    const filename = helpers.get('PETSTORE_API_FILE');
+    const config = vivos.api_config(filename);
+    const result = Constants.GetKeyPathFromObject(config, 'info.title');
+    expect(result).toContain('Petstore');
   });
 
   it('should load the API definition', () => {
     expect(vivos.api).toBeDefined();
   });
 
-  it('should return the event folder', async () => {
-    const test_bucket = helpers.get('TEST_BUCKET');
-    const test_object = helpers.get('TEST_EVENT_FILE');
-    const event = helpers.get('TEST_S3_EVENT');
+  it('should return the event path', async () => {
+    const event = helpers.event_data_local();
     const evivos = new Vivos(event, {});
-    const uri = evivos.getEventObjectURI();
-    expect(uri).toBe(`s3://${test_bucket}/${test_object}`);
 
     const path = evivos.event_path;
     expect(path).toBeDefined();
-    expect(path.bucket).toBe(test_bucket);
-    expect(path.key).toBe(test_object);
+    expect(path.bucket).toBe('');
+    expect(path.key).toBe(helpers.get('TEST_KEY'));
 
     const timestamp = (await evivos.getEventObjectAttributes()).LastModified;
     expect(timestamp).toBeDefined();

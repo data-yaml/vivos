@@ -62,7 +62,7 @@ export class Constants {
     return launch;
   }
 
-  public static GetKeyPathFromObject(object: any, keyPath: string): any {
+  public static GetKeyPathFromObject(object: KeyedConfig, keyPath: string): any {
     const keys = keyPath.split('.');
     let value = object;
     for (const key of keys) {
@@ -72,16 +72,6 @@ export class Constants {
       }
     }
     return value;
-  }
-
-  public static GetKeyPathFromFile(filePath: string, keyPath: string): any {
-    try {
-      const object = UPath.LoadObjectFile(filePath);
-      return Constants.GetKeyPathFromObject(object, keyPath);
-    } catch (e: any) {
-      console.error(e.message);
-      return undefined;
-    }
   }
 
   public context: any;
