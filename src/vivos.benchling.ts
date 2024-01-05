@@ -31,6 +31,13 @@ export class VivosBenchling extends Vivos {
     this.api_url = `https://${this.get('BENCHLING_TENANT')}.benchling.com/api/v2`;
   }
 
+  public env_defaults(): KeyedConfig {
+    return {
+      OPEN_API_FILE: 'benchling.yaml',
+      BENCHLING_API_FILE: 'benchling.yaml',
+      BENCHLING_API_URL: 'https://quilt-dtt.benchling.com/api/v2',
+    };
+  }
   public async getBenchlingClient(): Promise<BenchlingClient> {
     const this_api = await this.api(true);
     const client = this_api.init<BenchlingClient>();

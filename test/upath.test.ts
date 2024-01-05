@@ -4,16 +4,6 @@ import Constants from '../src/constants';
 import { UPath } from '../src/upath';
 
 describe('UPath', () => {
-  let pipeline: string;
-  let env: any;
-
-  beforeEach(() => {
-    pipeline = helpers.get('TOWER_DEFAULT_PIPELINE');
-    env = {
-      bucket: `s3://${helpers.get('TEST_BUCKET')}`,
-      computeEnvId: 'ce-1234567890abcdef',
-    };
-  });
 
   describe('DefaultS3', () => {
     it('should return a valid S3 client', () => {
@@ -82,21 +72,6 @@ describe('UPath', () => {
       expect(bucket).toHaveProperty('name');
       const name = Constants.GetKeyPathFromObject(bucket, 'name');
       expect(name).toEqual('');
-    });
-  });
-
-  describe('LoadPipeline', () => {
-    it('should load the pipeline correctly', async () => {
-      const result = await Constants.LoadPipeline(pipeline, env);
-      expect(result).toBeDefined();
-      expect(result.pipeline).toContain(pipeline);
-      expect(result.computeEnvId).toContain(env.computeEnvId);
-      expect(result.paramsText).toContain(env.bucket);
-    });
-    it.skip('should throw an error if the pipeline is not found', async () => {
-      const non_pipeline = 'nonexistent-pipeline';
-      const action = async () => Constants.LoadPipeline(non_pipeline, env);
-      expect(action).toThrow();
     });
   });
 

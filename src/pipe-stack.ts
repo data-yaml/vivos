@@ -24,7 +24,7 @@ export class PipeStack extends Stack {
     const cc = new Constants(context);
     const props = cc.defaultProps();
     props.buckets = [
-      cc.get('TOWER_OUTPUT_BUCKET').split('//')[1],
+      cc.get('CDK_DEFAULT_BUCKET').split('//')[1],
     ];
     props.email = cc.get('CDK_LOG_EMAIL');
     props.vivos_stem = cc.get('VIVOS_CONFIG_STEM');

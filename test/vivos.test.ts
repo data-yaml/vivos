@@ -21,20 +21,12 @@ describe('Vivos', () => {
   let vivos: Vivos;
 
   beforeEach(() => {
-    const ctx = {
-      OPEN_API_FILE: Constants.DEFAULTS.PETSTORE_API_FILE,
-    };
+    const ctx = {}; // defaults to PETSTORE_API_FILE
     vivos = new Vivos({ name: 'VivosTest' }, ctx);
   });
 
-  it.skip('should error if OPEN_API_FILE not provided', () => {
-    expect(() => {
-      new Vivos({ name: 'VivosTest' }, {});
-    }).toThrow('get[OPEN_API_FILE] not a valid string: undefined');
-  });
-
   it('should load the config from a file', async () => {
-    const filename = helpers.get('PETSTORE_API_FILE');
+    const filename = vivos.get('PETSTORE_API_FILE');
     const config = await vivos.api_config(filename);
     const result = Constants.GetKeyPathFromObject(config, 'info.title');
     expect(result).toContain('Petstore');
@@ -59,7 +51,7 @@ describe('Vivos', () => {
 
     // Assert that the string representation is correct
     expect(str).toContain('VivosTest');
-    expect(str).toContain(Constants.DEFAULTS.PETSTORE_API_FILE);
+    expect(str).toContain(vivos.get('PETSTORE_API_FILE'));
   });
 
   it('should call the API', async () => {

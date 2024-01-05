@@ -32,6 +32,8 @@ export class Vivos {
     this.event_object = (detail) ? detail.object.key : '';
     this.event_path = new UPath(this.event_object, this.event_bucket, 's3', context);
     this.cc = new Constants(context);
+    this.cc.updateContext(this.api_defaults());
+    this.cc.updateContext(this.env_defaults());
     this._api = undefined;
     this.api_file = this.cc.get('OPEN_API_FILE');
     this.api_key = this.cc.get('OPEN_API_KEY');
@@ -39,6 +41,21 @@ export class Vivos {
     this.sns_client = new SNSClient({});
   }
 
+  public api_defaults(): KeyedConfig {
+    return {
+      BASE_API: 's3://quilt-vivos/api',
+      BASE_CONFIG: 's3://quilt-vivos/config',
+      BASE_REGION: 'us-west-2',
+      PETSTORE_API_FILE: 'petstore.yaml',
+      PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
+    };
+  }
+
+  public env_defaults(): KeyedConfig {
+    return {
+      OPEN_API_FILE: this.cc.get('PETSTORE_API_FILE'),
+    };
+  }
 
   public async api(reset: boolean = false): Promise<OpenAPIClientAxios> {
     if (reset || this._api === undefined) {

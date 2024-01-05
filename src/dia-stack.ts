@@ -33,7 +33,7 @@ export class DiaStack extends Stack {
   public static DefaultProps(context: any = {}): DiaStackProps {
     const cc = new Constants(context);
     const props = cc.defaultProps();
-    props.bucketURI = cc.get('TOWER_OUTPUT_BUCKET');
+    props.bucketURI = cc.get('CDK_DEFAULT_BUCKET');
     console.info('DiaStackProps', props);
     return props as DiaStackProps;
   }
@@ -94,7 +94,7 @@ export class DiaStack extends Stack {
     const default_env: KeyedConfig = {
       LOG_LEVEL: 'ALL',
       STATUS_TOPIC_ARN: this.statusTopic.topicArn,
-      TOWER_OUTPUT_BUCKET: this.bucketURI,
+      CDK_DEFAULT_BUCKET: this.bucketURI,
     };
     // create merged env
     return {

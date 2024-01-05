@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { UPath } from './upath';
 
 export type KeyedConfig = {
   [key: string]: any;
@@ -9,19 +8,10 @@ export class Constants {
 
   public static DEFAULTS: { [key: string]: any } = {
     APP_NAME: 'vivos',
-    BASE_API: 's3://quilt-vivos/api',
-    BASE_CONFIG: 's3://quilt-vivos/config',
-    BASE_REGION: 'us-west-2',
     BENCHLING_API_FILE: 'benchling.yaml',
     BENCHLING_API_URL: 'https://quilt-dtt.benchling.com/api/v2',
-    PETSTORE_API_FILE: 'petstore.yaml',
-    PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
-    TOWER_API_FILE: 'tower.yaml',
-    TOWER_API_URL: 'https://api.tower.nf',
-    TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
     TOWER_INPUT_FILE: 'entry.json',
     TOWER_OUTPUT_FILE: 'nf-quilt/params.json',
-    TOWER_REPORT_FILE: 'multiqc/multiqc_report.html',
     VIVOS_CONFIG_STEM: 'pipe',
   };
 
@@ -43,23 +33,6 @@ export class Constants {
     const base = filePath.startsWith('/') ? 1 : 0;
     const components = filePath.split('/').slice(base, base+2);
     return components.join('/');
-  }
-
-  public static async LoadPipeline(pipeline: string, env: any = {}) {
-    var base = './config';
-    if (typeof env.package !== 'string' || env.package === '') {
-      env.package = pipeline;
-    }
-    if (typeof env.base_config === 'string' && env.base_config !== '') {
-      base = env.base_config;
-    }
-    const paramsFile = `${base}/${pipeline}/params.json`;
-    const launchFile = `${base}/${pipeline}/launch.json`;
-    const region = Constants.GET('BASE_REGION');
-    const params = await UPath.LoadObjectURI(paramsFile, env, region);
-    const launch = await UPath.LoadObjectURI(launchFile, env, region);
-    launch.paramsText = JSON.stringify(params);
-    return launch;
   }
 
   public static GetKeyPathFromObject(object: KeyedConfig, keyPath: string): any {

@@ -21,16 +21,16 @@ describe('Constants', () => {
   });
 
   it('should get the correct value for a given key', () => {
-    const key = 'TOWER_API_URL';
-    const expectedValue = 'https://api.tower.nf';
+    const key = 'APP_NAME';
+    const expectedValue = 'vivos';
 
     const result = constants.get(key);
     expect(result).toEqual(expectedValue);
   });
 
   it('should put a value for a given key', () => {
-    const key = 'TOWER_API_URL';
-    const value = 'https://api.example.com';
+    const key = 'APP_NAME';
+    const value = 'vivos';
 
     constants.put(key, value);
 
