@@ -17,7 +17,7 @@ describe('handler', () => {
   });
 
   it('should handle the event and context correctly', async () => {
-    const event = helpers.event_data_local();
+    const event = await helpers.event_data_local();
     const context = { /* mock context data */ };
 
     // You can add your own assertions here to test the behavior of the handler function

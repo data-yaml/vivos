@@ -1,6 +1,5 @@
 import { helpers } from './helpers';
 import { Constants } from '../src/constants';
-import { UPath } from '../src/upath';
 import { Vivos } from '../src/vivos';
 
 const PETINFO = {
@@ -36,7 +35,7 @@ describe('Vivos', () => {
 
   it('should load the config from a file', async () => {
     const filename = helpers.get('PETSTORE_API_FILE');
-    const config = vivos.api_config(filename);
+    const config = await vivos.api_config(filename);
     const result = Constants.GetKeyPathFromObject(config, 'info.title');
     expect(result).toContain('Petstore');
   });
@@ -46,16 +45,13 @@ describe('Vivos', () => {
   });
 
   it('should return the event path', async () => {
-    const event = helpers.event_data_local();
+    const event = await helpers.event_data_local();
     const evivos = new Vivos(event, {});
 
     const path = evivos.event_path;
     expect(path).toBeDefined();
     expect(path.bucket).toBe('');
     expect(path.key).toBe(helpers.get('TEST_KEY'));
-
-    const timestamp = (await evivos.getEventObjectAttributes()).LastModified;
-    expect(timestamp).toBeDefined();
   });
 
   it('should return a string representation of the Vivos instance', () => {

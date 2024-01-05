@@ -77,8 +77,8 @@ export class UPath {
   readonly params: object;
 
   constructor(key: string, bucket = '', scheme='file', params={}) {
-    this.scheme = scheme;
     this.bucket = bucket;
+    this.scheme = (bucket === '') ? 'file' : scheme;
     this.key = key;
     this.params = params;
   }

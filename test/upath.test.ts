@@ -73,7 +73,6 @@ describe('UPath', () => {
     it('should parse s3 object data correctly', async () => {
       const result = await helpers.event_data_s3();
       expect(result).toBeDefined();
-      console.log(result);
       const bucket = Constants.GetKeyPathFromObject(result, 'detail.bucket.name');
       expect(bucket).toEqual(helpers.get('TEST_BUCKET'));
     });

@@ -1,6 +1,4 @@
 import { IT, helpers } from './helpers';
-import { Constants } from '../src/constants';
-import { UPath } from '../src/upath';
 import { VivosTower } from '../src/vivos.tower';
 
 describe('VivosTower', () => {
@@ -53,9 +51,9 @@ describe('VivosTower', () => {
   });
 
   it('should generate valid launch_options', async () => {
-    const event = UPath.LoadObjectFile('test/data/event-entry.json');
-    const evivos = new VivosTower(event, Constants.DEFAULTS);
-    const pipeline = 'quiltdata/nf-quilt';
+    const event = helpers.event_data_local();
+    const evivos = new VivosTower(event, { BASE_CONFIG: './config' });
+    const pipeline = evivos.get('TOWER_DEFAULT_PIPELINE');
     const bucket = evivos.event_bucket;
     const launchOptions = await evivos.launch_options();
     expect(launchOptions).toBeDefined();
