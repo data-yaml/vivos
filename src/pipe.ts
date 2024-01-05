@@ -8,6 +8,16 @@ import { UPath } from './upath';
 import { Vivos } from './vivos';
 
 export class Pipe extends Vivos {
+
+  public static ENV_DEFAULTS = {
+    VIVOS_CONFIG_STEM: 'pipe',
+    VIVOS_CONFIG_SUFFIXES: ['json', 'yaml', 'yml'],
+  };
+
+  public static ENV_KEYS(): string[] {
+    return Object.keys(Pipe.ENV_DEFAULTS);
+  }
+
   public static getPrefix(): string {
     return 'test';
   }
@@ -17,6 +27,10 @@ export class Pipe extends Vivos {
   constructor(event: any, context: any) {
     super(event, context);
     this.event_sentinel = this.event_path.replaceExtension('md');
+  }
+
+  public env_defaults(): KeyedConfig {
+    return Pipe.ENV_DEFAULTS;
   }
 
   public findPrefix(): string {
