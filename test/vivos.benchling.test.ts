@@ -9,7 +9,7 @@ describe.skip('VivosBenchling', () => {
 
   beforeEach(() => {
     const event = UPath.LoadObjectFile('test/data/event-params.json');
-    entry = UPath.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
+    entry = UPath.LoadObjectFile(helpers.get('TEST_EVENT_FILE'));
     vivos = new VivosBenchling(event, {});
   });
 

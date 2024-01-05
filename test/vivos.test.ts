@@ -1,3 +1,4 @@
+import { helpers } from './helpers';
 import { Constants } from '../src/constants';
 import { UPath } from '../src/upath';
 import { Vivos } from '../src/vivos';
@@ -35,7 +36,7 @@ describe('Vivos', () => {
 
   it('should load the config from a file', async () => {
     const api_path = `${Constants.DEFAULTS.BASE_API}/${Constants.DEFAULTS.PETSTORE_API_FILE}`;
-    const config = await UPath.LoadObjectURI(api_path);
+    const config = await UPath.LoadObjectURI(api_path, { region: 'us-east-1' });
     // Assert that the config is loaded correctly
     expect(config.info.title).toContain('Petstore');
   });
@@ -45,20 +46,12 @@ describe('Vivos', () => {
   });
 
   it('should return the event folder', async () => {
-    const test_bucket = Constants.GET('TEST_BUCKET');
-    const test_object = Constants.GET('TEST_OBJECT');
-    const event = {
-      detail: {
-        bucket: { name: test_bucket },
-        object: { key: test_object },
-      },
-    };
+    const test_bucket = helpers.get('TEST_BUCKET');
+    const test_object = helpers.get('TEST_EVENT_FILE');
+    const event = helpers.get('TEST_S3_EVENT');
     const evivos = new Vivos(event, {});
     const uri = evivos.getEventObjectURI();
     expect(uri).toBe(`s3://${test_bucket}/${test_object}`);
-
-    const folder = Vivos.getStem(uri);
-    expect(folder).not.toContain('json');
 
     const path = evivos.event_path;
     expect(path).toBeDefined();

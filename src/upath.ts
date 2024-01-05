@@ -44,9 +44,10 @@ export class UPath {
     return new UPath(tmpobj.name, '', 'file');
   }
 
-  public static async LoadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {
+  // @ts-ignore
+  public static async LoadObjectURI(uri: string, env: object = {}, region=''): Promise<KeyedConfig> {
     const upath = UPath.FromURI(uri, env);
-    return upath.parse();
+    return upath.parse(region);
   }
 
   public static LoadObjectFile(filePath: string, env: object = {}): KeyedConfig {

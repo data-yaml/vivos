@@ -1,4 +1,4 @@
-import Constants from '../src/constants';
+import { helpers } from './helpers';
 import { getSubclass, handler, PIPE_CLASSES } from '../src/pipe-stack.router';
 import { UPath } from '../src/upath';
 
@@ -18,7 +18,7 @@ describe('handler', () => {
   });
 
   it('should handle the event and context correctly', async () => {
-    const event = UPath.LoadObjectFile(Constants.DEFAULTS.TEST_ENTRY_FILE);
+    const event = UPath.LoadObjectFile(helpers.get('TEST_EVENT_FILE'));
 
     const context = { /* mock context data */ };
 

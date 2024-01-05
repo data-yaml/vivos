@@ -5,21 +5,17 @@ export type KeyedConfig = {
   [key: string]: any;
 };
 
-const TEST_BUCKET = 'quilt-demos';
-const TEST_OBJECT = 'vivos/test.pipe.json';
 export class Constants {
 
   public static DEFAULTS: { [key: string]: any } = {
     APP_NAME: 'vivos',
-    BASE_API: `s3://${TEST_BUCKET}/api`,
-    BASE_CONFIG: `s3://${TEST_BUCKET}/config`,
+    BASE_API: 's3://quilt-vivos/api',
+    BASE_CONFIG: 's3://quilt-vivos/config',
+    BASE_REGION: 'us-west-2',
     BENCHLING_API_FILE: 'benchling.yaml',
     BENCHLING_API_URL: 'https://quilt-dtt.benchling.com/api/v2',
     PETSTORE_API_FILE: 'petstore.yaml',
     PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
-    TEST_BUCKET: TEST_BUCKET,
-    TEST_ENTRY_FILE: './test/data/PutObject.json',
-    TEST_OBJECT: TEST_OBJECT,
     TOWER_API_FILE: 'tower.yaml',
     TOWER_API_URL: 'https://api.tower.nf',
     TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
@@ -59,8 +55,9 @@ export class Constants {
     }
     const paramsFile = `${base}/${pipeline}/params.json`;
     const launchFile = `${base}/${pipeline}/launch.json`;
-    const params = await UPath.LoadObjectURI(paramsFile, env);
-    const launch = await UPath.LoadObjectURI(launchFile, env);
+    const region = Constants.GET('BASE_REGION');
+    const params = await UPath.LoadObjectURI(paramsFile, env, region);
+    const launch = await UPath.LoadObjectURI(launchFile, env, region);
     launch.paramsText = JSON.stringify(params);
     return launch;
   }
@@ -87,7 +84,7 @@ export class Constants {
     }
   }
 
-  private context: any;
+  public context: any;
 
   constructor(context: any) {
     this.context = context;

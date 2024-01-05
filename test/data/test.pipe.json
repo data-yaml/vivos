@@ -1,0 +1,10 @@
+{
+  "id": "1",
+  "user": "ernest",
+  "next": {
+    "key": "quilt.pipe.json",
+    "value": {
+      "depth": 2
+    }
+  }
+}

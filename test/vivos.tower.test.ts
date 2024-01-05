@@ -66,7 +66,7 @@ describe('VivosTower', () => {
     expect(launchOptions.revision).toBe('main');
 
     const params = launchOptions.paramsText!;
-    if (Constants.GET('GITHUB_ACTIONS') === undefined) {
+    if (helpers.get('GITHUB_ACTIONS') === undefined) {
       expect(launchOptions.pipeline).toContain(pipeline);
       expect(launchOptions.workDir).toContain(bucket);
       expect(params).toContain(bucket);

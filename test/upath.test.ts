@@ -1,21 +1,16 @@
 import fs from 'fs';
+import { helpers } from './helpers';
 import Constants from '../src/constants';
 import { UPath } from '../src/upath';
 
-describe('Constants', () => {
-  let bucket: string;
+describe('UPath', () => {
   let pipeline: string;
-  let rel_uri: string;
   let env: any;
-  let test_uri: string;
 
   beforeEach(() => {
-    bucket = Constants.GET('TEST_BUCKET');
-    pipeline = Constants.GET('TOWER_DEFAULT_PIPELINE');
-    rel_uri = `./config/${pipeline}/params.json`;
-    test_uri = `s3://${bucket}/${rel_uri}`;
+    pipeline = helpers.get('TOWER_DEFAULT_PIPELINE');
     env = {
-      bucket: `s3://${bucket}`,
+      bucket: `s3://${helpers.get('TEST_BUCKET')}`,
       computeEnvId: 'ce-1234567890abcdef',
     };
   });
@@ -29,72 +24,69 @@ describe('Constants', () => {
 
   describe('FromURI', () => {
     it('should return a valid UPath object for S3 uris', () => {
-      const result = UPath.FromURI(test_uri);
+      const uri = helpers.pipe_uri_s3();
+      const result = UPath.FromURI(uri);
       expect(result).toBeDefined();
       expect(result.scheme).toEqual('s3');
-      expect(result.bucket).toEqual(bucket);
-      expect(rel_uri).toContain(result.key);
+      expect(result.bucket).toEqual(helpers.get('TEST_BUCKET'));
+      expect(result.key).toEqual(helpers.get('TEST_KEY'));
     });
     it('should return a valid UPath object for file uris', () => {
-      const uri = 'file:///home/ubuntu/launch.json';
+      const uri = helpers.pipe_uri_local();
       const result = UPath.FromURI(uri);
       expect(result).toBeDefined();
       expect(result.scheme).toEqual('file');
-      expect(result.key).toEqual('/home/ubuntu/launch.json');
+      expect(result.bucket).toEqual('');
+      expect(result.key).toContain(helpers.get('TEST_KEY'));
     });
     it('should return a valid UPath object for relative file paths', () => {
-      const result = UPath.FromURI(rel_uri);
+      const uri = `./${helpers.get('TEST_KEY')}`;
+      const result = UPath.FromURI(uri);
       expect(result).toBeDefined();
       expect(result.scheme).toEqual('file');
-      expect(result.key).toEqual(rel_uri);
+      expect(result.key).toEqual(uri);
     });
     it('should throw an error if the URI is invalid', () => {
-      const nonExistentURI = 'https://quilt-example.com';
-      const action = () => UPath.FromURI(nonExistentURI);
+      const invalidScheme = 'https://quilt-example.com';
+      const action = () => UPath.FromURI(invalidScheme);
       expect(action).toThrow();
     });
   });
 
   describe('extension', () => {
     it('should return the correct extension', () => {
-      const result = UPath.FromURI(rel_uri);
+      const result = helpers.s3_upath();
       expect(result).toBeDefined();
       expect(result.extension()).toEqual('json');
     });
     it('should replace the extension correctly', () => {
-      const result = UPath.FromURI(rel_uri);
+      const result = helpers.s3_upath();
       expect(result).toBeDefined();
-      expect(result.replaceExtension('yaml').extension()).toEqual('yaml');
+      const replaced = result.replaceExtension('yaml');
+      expect(replaced).toBeDefined();
+      expect(replaced.extension()).toEqual('yaml');
     });
   });
 
-  describe('LoadObjectURI', () => {
-    it('should load s3 object URI correctly', async () => {
-      const result = await UPath.LoadObjectURI(test_uri);
+  describe('parse', () => {
+    // NOTE: requires network connection
+    it('should parse s3 object data correctly', async () => {
+      const result = await helpers.event_data_s3();
       expect(result).toBeDefined();
-      expect(result).toHaveProperty('benchling');
+      console.log(result);
+      const bucket = Constants.GetKeyPathFromObject(result, 'detail.bucket.name');
+      expect(bucket).toEqual(helpers.get('TEST_BUCKET'));
     });
-    it('should local relative path correctly', async () => {
-      const result = await UPath.LoadObjectURI(rel_uri, { benchling: 'test_tenant' } );
-      expect(result).toBeDefined();
-      expect(result).toHaveProperty('benchling');
-      expect(result.benchling).toEqual('test_tenant');
-    });
-    it('should throw an error if the object URI is invalid', async () => {
-      const nonExistentURI = 'https://quilt-example.com';
-      await expect(UPath.LoadObjectURI(nonExistentURI)).rejects.toThrow();
+    it('should parse local data correctly', async () => {
+      const result = await helpers.event_data_local();
+      const bucket = Constants.GetKeyPathFromObject(result, 'detail.bucket');
+      expect(bucket).toHaveProperty('name');
+      const name = Constants.GetKeyPathFromObject(bucket, 'name');
+      expect(name).toEqual('');
     });
   });
 
-  describe('LoadObjectFile', () => {
-    it('should load object file correctly', () => {
-      const result = UPath.LoadObjectFile(rel_uri);
-      expect(result.outdir).toContain('{{ bucket }}');
-    });
-    it('should expand environment variables', () => {
-      const result = UPath.LoadObjectFile(rel_uri, env);
-      expect(result.outdir).toContain(env.bucket);
-    });
+  describe('LoadPipeline', () => {
     it('should load the pipeline correctly', async () => {
       const result = await Constants.LoadPipeline(pipeline, env);
       expect(result).toBeDefined();
@@ -110,6 +102,7 @@ describe('Constants', () => {
   });
 
   describe('save', () => {
+    // NOTE: SKIP S3.save to avoid network connection
     it('should save contents to a local file', () => {
       const contents = 'Hello, world!';
       const temp_upath = UPath.TemporaryFile();

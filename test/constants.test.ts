@@ -1,3 +1,4 @@
+import { helpers } from './helpers';
 import Constants from '../src/constants';
 
 describe('Constants', () => {
@@ -40,7 +41,7 @@ describe('Constants', () => {
 
   describe('GetKeyPathFromFile', () => {
     function checkKeyPathValue(keyPath: string, value: any) {
-      const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
+      const filePath = helpers.get('TEST_EVENT_FILE');
       const result = Constants.GetKeyPathFromFile(filePath, keyPath);
       expect(result).toEqual(value);
     }
@@ -51,7 +52,7 @@ describe('Constants', () => {
     });
 
     it('should return undefined if the key path does not exist', () => {
-      const filePath = Constants.DEFAULTS.TEST_ENTRY_FILE;
+      const filePath = helpers.get('TEST_EVENT_FILE');
       const keyPath = 'undefined.Pipeline.value';
       const result = Constants.GetKeyPathFromFile(filePath, keyPath);
       expect(result).toBeUndefined();

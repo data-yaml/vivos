@@ -15,11 +15,6 @@ export class Vivos {
     'STATUS_TOPIC_ARN',
   ];
 
-  public static getStem(filename: string): string {
-    const stem = filename.split('.').slice(0, -1).join('.');
-    return stem;
-  }
-
   public readonly event_bucket: string;
   public readonly event_object: string;
   public readonly event_path: UPath;
@@ -48,7 +43,7 @@ export class Vivos {
 
   public async api(reset: boolean = false): Promise<OpenAPIClientAxios> {
     if (reset || this._api === undefined) {
-      this._api = await this.loadApi(this.api_file);
+      this._api = await this.api_client(this.api_file);
     }
     return this._api;
   }
@@ -119,9 +114,18 @@ export class Vivos {
     return 'Bearer';
   }
 
-  public async loadApi(filename: string): Promise<OpenAPIClientAxios> {
+  public async api_config(filename: string): Promise<Document> {
     const api_path = `${this.get('BASE_API')}/${filename}`;
-    const yaml_doc = await UPath.LoadObjectURI(api_path) as Document;
+    const config = await UPath.LoadObjectURI(
+      api_path,
+      this.cc.context,
+      this.get('BASE_REGION'),
+    );
+    return config as Document;
+  }
+
+  public async api_client(filename: string): Promise<OpenAPIClientAxios> {
+    const yaml_doc = await this.api_config(filename);
     let options = {
       definition: yaml_doc,
       axiosConfigDefaults: {},

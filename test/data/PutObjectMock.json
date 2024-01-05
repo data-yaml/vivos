@@ -11,10 +11,10 @@
   "detail": {
     "version": "0",
     "bucket": {
-      "name": "quilt-demos"
+      "name": ""
     },
     "object": {
-      "key": "test/data/test.pipe.json",
+      "key": "./test/data/test.pipe.json",
       "size": 39500,
       "etag": "8ea16091991a8dd68f4bbec39b6487b1",
       "version-id": "NL1JktufPyUO1K6oyC2NDCN6T9VGjfz2",
