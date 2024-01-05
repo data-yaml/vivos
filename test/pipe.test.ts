@@ -33,22 +33,22 @@ describe('Pipe', () => {
     expect(prefix).toBe('test');
   });
 
-  it('should check if the sentinel file is newer', async () => {
+  it('newer sentinel file ignores execution', async () => {
+    await pipe.write_sentinel('output');
+    const isNewer = await pipe.sentinel_newer();
+    expect(isNewer).toBe(true);
+    const result = await pipe.exec();
+    expect(result.status).toEqual('ignore');
+  });
+
+  it('missing sentinel file enables execution', async () => {
+    await pipe.event_sentinel.delete();
     const isNewer = await pipe.sentinel_newer();
     expect(isNewer).toBe(false);
-  });
-
-  it('should write the sentinel file', async () => {
-    await pipe.write_sentinel('output');
-    // Add your assertions here
-  });
-
-  it('should execute the pipe', async () => {
     const result = await pipe.exec();
-    expect(result).toEqual({ status: 'success' });
-    // Add your assertions here
-
+    expect(result.status).toEqual('success');
   });
+
 
   it('should run the pipe with input configuration', async () => {
     const output = await pipe.run(input);

@@ -27,6 +27,11 @@ export class Pipe extends Vivos {
   }
 
   public async sentinel_newer(): Promise<boolean> {
+    const sentinel_attr = await this.event_sentinel.getAttributes();
+    const event_attr = await this.event_path.getAttributes();
+    if (sentinel_attr.LastModified > event_attr.LastModified) {
+      return true;
+    }
     return false;
   }
 

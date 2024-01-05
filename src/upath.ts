@@ -1,5 +1,8 @@
-import { readFileSync, writeFileSync, statSync } from 'fs';
+import { readFileSync, writeFileSync, statSync, existsSync, unlinkSync } from 'fs';
 import {
+  DeleteObjectCommand,
+  DeleteObjectCommandInput,
+  DeleteObjectCommandOutput,
   GetObjectCommand,
   GetObjectAttributesCommand,
   GetObjectAttributesRequest,
@@ -16,7 +19,7 @@ import { Constants, KeyedConfig } from './constants';
 export class UPath {
 
   static S3Attributes: ObjectAttributes[] = [
-    ObjectAttributes.OBJECT_SIZE || ObjectAttributes.CHECKSUM || ObjectAttributes.ETAG
+    ObjectAttributes.OBJECT_SIZE || ObjectAttributes.CHECKSUM || ObjectAttributes.ETAG,
   ];
 
   public static DefaultS3(region: string = '') {
@@ -157,6 +160,35 @@ export class UPath {
     writeFileSync(this.key, contents);
   }
 
+  public async delete(region = ''): Promise<void> {
+    if (this.scheme === 's3') {
+      await this.deleteS3(region);
+    } else if (this.scheme === 'file') {
+      this.deleteLocal();
+    } else {
+      throw new Error(`Unsupported scheme: ${this.scheme}`);
+    }
+  }
+
+  public async deleteS3(region = ''): Promise<DeleteObjectCommandOutput> {
+    // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/DeleteObjectCommand/
+    const options: DeleteObjectCommandInput = {
+      Bucket: this.bucket,
+      Key: this.key,
+    };
+    const s3 = UPath.DefaultS3(region);
+    console.log(`delete.options: ${JSON.stringify(options)}`);
+    const command = new DeleteObjectCommand(options);
+
+    const response = await s3.send(command);
+    console.log(`delete.response: ${JSON.stringify(response)}`);
+    return response;
+  }
+
+  public deleteLocal(): void {
+    unlinkSync(this.key);
+  }
+
   public async getAttributesS3(region=''): Promise<KeyedConfig> {
     // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/GetObjectAttributesCommand/
     const options: GetObjectAttributesRequest = {
@@ -174,6 +206,9 @@ export class UPath {
   }
 
   public getAttributesLocal(): KeyedConfig {
+    if (!existsSync(this.key)) {
+      return {};
+    }
     const stats = statSync(this.key);
     return {
       ObjectSize: stats.size,
