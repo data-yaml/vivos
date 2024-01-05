@@ -213,7 +213,7 @@ export class UPath {
     return {
       ObjectSize: stats.size,
       LastModified: stats.mtime,
-    }
+    };
   }
 
   public async getAttributes(region=''): Promise<KeyedConfig> {
