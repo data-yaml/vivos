@@ -1,4 +1,3 @@
-import { GetObjectAttributesCommand, GetObjectAttributesRequest } from '@aws-sdk/client-s3';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { Document, OpenAPIClientAxios, OpenAPIClient } from 'openapi-client-axios';
 import { Constants, KeyedConfig } from './constants';
@@ -60,21 +59,6 @@ export class Vivos {
   public async getEventObject(): Promise<KeyedConfig> {
     const entry_uri = this.getEventObjectURI();
     return UPath.LoadObjectURI(entry_uri);
-  }
-
-  public async getEventObjectAttributes(key = ''): Promise<KeyedConfig> {
-    // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/GetObjectAttributesCommand/
-    const options: GetObjectAttributesRequest = {
-      Bucket: this.event_bucket,
-      Key: key || this.event_object,
-      ObjectAttributes: [ // ObjectAttributesList // required
-        'ETag' || 'Checksum' || 'LastModified' || 'DeleteMarker' || 'ObjectSize' || 'VersionId',
-      ],
-    };
-    const s3 = UPath.DefaultS3();
-    const command = new GetObjectAttributesCommand(options);
-    const response = await s3.send(command);
-    return response;
   }
 
   // log message to STATUS_TOPIC_ARN if defined

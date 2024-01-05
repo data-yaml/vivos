@@ -14,6 +14,10 @@ class Helpers extends Constants {
     return UPath.FromURI(this.pipe_uri_s3());
   }
 
+  public local_upath(): UPath {
+    return UPath.FromURI(this.pipe_uri_local());
+  }
+
   public pipe_uri_s3(): string {
     return `s3://${this.get('TEST_BUCKET')}/${this.get('TEST_KEY')}`;
   }

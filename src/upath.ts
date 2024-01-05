@@ -1,10 +1,11 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, statSync } from 'fs';
 import {
   GetObjectCommand,
   GetObjectAttributesCommand,
   GetObjectAttributesRequest,
-  S3Client,
+  ObjectAttributes,
   PutObjectCommand,
+  S3Client,
 } from '@aws-sdk/client-s3';
 import handlebars from 'handlebars';
 import yaml from 'js-yaml';
@@ -13,6 +14,11 @@ import { Constants, KeyedConfig } from './constants';
 
 
 export class UPath {
+
+  static S3Attributes: ObjectAttributes[] = [
+    ObjectAttributes.OBJECT_SIZE || ObjectAttributes.CHECKSUM || ObjectAttributes.ETAG
+  ];
+
   public static DefaultS3(region: string = '') {
     if (region === '') {
       region = Constants.GET('AWS_DEFAULT_REGION');
@@ -151,18 +157,38 @@ export class UPath {
     writeFileSync(this.key, contents);
   }
 
-  public async getAttributes(region=''): Promise<KeyedConfig> {
+  public async getAttributesS3(region=''): Promise<KeyedConfig> {
     // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/GetObjectAttributesCommand/
     const options: GetObjectAttributesRequest = {
       Bucket: this.bucket,
       Key: this.key,
-      ObjectAttributes: [ // ObjectAttributesList // required
-        'ETag' || 'Checksum' || 'LastModified' || 'DeleteMarker' || 'ObjectSize' || 'VersionId',
-      ],
+      ObjectAttributes: UPath.S3Attributes,
     };
     const s3 = UPath.DefaultS3(region);
+    console.log(`getAttributesS3.options: ${JSON.stringify(options)}`);
     const command = new GetObjectAttributesCommand(options);
+
     const response = await s3.send(command);
+    console.log(`getAttributesS3.response: ${JSON.stringify(response)}`);
     return response;
   }
+
+  public getAttributesLocal(): KeyedConfig {
+    const stats = statSync(this.key);
+    return {
+      ObjectSize: stats.size,
+      LastModified: stats.mtime,
+    }
+  }
+
+  public async getAttributes(region=''): Promise<KeyedConfig> {
+    if (this.scheme === 's3') {
+      return this.getAttributesS3(region);
+    } else if (this.scheme === 'file') {
+      return this.getAttributesLocal();
+    } else {
+      throw new Error(`Unsupported scheme: ${this.scheme}`);
+    }
+  }
+
 }

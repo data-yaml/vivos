@@ -121,4 +121,25 @@ describe('UPath', () => {
     });
   });
 
+  describe('getAttributes', () => {
+    // Network Call; requires AWS credentials
+    it('should return the correct S3 attributes', async () => {
+      const result = await helpers.s3_upath().getAttributes();
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('ObjectSize');
+      expect(result).toHaveProperty('LastModified');
+      const ts = result.LastModified;
+      expect(ts).toBeDefined();
+      expect(ts).toBeInstanceOf(Date);
+    });
+    it('should return the correct attributes for a local file', async () => {
+      const result = await helpers.local_upath().getAttributes();
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('ObjectSize');
+      expect(result).toHaveProperty('LastModified');
+      const ts = result.LastModified;
+      expect(ts).toBeDefined();
+      expect(ts).toBeInstanceOf(Date);
+    });
+  });
 });
