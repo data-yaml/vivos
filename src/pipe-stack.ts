@@ -78,7 +78,6 @@ export class PipeStack extends VivosStack {
     return new Rule(this, id, {
       description: `${id}[ ${this.props.vivos_stem}] Rule`,
       eventPattern: {
-        detailType: ['Object Created'],
         source: ['aws.s3'],
         resources: this.getBucketARNs(),
         detail: {
