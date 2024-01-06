@@ -9,8 +9,8 @@ import { SnsTopic, LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
-import { VivosStack, VivosStackProps } from './vivos-stack';
 import { Pipe } from './pipe';
+import { VivosStack, VivosStackProps } from './vivos-stack';
 
 export interface PipeStackProps extends VivosStackProps {
   readonly buckets: string[];
@@ -59,7 +59,12 @@ export class PipeStack extends VivosStack {
   }
 
   public getBucketNames(): string[] {
-    return this.props.buckets.map(bucket => bucket.split('//')[1]);
+    if (!this.props) {
+      return super.getBucketNames();
+    }
+    const names = this.props.buckets.map(bucket => bucket.split('//')[1]);
+    return super.getBucketNames().concat(names);
+
   }
 
   public makeEventRule(id: string, keys: string[]): Rule {

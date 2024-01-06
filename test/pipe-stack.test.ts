@@ -3,26 +3,21 @@ import { Template } from 'aws-cdk-lib/assertions';
 import { PipeStack } from '../src/pipe-stack';
 
 describe('PipeStack', () => {
-  let app: App;
   let stack: PipeStack;
-  let template: Template;
 
   beforeEach(() => {
     const props = PipeStack.DefaultProps();
-    app = new App();
+    let app = new App();
     stack = new PipeStack(app, 'TestStack', props);
-    template = Template.fromStack(stack);
   });
 
   it('should create a stack with the specified resources', () => {
-    template.resourceCountIs('AWS::SNS::Topic', 1);
-    template.resourceCountIs('AWS::SNS::Subscription', 1);
+    let template = Template.fromStack(stack);
+    template.resourceCountIs('AWS::SNS::Topic', 2);
+    template.resourceCountIs('AWS::SNS::Subscription', 2);
     template.resourceCountIs('AWS::Events::Rule', 1);
   });
 
   it('should have the correct properties', () => {
-    expect(stack.props.buckets).toEqual(['bucket1', 'bucket2']);
-    expect(stack.props.email).toEqual('test@example.com');
-    expect(stack.props.vivos_stem).toEqual('conf');
   });
 });

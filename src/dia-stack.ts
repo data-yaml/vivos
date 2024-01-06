@@ -62,7 +62,7 @@ export class DiaStack extends VivosStack {
   }
 
   public getBucketNames(): string[] {
-    return [this.bucketName];
+    return super.getBucketNames().concat([this.bucketName]);
   }
 
 }

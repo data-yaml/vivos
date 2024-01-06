@@ -1,4 +1,4 @@
-import { Duration, Stack, type StackProps } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy, Stack, type StackProps } from 'aws-cdk-lib';
 import {
   AccountPrincipal,
   ManagedPolicy,
@@ -8,6 +8,7 @@ import {
 } from 'aws-cdk-lib/aws-iam';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
@@ -28,15 +29,23 @@ export class VivosStack extends Stack {
     return props as VivosStackProps;
   }
 
+  public static TrainCase(name: string): string {
+    return name.replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '');
+  }
+
   protected static ASSET_KEYS = ['config', 'api'];
   protected static PRINCIPAL_KEYS = ['events', 'lambda'];
+  protected readonly statusBucket: Bucket;
   protected readonly lambdaRole: Role;
   protected readonly principal: AccountPrincipal;
   protected readonly principals: { [key: string]: ServicePrincipal };
   public readonly statusTopic: Topic;
+  public readonly stack_name: string;
 
   constructor(scope: Construct, id: string, props: VivosStackProps) {
     super(scope, id, props);
+
+    this.stack_name = VivosStack.TrainCase(this.constructor.name);
 
     this.statusTopic = new Topic(this, 'VivosStatusTopic', {
       displayName: 'VIVOS Status Topic',
@@ -46,6 +55,7 @@ export class VivosStack extends Stack {
     this.principals = Object.fromEntries(
       VivosStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
     );
+    this.statusBucket = this.makeBucket('status');
 
     this.statusTopic.addSubscription(
       new EmailSubscription(props.email),
@@ -56,6 +66,22 @@ export class VivosStack extends Stack {
     }
 
     this.lambdaRole = this.makeLambdaRole(this.principals.lambda, this.statusTopic);
+  }
+
+  public makeBucket(name: string): Bucket {
+    const bucketOptions = {
+      bucketName: `${this.stack_name}-${name}`,
+      autoDeleteObjects: true,
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      encryption: BucketEncryption.S3_MANAGED,
+      enforceSSL: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+      versioned: true,
+    };
+    const bucket = new Bucket(this, name, bucketOptions);
+    bucket.grantDelete(this.principal);
+    bucket.grantReadWrite(this.principal);
+    return bucket;
   }
 
   public makeEnvars(env: object, topic: Topic): KeyedConfig {
@@ -72,7 +98,7 @@ export class VivosStack extends Stack {
   }
 
   public getBucketNames(): string[] {
-    return [];
+    return [this.statusBucket.bucketName];
   }
 
   public getBucketARNs(): string[] {
@@ -83,7 +109,8 @@ export class VivosStack extends Stack {
 
   public makeLambda(name: string, env: object, role: Role, topic: Topic) {
     return new NodejsFunction(this, name, {
-      description: `VIVOS ${name} Lambda`,
+      entry: `src/${this.stack_name}.${name}.ts`,
+      description: `${this.stackName} ${name} Lambda`,
       runtime: Runtime.NODEJS_18_X,
       role: role,
       timeout: Duration.seconds(60),
