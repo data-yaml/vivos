@@ -23,9 +23,8 @@ export interface VivosStackProps extends StackProps {
 export class VivosStack extends Stack {
 
   public static DefaultProps(context: any = {}): VivosStackProps {
-    const cc = new Constants(context);
-    const props = cc.defaultProps();
-    console.info('VivosStackProps', props);
+    const vivos = new Vivos({}, context);
+    const props = vivos.defaultProps();
     return props as VivosStackProps;
   }
 
@@ -34,7 +33,7 @@ export class VivosStack extends Stack {
   protected readonly lambdaRole: Role;
   protected readonly principal: AccountPrincipal;
   protected readonly principals: { [key: string]: ServicePrincipal };
-  protected readonly statusTopic: Topic;
+  public readonly statusTopic: Topic;
 
   constructor(scope: Construct, id: string, props: VivosStackProps) {
     super(scope, id, props);

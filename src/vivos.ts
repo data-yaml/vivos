@@ -57,6 +57,14 @@ export class Vivos {
     };
   }
 
+  public defaultProps(): KeyedConfig {
+    return {
+      account: this.get('CDK_DEFAULT_ACCOUNT'),
+      region: this.get('CDK_DEFAULT_REGION'),
+      email: this.get('CDK_DEFAULT_EMAIL'),
+    };
+  }
+
   public async api(reset: boolean = false): Promise<OpenAPIClientAxios> {
     if (reset || this._api === undefined) {
       this._api = await this.api_client(this.api_file);

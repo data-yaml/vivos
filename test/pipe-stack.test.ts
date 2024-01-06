@@ -8,12 +8,9 @@ describe('PipeStack', () => {
   let template: Template;
 
   beforeEach(() => {
+    const props = PipeStack.DefaultProps();
     app = new App();
-    stack = new PipeStack(app, 'TestStack', {
-      buckets: ['bucket1', 'bucket2'],
-      email: 'test@example.com',
-      vivos_stem: 'conf',
-    });
+    stack = new PipeStack(app, 'TestStack', props);
     template = Template.fromStack(stack);
   });
 

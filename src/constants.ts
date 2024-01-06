@@ -77,13 +77,6 @@ export class Constants {
     this.context[key] = value;
   }
 
-  public defaultProps(): KeyedConfig {
-    return {
-      account: this.get('CDK_DEFAULT_ACCOUNT'),
-      region: this.get('CDK_DEFAULT_REGION'),
-      email: this.get('CDK_DEFAULT_EMAIL'),
-    };
-  }
 }
 
 export default Constants;

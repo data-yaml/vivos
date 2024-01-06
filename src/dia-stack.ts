@@ -16,10 +16,9 @@ export interface DiaStackProps extends VivosStackProps {
 export class DiaStack extends VivosStack {
 
   public static DefaultProps(context: any = {}): DiaStackProps {
-    const cc = new Constants(context);
-    const props = cc.defaultProps();
-    props.bucketURI = cc.get('CDK_DEFAULT_BUCKET');
-    console.info('DiaStackProps', props);
+    const vivos = new VivosTower({}, context);
+    const props = vivos.defaultProps();
+    props.bucketURI = vivos.get('CDK_DEFAULT_BUCKET');
     return props as DiaStackProps;
   }
 

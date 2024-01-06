@@ -49,7 +49,7 @@ describe('DiaStack', () => {
     const stack = new DiaStack(app, 'test', stackProps);
 
     const lambdaPrincipal = new ServicePrincipal('s3.amazonaws.com');
-    const lambdaRole = stack.makeLambdaRole(lambdaPrincipal);
+    const lambdaRole = stack.makeLambdaRole(lambdaPrincipal, stack.statusTopic);
 
     expect(lambdaRole.assumeRoleAction).toEqual('sts:AssumeRole');
   });

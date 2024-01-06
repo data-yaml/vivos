@@ -9,8 +9,8 @@ import { SnsTopic, LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
-import { Constants } from './constants';
 import { VivosStack, VivosStackProps } from './vivos-stack';
+import { Pipe } from './pipe';
 
 export interface PipeStackProps extends VivosStackProps {
   readonly buckets: string[];
@@ -22,14 +22,14 @@ export interface PipeStackProps extends VivosStackProps {
 export class PipeStack extends VivosStack {
 
   public static DefaultProps(context: any = {}): PipeStackProps {
-    const cc = new Constants(context);
-    const props = cc.defaultProps();
+    const pipe = new Pipe({}, context);
+    const props = pipe.defaultProps();
     props.buckets = [
-      cc.get('CDK_DEFAULT_BUCKET').split('//')[1],
+      pipe.get('CDK_DEFAULT_BUCKET').split('//')[1],
     ];
-    props.log_email = cc.get('CDK_LOG_EMAIL');
-    props.vivos_stem = cc.get('VIVOS_CONFIG_STEM');
-    props.vivos_suffixes = cc.get('VIVOS_CONFIG_SUFFIXES');
+    props.log_email = pipe.get('CDK_LOG_EMAIL');
+    props.vivos_stem = pipe.get('VIVOS_CONFIG_STEM');
+    props.vivos_suffixes = pipe.get('VIVOS_CONFIG_SUFFIXES').split(',');
     console.info('PipeStackProps', props);
     return props as PipeStackProps;
   }
