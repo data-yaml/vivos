@@ -75,6 +75,7 @@ export class VivosStack extends Stack {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: BucketEncryption.S3_MANAGED,
       enforceSSL: true,
+      eventBridgeEnabled: true,
       removalPolicy: RemovalPolicy.DESTROY,
       versioned: true,
     };
