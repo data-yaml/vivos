@@ -1,12 +1,21 @@
 import { App } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { PipeStack } from '../src/pipe-stack';
+import { PipeStack, PipeStackProps } from '../src/pipe-stack';
 
 describe('PipeStack', () => {
+  let props: PipeStackProps;
   let stack: PipeStack;
 
   beforeEach(() => {
-    const props = PipeStack.DefaultProps();
+    props = {
+      account: '123456789012',
+      region: 'us-east-1',
+      email: 'test@example.com',
+      buckets: ['quilt-test-bucket'],
+      log_email: 'log@example.com',
+      vivos_stem: 'vivos',
+      vivos_suffixes: ['md'],
+    };
     let app = new App();
     stack = new PipeStack(app, 'TestStack', props);
   });
@@ -18,6 +27,10 @@ describe('PipeStack', () => {
     template.resourceCountIs('AWS::Events::Rule', 1);
   });
 
-  it('should have the correct properties', () => {
+  it('should have the correct props', () => {
+    expect(stack.props).toEqual(props);
+    expect(stack.stack_name).toEqual('pipe-stack');
+    const buckets = stack.getBucketNames();
+    expect(buckets[1]).toEqual('quilt-test-bucket');
   });
 });

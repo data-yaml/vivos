@@ -34,6 +34,12 @@ export class PipeStack extends VivosStack {
     return props as PipeStackProps;
   }
 
+  public static MakeFilters(stem: string, suffixes: string[]): object[] {
+    return suffixes.map(ext => {
+      return { suffix: `${stem}.${ext}` };
+    });
+  }
+
   public props: PipeStackProps;
   constructor(scope: Construct, id: string, props: PipeStackProps) {
     super(scope, id, props);
@@ -42,7 +48,8 @@ export class PipeStack extends VivosStack {
     // Monitor EventBridge events from the buckets
     // matching suffix props.stem.{json,yaml,yml}
     // https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_events.EventPattern.html
-    const eventRule = this.makeEventRule('VivosLogRule', props.vivos_suffixes);
+    const filters = PipeStack.MakeFilters(props.vivos_stem, props.vivos_suffixes);
+    const eventRule = this.makeEventRule('VivosLogRule', filters);
     // Send email whenever a matching file is uploaded
     const log_topic = new Topic(this, 'VivosLogTopic', {
       displayName: 'VIVOS Log Topic',
@@ -62,24 +69,20 @@ export class PipeStack extends VivosStack {
     if (!this.props) {
       return super.getBucketNames();
     }
-    const names = this.props.buckets.map(bucket => bucket.split('//')[1]);
+    const names = this.props.buckets.map(bucket => bucket.replace('s3://', ''));
     return super.getBucketNames().concat(names);
 
   }
 
-  public makeEventRule(id: string, keys: string[]): Rule {
-    const suffix_keys = keys.map(key => {
-      { suffix: `${this.props.vivos_stem}.${key}`; };
-    });
-
+  public makeEventRule(id: string, filters: object[]): Rule {
     return new Rule(this, id, {
-      description: 'VIVOS Log Bucket Rule',
+      description: `${id}[ ${this.props.vivos_stem}] Rule`,
       eventPattern: {
         detailType: ['Object Created'],
         source: ['aws.s3'],
         resources: this.getBucketARNs(),
         detail: {
-          object: { key: suffix_keys },
+          object: { key: filters },
           reason: ['PutObject'],
         },
       },
