@@ -45,6 +45,7 @@ project.tryFindObjectFile('.github/workflows/build.yml')!.addOverride('jobs.buil
   CDK_DEFAULT_ACCOUNT: '${{ secrets.AWS_ACCOUNT_ID }}',
   CDK_DEFAULT_REGION: '${{ secrets.AWS_DEFAULT_REGION }}',
   CDK_DEFAULT_EMAIL: '${{ secrets.CDK_DEFAULT_EMAIL }}',
+  CDK_LOG_EMAIL: '${{ secrets.CDK_LOG_EMAIL }}',
   TOWER_ACCESS_TOKEN: '${{ secrets.TOWER_ACCESS_TOKEN }}',
   TOWER_COMPUTE_ENV_ID: '${{ secrets.TOWER_COMPUTE_ENV_ID }}',
   CDK_DEFAULT_BUCKET: '${{ secrets.CDK_DEFAULT_BUCKET }}',
