@@ -26,7 +26,6 @@ export class DiaStack extends VivosStack {
   private readonly bucketURI: string;
   private readonly bucketName: string;
 
-
   constructor(scope: Construct, id: string, props: DiaStackProps) {
     super(scope, id, props);
     this.bucketURI = props.bucketURI;
@@ -49,9 +48,9 @@ export class DiaStack extends VivosStack {
     successLambda.addEventSource(outputSource);
   }
 
+  // TODO: make more generic
   public makeEnvars(env: object): KeyedConfig {
     const super_env = super.makeEnvars(env, this.statusTopic);
-    // create merged env
     return {
       CDK_DEFAULT_BUCKET: this.bucketURI,
       ...super_env,

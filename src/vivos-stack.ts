@@ -35,10 +35,10 @@ export class VivosStack extends Stack {
 
   protected static ASSET_KEYS = ['config', 'api'];
   protected static PRINCIPAL_KEYS = ['events', 'lambda'];
-  protected readonly statusBucket: Bucket;
-  protected readonly lambdaRole: Role;
   protected readonly principal: AccountPrincipal;
   protected readonly principals: { [key: string]: ServicePrincipal };
+  public readonly statusBucket: Bucket;
+  public readonly lambdaRole: Role;
   public readonly statusTopic: Topic;
   public readonly stack_name: string;
 
@@ -66,6 +66,16 @@ export class VivosStack extends Stack {
     }
 
     this.lambdaRole = this.makeLambdaRole(this.principals.lambda, this.statusTopic);
+  }
+
+  public getBucketNames(): string[] {
+    return [this.statusBucket.bucketName];
+  }
+
+  public getBucketARNs(): string[] {
+    const arns = this.getBucketNames().map(bucket => `arn:aws:s3:::${bucket}`);
+    const stars = arns.map(arn => `${arn}/*`);
+    return arns.concat(stars);
   }
 
   public makeBucket(name: string): Bucket {
@@ -96,16 +106,6 @@ export class VivosStack extends Stack {
       ...Constants.MapEnvars(Vivos.ENVARS),
       ...env,
     };
-  }
-
-  public getBucketNames(): string[] {
-    return [this.statusBucket.bucketName];
-  }
-
-  public getBucketARNs(): string[] {
-    const arns = this.getBucketNames().map(bucket => `arn:aws:s3:::${bucket}`);
-    const stars = arns.map(arn => `${arn}/*`);
-    return arns.concat(stars);
   }
 
   public makeLambda(name: string, env: object, role: Role, topic: Topic) {
@@ -144,7 +144,7 @@ export class VivosStack extends Stack {
 
     const lambdaS3Policy = new PolicyStatement({
       sid: 'VivosLambdaS3Policy',
-      actions: ['s3:ListBucket', 's3:GetObject', 's3:PutObject', 'SNS:Publish'],
+      actions: ['s3:ListBucket', 's3:GetObject', 's3:PutObject', 'sns:Publish'],
       resources: this.getBucketARNs(),
     });
     lambdaRole.addToPolicy(lambdaS3Policy);

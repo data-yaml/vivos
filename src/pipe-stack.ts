@@ -65,6 +65,7 @@ export class PipeStack extends VivosStack {
     eventRule.addTarget(new LambdaFunction(routerLambda));
   }
 
+  // TODO: automatically normalize handling of bucket names
   public getBucketNames(): string[] {
     if (!this.props) {
       return super.getBucketNames();
