@@ -55,7 +55,7 @@ export class VivosStack extends Stack {
     this.principals = Object.fromEntries(
       VivosStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
     );
-    this.workBucket = this.makeBucket('work-bucket');
+    this.workBucket = this.makeBucket('vivos-pipes');
 
     this.statusTopic.addSubscription(
       new EmailSubscription(props.email),
@@ -80,7 +80,7 @@ export class VivosStack extends Stack {
 
   public makeBucket(name: string): Bucket {
     const bucketOptions = {
-      bucketName: `${this.stackId}-${name}`,
+      bucketName: name,
       autoDeleteObjects: true,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: BucketEncryption.S3_MANAGED,

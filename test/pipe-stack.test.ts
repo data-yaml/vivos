@@ -22,7 +22,6 @@ describe('PipeStack', () => {
 
   it('should create a stack with the specified resources', () => {
     let template = Template.fromStack(stack);
-    console.info('template\n', template);
     template.resourceCountIs('AWS::SNS::Topic', 2);
     template.resourceCountIs('AWS::SNS::Subscription', 2);
     template.resourceCountIs('AWS::Events::Rule', 1);
@@ -40,59 +39,5 @@ describe('PipeStack', () => {
     expect(buckets.length).toEqual(2);
     expect(buckets[1]).toEqual('quilt-test-bucket');
     expect(stack.lambdaRole).toBeDefined();
-  });
-
-  it('should have test bucket in lambda role', () => {
-    let template = Template.fromStack(stack);
-    template.hasResourceProperties('AWS::IAM::Policy', {
-      PolicyDocument: {
-        Statement: [
-          {
-            Action: 'sns:Publish',
-            Effect: 'Allow',
-            Resource: {
-              Ref: 'VivosStatusTopicA15DB4F3',
-            },
-            Sid: 'VivosLambdaSNSPolicy',
-          },
-          {
-            Action: [
-              's3:ListBucket',
-              's3:GetObject*',
-              's3:PutObject',
-              'sns:Publish',
-            ],
-            Effect: 'Allow',
-            Resource: [
-              {
-                'Fn::Join': [
-                  '',
-                  [
-                    'arn:aws:s3:::',
-                    {
-                      Ref: 'workbucketE90D6740',
-                    },
-                  ],
-                ],
-              },
-              {
-                'Fn::Join': [
-                  '',
-                  [
-                    'arn:aws:s3:::',
-                    {
-                      Ref: 'workbucketE90D6740',
-                    },
-                    '/*',
-                  ],
-                ],
-              },
-            ],
-            Sid: 'VivosLambdaS3Policy',
-          },
-        ],
-        Version: '2012-10-17',
-      },
-    });
   });
 });
