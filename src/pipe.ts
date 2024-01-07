@@ -12,6 +12,8 @@ export class Pipe extends Vivos {
   public static ENV_DEFAULTS = {
     VIVOS_CONFIG_STEM: 'pipe',
     VIVOS_CONFIG_SUFFIXES: 'json,yaml,yml',
+    VIVOS_VPC: 'sales-production',
+    VIVOS_BATCH_SIZE: '1',
   };
 
   public static ENV_KEYS(): string[] {

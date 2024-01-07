@@ -65,7 +65,7 @@ export class VivosStack extends Stack {
       this.statusTopic.grantPublish(principal);
     }
 
-    this.lambdaRole = this.makeLambdaRole(this.principals.lambda, this.statusTopic);
+    this.lambdaRole = this.makeServiceRole(this.principals.lambda, this.statusTopic);
   }
 
   public getBucketNames(): string[] {
@@ -120,40 +120,40 @@ export class VivosStack extends Stack {
     });
   }
 
-  public makeLambdaRole(lambdaPrincipal: ServicePrincipal, topic: Topic) {
-    const APP_NAME = Constants.DEFAULTS.APP_NAME;
-    const lambdaRole = new Role(this, `${APP_NAME}-${lambdaPrincipal.service}-role`, {
-      assumedBy: lambdaPrincipal,
-      managedPolicies: [
-        ManagedPolicy.fromAwsManagedPolicyName(
-          'service-role/AWSLambdaBasicExecutionRole',
-        ),
-        ManagedPolicy.fromAwsManagedPolicyName(
-          'AmazonSNSFullAccess',
-        ),
-      ],
-    });
-    const lambdaSNSPolicy = new PolicyStatement({
-      sid: 'VivosLambdaSNSPolicy',
-      actions: ['sns:Publish'],
-      resources: [
-        topic.topicArn,
-      ],
-    });
-    lambdaRole.addToPolicy(lambdaSNSPolicy);
+    public makeServiceRole(servicePrincipal: ServicePrincipal, topic: Topic) {
+      const APP_NAME = Constants.DEFAULTS.APP_NAME;
+      const serviceRole = new Role(this, `${APP_NAME}-${servicePrincipal.service}-role`, {
+        assumedBy: servicePrincipal,
+        managedPolicies: [
+          ManagedPolicy.fromAwsManagedPolicyName(
+            'service-role/AWSLambdaBasicExecutionRole',
+          ),
+          ManagedPolicy.fromAwsManagedPolicyName(
+            'AmazonSNSFullAccess',
+          ),
+        ],
+      });
+      const serviceSNSPolicy = new PolicyStatement({
+        sid: 'VivosServiceSNSPolicy',
+        actions: ['sns:Publish'],
+        resources: [
+          topic.topicArn,
+        ],
+      });
+      serviceRole.addToPolicy(serviceSNSPolicy);
 
-    const lambdaS3Policy = new PolicyStatement({
-      sid: 'VivosLambdaS3Policy',
-      actions: [
-        's3:ListBucket',
-        's3:GetObject*',
-        's3:PutObject',
-        'sns:Publish',
-      ],
-      resources: this.getBucketARNs(),
-    });
-    lambdaRole.addToPolicy(lambdaS3Policy);
-    return lambdaRole;
+      const serviceS3Policy = new PolicyStatement({
+        sid: 'VivosServiceS3Policy',
+        actions: [
+          's3:ListBucket',
+          's3:GetObject*',
+          's3:PutObject',
+          'sns:Publish',
+        ],
+        resources: this.getBucketARNs(),
+      });
+      serviceRole.addToPolicy(serviceS3Policy);
+      return serviceRole;
+    }
+
   }
-
-}

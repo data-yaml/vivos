@@ -11,12 +11,17 @@ import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
 import { Pipe } from './pipe';
 import { VivosStack, VivosStackProps } from './vivos-stack';
+import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { FargateComputeEnvironment, JobQueue } from 'aws-cdk-lib/aws-batch';
+import { ManagedPolicy, ServicePrincipal, Role } from 'aws-cdk-lib/aws-iam';
 
 export interface PipeStackProps extends VivosStackProps {
   readonly buckets: string[];
   readonly log_email: string;
   readonly vivos_stem: string;
   readonly vivos_suffixes: string[];
+  readonly vivos_batch_size: string;
+  readonly vivos_vpc: string;
 }
 
 export class PipeStack extends VivosStack {
@@ -30,6 +35,8 @@ export class PipeStack extends VivosStack {
     props.log_email = pipe.get('CDK_LOG_EMAIL');
     props.vivos_stem = pipe.get('VIVOS_CONFIG_STEM');
     props.vivos_suffixes = pipe.get('VIVOS_CONFIG_SUFFIXES').split(',');
+    props.vivos_batch_size = pipe.get('VIVOS_BATCH_SIZE');
+    props.vivos_vpc = pipe.get('VIVOS_VPC');
     console.info('PipeStackProps', props);
     return props as PipeStackProps;
   }
@@ -41,12 +48,13 @@ export class PipeStack extends VivosStack {
   }
 
   public props: PipeStackProps;
+  public batchQueue: JobQueue;
+
   constructor(scope: Construct, id: string, props: PipeStackProps) {
     super(scope, id, props);
     this.props = props;
 
     // Monitor EventBridge events from the buckets
-    // matching suffix props.stem.{json,yaml,yml}
     // https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_events.EventPattern.html
     const filters = PipeStack.MakeFilters(props.vivos_stem, props.vivos_suffixes);
     const eventRule = this.makeEventRule('VivosLogRule', filters);
@@ -63,6 +71,8 @@ export class PipeStack extends VivosStack {
 
     const routerLambda = this.makeLambda('router', {}, this.lambdaRole, log_topic);
     eventRule.addTarget(new LambdaFunction(routerLambda));
+
+    this.batchQueue = this.makeBatchQueue('vivos-batch');
   }
 
   // TODO: automatically normalize handling of bucket names
@@ -88,5 +98,36 @@ export class PipeStack extends VivosStack {
       },
     });
   }
+  
+  public  makeTaskRole(): Role {
+    const ecs_tasks = new ServicePrincipal('ecs-tasks.amazonaws.com');
+    const role = this.makeServiceRole(ecs_tasks, this.statusTopic);
 
+    const policyNames = ['service-role/AmazonECSTaskExecutionRolePolicy', 'AmazonEC2ContainerRegistryReadOnly'];
+    for (const policyName of policyNames) {
+      role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName(policyName));
+    }
+
+    return role;
+  }
+
+  public makeBatchQueue(batchName: string): JobQueue {
+    // This resource alone will create a private / public subnet in each AZ as well as nat / internet gateway(s)
+    const vpc = Vpc.fromLookup(this, 'quilt-vpc', { vpcName: this.props.vivos_vpc });
+    // Create AWS Batch Job Queue
+    const batchQueue = new JobQueue(this, batchName);
+
+    // For loop to create Batch Compute Environments
+    const count = parseInt(this.props.vivos_batch_size);
+    for (let i = 0; i < count; i++) {
+      const name = `${batchName}FargateEnv${i}`;
+      const fargateSpotEnvironment = new FargateComputeEnvironment(this, name, {
+        vpc: vpc,
+        vpcSubnets: { subnetType: SubnetType.PRIVATE_WITH_EGRESS },
+      });
+
+      this.batchQueue.addComputeEnvironment(fargateSpotEnvironment, i);
+    }
+    return batchQueue;
+  }
 };
