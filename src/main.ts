@@ -5,7 +5,10 @@ import { PipeStack } from './pipe-stack';
 const app = new App();
 
 // new DiaStack(app, 'vivos-dev-dia', DiaStack.DefaultProps());
-new PipeStack(app, 'vivos-dev-pipe', PipeStack.DefaultProps());
+const props = PipeStack.DefaultProps();
+props.buckets.push('quilt-sales-raw');
+props.buckets.push('quilt-sales-staging');
+new PipeStack(app, 'vivos-demo', props);
 // new DiaStack(app, 'vivos-prod', { env: prodEnv });
 
 app.synth();

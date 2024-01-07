@@ -4,69 +4,89 @@
 /// to one of the buckets.
 /// NOTE: uses EventBridge events, not S3 events
 
-import { Stack, type StackProps } from 'aws-cdk-lib';
 import { Rule } from 'aws-cdk-lib/aws-events';
-import { SnsTopic } from 'aws-cdk-lib/aws-events-targets';
+import { SnsTopic, LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
-import { Constants } from './constants';
+import { Pipe } from './pipe';
+import { VivosStack, VivosStackProps } from './vivos-stack';
 
-
-export interface PipeStackProps extends StackProps {
-  buckets: string[];
-  email: string;
-  suffix: string;
+export interface PipeStackProps extends VivosStackProps {
+  readonly buckets: string[];
+  readonly log_email: string;
+  readonly vivos_stem: string;
+  readonly vivos_suffixes: string[];
 }
 
-export class PipeStack extends Stack {
+export class PipeStack extends VivosStack {
+
   public static DefaultProps(context: any = {}): PipeStackProps {
-    const cc = new Constants(context);
-    const props = cc.defaultProps();
+    const pipe = new Pipe({}, context);
+    const props = pipe.defaultProps();
     props.buckets = [
-      cc.get('TOWER_OUTPUT_BUCKET').split('//')[1],
+      pipe.get('CDK_DEFAULT_BUCKET').split('//')[1],
     ];
-    props.email = cc.get('CDK_LOG_EMAIL');
-    props.suffix = cc.get('VIVOS_CONFIG_SUFFIX');
+    props.log_email = pipe.get('CDK_LOG_EMAIL');
+    props.vivos_stem = pipe.get('VIVOS_CONFIG_STEM');
+    props.vivos_suffixes = pipe.get('VIVOS_CONFIG_SUFFIXES').split(',');
     console.info('PipeStackProps', props);
     return props as PipeStackProps;
+  }
+
+  public static MakeFilters(stem: string, suffixes: string[]): object[] {
+    return suffixes.map(ext => {
+      return { suffix: `${stem}.${ext}` };
+    });
   }
 
   public props: PipeStackProps;
   constructor(scope: Construct, id: string, props: PipeStackProps) {
     super(scope, id, props);
     this.props = props;
-    const bucketArnList = props.buckets.map(bucket => `arn:aws:s3:::${bucket}`);
 
     // Monitor EventBridge events from the buckets
-    // matching suffix props.suffix
+    // matching suffix props.stem.{json,yaml,yml}
     // https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_events.EventPattern.html
-    const eventRule = new Rule(this, 'VivosLogBucketRule', {
-      description: 'VIVOS Log Bucket Rule',
+    const filters = PipeStack.MakeFilters(props.vivos_stem, props.vivos_suffixes);
+    const eventRule = this.makeEventRule('VivosLogRule', filters);
+    // Send email whenever a matching file is uploaded
+    const log_topic = new Topic(this, 'VivosLogTopic', {
+      displayName: 'VIVOS Log Topic',
+    });
+    eventRule.addTarget(new SnsTopic(log_topic));
+    if (props.log_email) {
+      log_topic.addSubscription(new EmailSubscription(props.log_email));
+    } else {
+      console.warn('No `CDK_LOG_EMAIL` provided for log notifications');
+    }
+
+    const routerLambda = this.makeLambda('router', {}, this.lambdaRole, log_topic);
+    eventRule.addTarget(new LambdaFunction(routerLambda));
+  }
+
+  // TODO: automatically normalize handling of bucket names
+  public getBucketNames(): string[] {
+    if (!this.props) {
+      return super.getBucketNames();
+    }
+    const names = this.props.buckets.map(bucket => bucket.replace('s3://', ''));
+    return super.getBucketNames().concat(names);
+
+  }
+
+  public makeEventRule(id: string, filters: object[]): Rule {
+    return new Rule(this, id, {
+      description: `${id}[${this.props.vivos_stem}] Rule`,
       eventPattern: {
-        detailType: ['Object Created'],
         source: ['aws.s3'],
-        resources: bucketArnList,
+        resources: this.getBucketARNs(),
         detail: {
-          object: {
-            key: [
-              { suffix: props.suffix },
-            ],
-          },
+          object: { key: filters },
           reason: ['PutObject'],
         },
       },
     });
-
-    // Send email whenever a matching file is uploaded
-    const topic = new Topic(this, 'VivosLogTopic', {
-      displayName: 'VIVOS Log Topic',
-    });
-    eventRule.addTarget(new SnsTopic(topic));
-    if (props.email) {
-      topic.addSubscription(new EmailSubscription(props.email));
-    } else {
-      console.warn('No `CDK_LOG_EMAIL` provided for log notifications');
-    }
   }
+
 };

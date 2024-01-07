@@ -1,17 +1,20 @@
-import { IT } from './helpers';
-import { Constants } from '../src/constants';
+import { IT, helpers } from './helpers';
 import { VivosTower } from '../src/vivos.tower';
 
 describe('VivosTower', () => {
   let vivos: VivosTower;
+  let pipeline: string;
+  let env: any;
 
   beforeEach(() => {
-    vivos = new VivosTower({
-      name: 'VivosTowerTest',
-    }, {
+    env = {
+      bucket: `s3://${helpers.get('TEST_BUCKET')}`,
+      computeEnvId: 'ce-1234567890abcdef',
       TOWER_ORG: 'nf-core',
       TOWER_WORKSPACE: 'hackathon',
-    });
+    };
+    vivos = new VivosTower({ name: 'VivosTowerTest' }, env);
+    pipeline = vivos.get('TOWER_DEFAULT_PIPELINE');
   });
 
   it('should get the Tower URL', async () => {
@@ -51,39 +54,52 @@ describe('VivosTower', () => {
     expect(description.workflow.id).toBe(workflowId);
   });
 
-  it('should generate valid launch_options', async () => {
-    const event = Constants.LoadObjectFile('test/data/event-entry.json');
-    const evivos = new VivosTower(event, {});
-    const pipeline = 'quiltdata/nf-quilt';
-    const bucket = evivos.event_bucket;
-    const launchOptions = await evivos.launch_options();
-    expect(launchOptions).toBeDefined();
-    expect(launchOptions.computeEnvId).toBe(evivos.get('TOWER_COMPUTE_ENV_ID'));
-    expect(launchOptions.configProfiles).toEqual(['standard']);
-    expect(launchOptions.configText).toBe("plugins = ['nf-quilt']");
+  describe('LoadPipeline', () => {
+    it('should load the pipeline correctly', async () => {
+      const result = await vivos.load_pipeline(pipeline, env);
+      expect(result).toBeDefined();
+      expect(result.pipeline).toContain(pipeline);
+      expect(result.computeEnvId).toContain(env.computeEnvId);
+      expect(result.paramsText).toContain(env.bucket);
+    });
+    it.skip('should throw an error if the pipeline is not found', async () => {
+      const non_pipeline = 'nonexistent-pipeline';
+      const action = async () => vivos.load_pipeline(non_pipeline, env);
+      expect(action).toThrow();
+    });
+    it('should generate valid launch_options', async () => {
+      const event = helpers.event_data_local();
+      const evivos = new VivosTower(event, { BASE_CONFIG: './config' });
+      const bucket = evivos.event_bucket;
+      const launchOptions = await evivos.launch_options();
+      expect(launchOptions).toBeDefined();
+      expect(launchOptions.computeEnvId).toBe(evivos.get('TOWER_COMPUTE_ENV_ID'));
+      expect(launchOptions.configProfiles).toEqual(['standard']);
+      expect(launchOptions.configText).toBe("plugins = ['nf-quilt']");
 
-    expect(launchOptions.revision).toBe('main');
+      expect(launchOptions.revision).toBe('main');
 
-    const params = launchOptions.paramsText!;
-    if (Constants.GET('GITHUB_ACTIONS') === undefined) {
-      expect(launchOptions.pipeline).toContain(pipeline);
-      expect(launchOptions.workDir).toContain(bucket);
-      expect(params).toContain(bucket);
-      expect(params).toContain(pipeline);
-    }
+      const params = launchOptions.paramsText!;
+      if (helpers.get('GITHUB_ACTIONS') === undefined) {
+        expect(launchOptions.pipeline).toContain(pipeline);
+        expect(launchOptions.workDir).toContain(bucket);
+        expect(params).toContain(bucket);
+        expect(params).toContain(pipeline);
+      }
 
-    const status = await evivos.getStatus();
-    expect(status).toBeDefined();
+      const status = await evivos.getStatus();
+      expect(status).toBeDefined();
 
-    const dict = evivos.toDict();
-    expect(dict).toBeDefined();
-    expect(dict.event).toEqual(event);
+      const dict = evivos.toDict();
+      expect(dict).toBeDefined();
+      expect(dict.event).toEqual(event);
+    });
   });
+
 
   // itif(hasOutput)
   IT.ifhas('LAUNCH_WORKFLOWS')('should launch a workflow', async () => {
-    const pipeline = vivos.get('TOWER_DEFAULT_PIPELINE'); // 'nf-core/hlatyping'; // 'quiltdata/nf-quilt';
-    const bucket = vivos.get('TOWER_OUTPUT_BUCKET');
+    const bucket = vivos.get('CDK_DEFAULT_BUCKET');
     const launchOptions = await vivos.launch_options(pipeline, bucket);
     const workflowId = await vivos.launch(launchOptions);
     expect(workflowId).toBeDefined();

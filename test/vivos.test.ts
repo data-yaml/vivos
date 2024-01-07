@@ -1,3 +1,4 @@
+import { helpers } from './helpers';
 import { Constants } from '../src/constants';
 import { Vivos } from '../src/vivos';
 
@@ -20,27 +21,29 @@ describe('Vivos', () => {
   let vivos: Vivos;
 
   beforeEach(() => {
-    const ctx = {
-      OPEN_API_FILE: Constants.DEFAULTS.PETSTORE_API_FILE,
-    };
+    const ctx = {}; // defaults to PETSTORE_API_FILE
     vivos = new Vivos({ name: 'VivosTest' }, ctx);
   });
 
-  it('should error if OPEN_API_FILE not provided', () => {
-    expect(() => {
-      new Vivos({ name: 'VivosTest' }, {});
-    }).toThrow('get[OPEN_API_FILE] not a valid string: undefined');
-  });
-
   it('should load the config from a file', async () => {
-    const api_path = `${Constants.DEFAULTS.BASE_API}/${Constants.DEFAULTS.PETSTORE_API_FILE}`;
-    const config = await Constants.LoadObjectURI(api_path);
-    // Assert that the config is loaded correctly
-    expect(config.info.title).toContain('Petstore');
+    const filename = vivos.get('PETSTORE_API_FILE');
+    const config = await vivos.api_config(filename);
+    const result = Constants.GetKeyPathFromObject(config, 'info.title');
+    expect(result).toContain('Petstore');
   });
 
   it('should load the API definition', () => {
     expect(vivos.api).toBeDefined();
+  });
+
+  it('should return the event path', async () => {
+    const event = await helpers.event_data_local();
+    const evivos = new Vivos(event, {});
+
+    const path = evivos.event_path;
+    expect(path).toBeDefined();
+    expect(path.bucket).toBe('');
+    expect(path.key).toBe(helpers.get('TEST_KEY'));
   });
 
   it('should return a string representation of the Vivos instance', () => {
@@ -48,7 +51,7 @@ describe('Vivos', () => {
 
     // Assert that the string representation is correct
     expect(str).toContain('VivosTest');
-    expect(str).toContain(Constants.DEFAULTS.PETSTORE_API_FILE);
+    expect(str).toContain(vivos.get('PETSTORE_API_FILE'));
   });
 
   it('should call the API', async () => {

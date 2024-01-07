@@ -2,6 +2,7 @@ import { AxiosResponse } from 'axios';
 import { Constants, KeyedConfig } from './constants';
 import type { Components as Benchling } from './types/benchling';
 import type { Client as TowerClient, Components } from './types/tower';
+import { UPath } from './upath';
 import { Vivos } from './vivos';
 
 export type DescribeWorkflowResponse = Components.Schemas.DescribeWorkflowResponse;
@@ -17,7 +18,7 @@ export class VivosTower extends Vivos {
   public static ENVARS = [
     'TOWER_ACCESS_TOKEN',
     'TOWER_COMPUTE_ENV_ID',
-    'TOWER_OUTPUT_BUCKET',
+    'CDK_DEFAULT_BUCKET',
     'TOWER_ORG',
     'TOWER_WORKSPACE',
     'TOWER_WORKSPACE_ID',
@@ -28,12 +29,23 @@ export class VivosTower extends Vivos {
 
 
   constructor(event: any, context: any) {
-    context.OPEN_API_FILE = Constants.DEFAULTS.TOWER_API_FILE;
     super(event, context);
     this.api_key = this.get('TOWER_ACCESS_TOKEN');
     this.api_url = this.get('TOWER_API_URL');
     this.workspaceId = this.get('TOWER_WORKSPACE_ID');
     this.computeEnvId = this.get('TOWER_COMPUTE_ENV_ID');
+  }
+
+  public env_defaults(): KeyedConfig {
+    return {
+      OPEN_API_FILE: 'tower.yaml',
+      TOWER_API_FILE: 'tower.yaml',
+      TOWER_API_URL: 'https://api.tower.nf',
+      TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
+      TOWER_INPUT_FILE: 'entry.json',
+      TOWER_OUTPUT_FILE: 'nf-quilt/params.json',
+      TOWER_REPORT_FILE: 'multiqc/multiqc_report.html',
+    };
   }
 
   public async getTowerClient(): Promise<TowerClient> {
@@ -118,7 +130,7 @@ export class VivosTower extends Vivos {
 
   public async launch_options(pipeline: string = '', bucket: string = ''): Promise<WorkflowLaunchRequest> {
     if (bucket === '') {
-      bucket = this.get('TOWER_OUTPUT_BUCKET');
+      bucket = this.get('CDK_DEFAULT_BUCKET');
     };
     if (pipeline === '') {
       pipeline = await this.getPipeline() || this.get('TOWER_DEFAULT_PIPELINE');
@@ -136,8 +148,26 @@ export class VivosTower extends Vivos {
     if (typeof base_config === 'string') {
       env.base_config = base_config;
     }
-    return await Constants.LoadPipeline(pipeline, env) as WorkflowLaunchRequest;
+    return this.load_pipeline(pipeline, env);
   }
+
+  public async load_pipeline(pipeline: string, env: any = {}): Promise<WorkflowLaunchRequest> {
+    var base = './config';
+    if (typeof env.package !== 'string' || env.package === '') {
+      env.package = pipeline;
+    }
+    if (typeof env.base_config === 'string' && env.base_config !== '') {
+      base = env.base_config;
+    }
+    const paramsFile = `${base}/${pipeline}/params.json`;
+    const launchFile = `${base}/${pipeline}/launch.json`;
+    const region = Constants.GET('BASE_REGION');
+    const params = await UPath.LoadObjectURI(paramsFile, env, region);
+    const launch = await UPath.LoadObjectURI(launchFile, env, region);
+    launch.paramsText = JSON.stringify(params);
+    return launch as WorkflowLaunchRequest;
+  }
+
 
   public async launch(launchOptions: WorkflowLaunchRequest): Promise<string> {
     try {

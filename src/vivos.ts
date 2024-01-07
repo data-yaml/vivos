@@ -1,6 +1,7 @@
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { Document, OpenAPIClientAxios, OpenAPIClient } from 'openapi-client-axios';
 import { Constants, KeyedConfig } from './constants';
+import { UPath } from './upath';
 
 export class Vivos {
 
@@ -15,6 +16,7 @@ export class Vivos {
 
   public readonly event_bucket: string;
   public readonly event_object: string;
+  public readonly event_path: UPath;
   protected event: any;
   protected cc: Constants;
   protected api_file: string;
@@ -25,21 +27,47 @@ export class Vivos {
 
   constructor(event: any, context: any) {
     this.event = event;
-    const records = event.Records;
-    this.event_bucket = (records) ? records[0].s3.bucket.name : '';
-    this.event_object = (records) ? records[0].s3.object.key : '';
+    const detail = event.detail;
+    this.event_bucket = (detail) ? detail.bucket.name : '';
+    this.event_object = (detail) ? detail.object.key : '';
+    this.event_path = new UPath(this.event_object, this.event_bucket, 's3', context);
     this.cc = new Constants(context);
+    this.cc.updateContext(this.api_defaults());
+    this.cc.updateContext(this.env_defaults());
     this._api = undefined;
-    this.api_file = this.get('OPEN_API_FILE');
+    this.api_file = this.cc.get('OPEN_API_FILE');
     this.api_key = this.cc.get('OPEN_API_KEY');
     this.api_url = this.cc.get('OPEN_API_URL');
     this.sns_client = new SNSClient({});
   }
 
+  public api_defaults(): KeyedConfig {
+    return {
+      BASE_API: 's3://quilt-vivos/api',
+      BASE_CONFIG: 's3://quilt-vivos/config',
+      BASE_REGION: 'us-west-2',
+      PETSTORE_API_FILE: 'petstore.yaml',
+      PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
+    };
+  }
+
+  public env_defaults(): KeyedConfig {
+    return {
+      OPEN_API_FILE: this.cc.get('PETSTORE_API_FILE'),
+    };
+  }
+
+  public defaultProps(): KeyedConfig {
+    return {
+      account: this.get('CDK_DEFAULT_ACCOUNT'),
+      region: this.get('CDK_DEFAULT_REGION'),
+      email: this.get('CDK_DEFAULT_EMAIL'),
+    };
+  }
 
   public async api(reset: boolean = false): Promise<OpenAPIClientAxios> {
     if (reset || this._api === undefined) {
-      this._api = await this.loadApi(this.api_file);
+      this._api = await this.api_client(this.api_file);
     }
     return this._api;
   }
@@ -49,9 +77,13 @@ export class Vivos {
     return this_api.getClient();
   }
 
+  public getEventObjectURI(): string {
+    return `s3://${this.event_bucket}/${this.event_object}`;
+  }
+
   public async getEventObject(): Promise<KeyedConfig> {
-    const entry_uri = `s3://${this.event_bucket}/${this.event_object}`;
-    return Constants.LoadObjectURI(entry_uri);
+    const entry_uri = this.getEventObjectURI();
+    return UPath.LoadObjectURI(entry_uri);
   }
 
   // log message to STATUS_TOPIC_ARN if defined
@@ -91,9 +123,18 @@ export class Vivos {
     return 'Bearer';
   }
 
-  public async loadApi(filename: string): Promise<OpenAPIClientAxios> {
+  public async api_config(filename: string): Promise<Document> {
     const api_path = `${this.get('BASE_API')}/${filename}`;
-    const yaml_doc = await Constants.LoadObjectURI(api_path) as Document;
+    const config = await UPath.LoadObjectURI(
+      api_path,
+      this.cc.context,
+      this.get('BASE_REGION'),
+    );
+    return config as Document;
+  }
+
+  public async api_client(filename: string): Promise<OpenAPIClientAxios> {
+    const yaml_doc = await this.api_config(filename);
     let options = {
       definition: yaml_doc,
       axiosConfigDefaults: {},

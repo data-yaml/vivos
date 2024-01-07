@@ -1,31 +1,18 @@
 import 'dotenv/config';
-import { readFileSync } from 'fs';
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import handlebars from 'handlebars';
-import yaml from 'js-yaml';
 
 export type KeyedConfig = {
   [key: string]: any;
 };
+
 export class Constants {
 
   public static DEFAULTS: { [key: string]: any } = {
     APP_NAME: 'vivos',
-    BASE_API: 's3://quilt-demos/api',
-    BASE_CONFIG: 's3://quilt-demos/config',
     BENCHLING_API_FILE: 'benchling.yaml',
     BENCHLING_API_URL: 'https://quilt-dtt.benchling.com/api/v2',
-    PETSTORE_API_FILE: 'petstore.yaml',
-    PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
-    TEST_ENTRY_FILE: './test/data/entry.json',
-    TOWER_API_FILE: 'tower.yaml',
-    TOWER_API_URL: 'https://api.tower.nf',
-    TOWER_DEFAULT_PIPELINE: 'quiltdata/nf-quilt',
     TOWER_INPUT_FILE: 'entry.json',
     TOWER_OUTPUT_FILE: 'nf-quilt/params.json',
-    TOWER_REPORT_FILE: 'multiqc/multiqc_report.html',
-    VIVOS_CONFIG_FILE: './test/data/vivos.json',
-    VIVOS_CONFIG_SUFFIX: 'pipe.json',
+    VIVOS_CONFIG_STEM: 'pipe',
   };
 
   public static GET(key: string): any {
@@ -41,14 +28,6 @@ export class Constants {
     return envs;
   }
 
-  public static DefaultS3(region: string = '') {
-    if (region === '') {
-      region = Constants.GET('CDK_DEFAULT_REGION');
-    }
-    const s3 = new S3Client({ region: region });
-    return s3;
-  }
-
   public static GetPackageName(filePath: string): string {
     // first two components, joined by a slash
     const base = filePath.startsWith('/') ? 1 : 0;
@@ -56,68 +35,7 @@ export class Constants {
     return components.join('/');
   }
 
-  public static async LoadObjectURI(uri: string, env: object = {}): Promise<KeyedConfig> {
-    const split = uri.split('://');
-    const scheme = split[0];
-    if (!scheme || scheme === '' || scheme === 'file' || scheme[0] === '/' || scheme[0] == '.' ) {
-      return Constants.LoadObjectFile(uri, env);
-    }
-    if (scheme !== 's3') {
-      throw new Error(`Unsupported scheme: ${scheme}`);
-    }
-    const paths = split[1].split('/');
-    const s3 = Constants.DefaultS3();
-    const bucket = paths[0];
-    const file = paths.slice(-1)[0];
-    const key = paths.slice(1).join('/');
-    const command = new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-    });
-    const response = await s3.send(command);
-    const contents = await response.Body!.transformToString();
-    const extension = file.split('.').pop()?.toLowerCase();
-    return Constants.LoadObjectData(contents, extension!, env);
-  }
-
-  public static LoadObjectFile(filePath: string, env: object = {}): KeyedConfig {
-    var fileData = readFileSync(filePath, 'utf-8');
-    const fileExtension = filePath.split('.').pop()?.toLowerCase();
-    return Constants.LoadObjectData(fileData, fileExtension!, env);
-  }
-
-  public static LoadObjectData(data: string, extension: string, env: object = {}): KeyedConfig {
-    if (Object.keys(env).length > 0) {
-      const template = handlebars.compile(data);
-      data = template(env);
-    }
-
-    if (extension === 'yaml' || extension === 'yml') {
-      return yaml.load(data) as KeyedConfig;
-    } else if (extension === 'json') {
-      return JSON.parse(data);
-    } else {
-      throw new Error(`Unsupported file extension: ${extension}`);
-    }
-  }
-
-  public static async LoadPipeline(pipeline: string, env: any = {}) {
-    var base = './config';
-    if (typeof env.package !== 'string' || env.package === '') {
-      env.package = pipeline;
-    }
-    if (typeof env.base_config === 'string' && env.base_config !== '') {
-      base = env.base_config;
-    }
-    const paramsFile = `${base}/${pipeline}/params.json`;
-    const launchFile = `${base}/${pipeline}/launch.json`;
-    const params = await Constants.LoadObjectURI(paramsFile, env);
-    const launch = await Constants.LoadObjectURI(launchFile, env);
-    launch.paramsText = JSON.stringify(params);
-    return launch;
-  }
-
-  public static GetKeyPathFromObject(object: any, keyPath: string): any {
+  public static GetKeyPathFromObject(object: KeyedConfig, keyPath: string): any {
     const keys = keyPath.split('.');
     let value = object;
     for (const key of keys) {
@@ -129,17 +47,7 @@ export class Constants {
     return value;
   }
 
-  public static GetKeyPathFromFile(filePath: string, keyPath: string): any {
-    try {
-      const object = Constants.LoadObjectFile(filePath);
-      return Constants.GetKeyPathFromObject(object, keyPath);
-    } catch (e: any) {
-      console.error(e.message);
-      return undefined;
-    }
-  }
-
-  private context: any;
+  public context: any;
 
   constructor(context: any) {
     this.context = context;
@@ -169,13 +77,6 @@ export class Constants {
     this.context[key] = value;
   }
 
-  public defaultProps(): KeyedConfig {
-    return {
-      account: this.get('CDK_DEFAULT_ACCOUNT'),
-      region: this.get('CDK_DEFAULT_REGION'),
-      email: this.get('CDK_DEFAULT_EMAIL'),
-    };
-  }
 }
 
 export default Constants;
