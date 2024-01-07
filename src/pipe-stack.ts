@@ -55,8 +55,8 @@ export class PipeStack extends VivosStack {
       displayName: 'VIVOS Log Topic',
     });
     eventRule.addTarget(new SnsTopic(log_topic));
-    if (props.email) {
-      log_topic.addSubscription(new EmailSubscription(props.email));
+    if (props.log_email) {
+      log_topic.addSubscription(new EmailSubscription(props.log_email));
     } else {
       console.warn('No `CDK_LOG_EMAIL` provided for log notifications');
     }
