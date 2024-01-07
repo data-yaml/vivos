@@ -8,7 +8,7 @@ const app = new App();
 const props = PipeStack.DefaultProps();
 props.buckets.push('quilt-sales-raw');
 props.buckets.push('quilt-sales-staging');
-new PipeStack(app, 'vivos-dev-pipe', props);
+new PipeStack(app, 'vivos-demo', props);
 // new DiaStack(app, 'vivos-prod', { env: prodEnv });
 
 app.synth();

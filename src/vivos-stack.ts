@@ -37,7 +37,7 @@ export class VivosStack extends Stack {
   protected static PRINCIPAL_KEYS = ['events', 'lambda'];
   protected readonly principal: AccountPrincipal;
   protected readonly principals: { [key: string]: ServicePrincipal };
-  public readonly statusBucket: Bucket;
+  public readonly workBucket: Bucket;
   public readonly lambdaRole: Role;
   public readonly statusTopic: Topic;
   public readonly stack_name: string;
@@ -55,7 +55,7 @@ export class VivosStack extends Stack {
     this.principals = Object.fromEntries(
       VivosStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
     );
-    this.statusBucket = this.makeBucket('status');
+    this.workBucket = this.makeBucket('work-bucket');
 
     this.statusTopic.addSubscription(
       new EmailSubscription(props.email),
@@ -69,7 +69,7 @@ export class VivosStack extends Stack {
   }
 
   public getBucketNames(): string[] {
-    return [this.statusBucket.bucketName];
+    return [this.workBucket.bucketName];
   }
 
   public getBucketARNs(): string[] {
@@ -80,7 +80,7 @@ export class VivosStack extends Stack {
 
   public makeBucket(name: string): Bucket {
     const bucketOptions = {
-      bucketName: `${this.stack_name}-${name}`,
+      bucketName: `${this.stackId}-${name}`,
       autoDeleteObjects: true,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: BucketEncryption.S3_MANAGED,

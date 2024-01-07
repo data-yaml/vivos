@@ -25,6 +25,12 @@ describe('VivosStack', () => {
     expect(topic.topicArn).toBeDefined();
   });
 
+  test('workBucket', () => {
+    expect(stack.workBucket).toBeDefined();
+    const bucket = stack.workBucket;
+    expect(bucket.bucketName).toBeDefined();
+  });
+
   test('Snapshot', () => {
     const template = Template.fromStack(stack);
     expect(template.toJSON()).toMatchSnapshot();
