@@ -41,10 +41,14 @@ export class Pipe extends Vivos {
   }
 
   public async sentinel_newer(): Promise<boolean> {
-    const sentinel_attr = await this.event_sentinel.getAttributes();
-    const event_attr = await this.event_path.getAttributes();
-    if (sentinel_attr.LastModified > event_attr.LastModified) {
-      return true;
+    try {
+      const event_attr = await this.event_path.getAttributes();
+      const sentinel_attr = await this.event_sentinel.getAttributes();
+      if (sentinel_attr.LastModified > event_attr.LastModified) {
+        return true;
+      }
+    } catch (error) {
+      console.warn(`File(s) not found: ${this.event_sentinel} < ${this.event_path}`);
     }
     return false;
   }

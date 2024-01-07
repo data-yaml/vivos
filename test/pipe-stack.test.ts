@@ -37,6 +37,7 @@ describe('PipeStack', () => {
     expect(stack.props).toEqual(props);
     expect(stack.stack_name).toEqual('pipe-stack');
     const buckets = stack.getBucketNames();
+    expect(buckets.length).toEqual(2);
     expect(buckets[1]).toEqual('quilt-test-bucket');
     expect(stack.lambdaRole).toBeDefined();
   });

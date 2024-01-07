@@ -144,7 +144,12 @@ export class VivosStack extends Stack {
 
     const lambdaS3Policy = new PolicyStatement({
       sid: 'VivosLambdaS3Policy',
-      actions: ['s3:ListBucket', 's3:GetObject', 's3:PutObject', 'sns:Publish'],
+      actions: [
+        's3:ListBucket',
+        's3:GetObject*',
+        's3:PutObject',
+        'sns:Publish',
+      ],
       resources: this.getBucketARNs(),
     });
     lambdaRole.addToPolicy(lambdaS3Policy);
