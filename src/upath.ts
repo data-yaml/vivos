@@ -103,9 +103,9 @@ export class UPath {
   }
 
   public toString(): string {
-    return `UPath(${this.toURI()})`
+    return `UPath(${this.toURI()})`;
   }
-  
+
   public extension(): string {
     const split = this.key.split('.');
     return split.slice(-1)[0];
