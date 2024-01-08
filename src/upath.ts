@@ -92,6 +92,20 @@ export class UPath {
     this.params = params;
   }
 
+  public toURI(): string {
+    if (this.scheme === 's3') {
+      return `s3://${this.bucket}/${this.key}`;
+    } else if (this.scheme === 'file') {
+      return this.key;
+    } else {
+      throw new Error(`Unsupported scheme: ${this.scheme}`);
+    }
+  }
+
+  public toString(): string {
+    return `UPath(${this.toURI()})`
+  }
+  
   public extension(): string {
     const split = this.key.split('.');
     return split.slice(-1)[0];
