@@ -127,6 +127,7 @@ export class PipeStack extends VivosStack {
 
   public makeBatchQueue(batchName: string, vpcName: string, batchSize: number): JobQueue {
     // This resource alone will create a private / public subnet in each AZ as well as nat / internet gateway(s)
+    console.debug(`Creating VPC from ${vpcName} for Batch Queue ${batchName} with ${batchSize} compute environments`);
     const vpc = Vpc.fromLookup(this, 'vivos-pipe-vpc', {
       vpcName: vpcName,
     });
@@ -148,7 +149,7 @@ export class PipeStack extends VivosStack {
 
   // TODO: allow Pipe to override any parameters to EcsFargateContainerDefinition
   public makeJobDefinition(job_definition: string, registry: string, command: string[], queueARN: string): EcsJobDefinition {
-
+    console.debug(`Creating Batch Job Definition ${job_definition} with registry ${registry} and command ${command}`);
     const job_role = this.makeJobRole();
     // Create Job Definition to submit job in batch job queue.
     const batchJobDef = new EcsJobDefinition(this, job_definition, {

@@ -22,6 +22,7 @@ describe('PipeStack', () => {
     stack = new PipeStack(app, 'TestStack', props);
   });
 
+
   it('should create a stack with the specified resources', () => {
     let template = Template.fromStack(stack);
     template.resourceCountIs('AWS::SNS::Topic', 2);
@@ -32,6 +33,7 @@ describe('PipeStack', () => {
     template.resourceCountIs('AWS::IAM::Policy', 3);
     template.resourceCountIs('AWS::S3::Bucket', 1);
     template.resourceCountIs('AWS::S3::BucketPolicy', 1);
+    template.resourceCountIs('AWS::Batch::ComputeEnvironment', 1);
   });
 
   it('should have the correct props', () => {

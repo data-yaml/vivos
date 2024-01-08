@@ -23,7 +23,7 @@ export class PipeQuilt extends Pipe {
 
   public static ExtendStack(stack: PipeStack) {
     const batchName = this.QUILT_DEFAULTS.QUILT_QUEUE;
-    const batchSize = Number(this.QUILT_DEFAULTS.QUILT_BATCH_SIZE);
+    const batchSize = Number(this.QUILT_DEFAULTS.QUILT_BATCH_SIZE) || 1;
     const jobName = this.QUILT_DEFAULTS.QUILT_JOB;
     const vpcName = PipeQuilt.QUILT_DEFAULTS.QUILT_VPC;
 
@@ -56,7 +56,7 @@ export class PipeQuilt extends Pipe {
       // Add key values from input to environment
       ...Object.entries(input).map(([key, value]) => ({ name: key, value: String(value) })),
     ];
-
+    console.debug('Environment:', JSON.stringify(environment));
     try {
       // Submit a job to the Batch job queue
       const client = new BatchClient({ region: region });
