@@ -44,7 +44,7 @@ export class PipeQuilt extends Pipe {
     // ensure event contains a config file
   }
 
-  public async run(input: KeyedConfig): Promise<string> {
+  public async run(input: KeyedConfig): Promise<KeyedConfig> {
     const region = this.get('AWS_REGION');
     const job_queue = this.get('QUILT_QUEUE');
     const job_definition = this.get('QUILT_JOB');
@@ -62,7 +62,7 @@ export class PipeQuilt extends Pipe {
       const client = new BatchClient({ region: region });
       const command = new SubmitJobCommand({
         jobDefinition: job_definition,
-        jobName: this.constructor.name,
+        jobName: 'pipequilt',
         jobQueue: job_queue,
         containerOverrides: {
           environment,
@@ -72,17 +72,17 @@ export class PipeQuilt extends Pipe {
       console.log(response);
 
       // Return the response from the submit_job call
-      return JSON.stringify({
+      return {
         statusCode: 200,
         body: response,
-      });
+      };
     } catch (e) {
       // Handle exceptions and errors
       console.log(e);
-      return JSON.stringify({
+      return {
         statusCode: 500,
         body: String(e),
-      });
+      };
     }
   }
 

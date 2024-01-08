@@ -53,6 +53,6 @@ describe('Pipe', () => {
   it('should run the pipe with input configuration', async () => {
     const output = await pipe.run(input);
     // Add your assertions here
-    expect(output).toBe(input.toString());
+    expect(output).toBe(input);
   });
 });

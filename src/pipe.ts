@@ -69,11 +69,12 @@ export class Pipe extends Vivos {
     this.cc.updateContext(input);
 
     const output = await this.run(input);
-    await this.write_sentinel(output);
-    return { status: 'success' };
+    output.status = 'success';
+    await this.write_sentinel(JSON.stringify(output));
+    return output;
   }
 
-  public async run(input: KeyedConfig): Promise<string> {
-    return input.toString();
+  public async run(input: KeyedConfig): Promise<KeyedConfig> {
+    return input;
   }
 }
