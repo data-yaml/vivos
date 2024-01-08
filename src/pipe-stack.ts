@@ -4,6 +4,7 @@
 /// to one of the buckets.
 /// NOTE: uses EventBridge events, not S3 events
 
+import { Size } from 'aws-cdk-lib';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { SnsTopic, LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { Topic } from 'aws-cdk-lib/aws-sns';
@@ -12,8 +13,14 @@ import { Construct } from 'constructs';
 import { Pipe } from './pipe';
 import { VivosStack, VivosStackProps } from './vivos-stack';
 import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
-import { FargateComputeEnvironment, JobQueue } from 'aws-cdk-lib/aws-batch';
-import { ManagedPolicy, ServicePrincipal, Role } from 'aws-cdk-lib/aws-iam';
+import { ManagedPolicy, ServicePrincipal, Role, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { ContainerImage } from 'aws-cdk-lib/aws-ecs';
+import {
+  FargateComputeEnvironment,
+  EcsJobDefinition,
+  EcsFargateContainerDefinition,
+  JobQueue
+} from 'aws-cdk-lib/aws-batch';
 
 export interface PipeStackProps extends VivosStackProps {
   readonly buckets: string[];
@@ -99,7 +106,7 @@ export class PipeStack extends VivosStack {
     });
   }
   
-  public  makeTaskRole(): Role {
+  public  makeJobRole(): Role {
     const ecs_tasks = new ServicePrincipal('ecs-tasks.amazonaws.com');
     const role = this.makeServiceRole(ecs_tasks, this.statusTopic);
 
@@ -129,5 +136,40 @@ export class PipeStack extends VivosStack {
       this.batchQueue.addComputeEnvironment(fargateSpotEnvironment, i);
     }
     return batchQueue;
+  }
+
+  public makeJobDefinition(id: string, image: ContainerImage, command=[]) {
+    const job_definition = `${id}JobDefinition`;
+    const job_role = this.makeJobRole();
+    // Create Job Definition to submit job in batch job queue.
+    const batchJobDef = new EcsJobDefinition(this, job_definition, {
+      container: new EcsFargateContainerDefinition(this, 'FargateCDKJobDef', {
+        image: image,
+        command: command,
+        memory: Size.mebibytes(512),
+        cpu: 0.25,
+        executionRole: job_role,
+        jobRole: job_role, // TODO: split out as separate role  
+      }),
+    });
+
+    // This removes the version appendage from the ARN for the Job Definition as required by IAM
+    const jobDefinitionArnWithoutVersion = `arn:aws:batch:${this.region}:${this.account}:job-definition/${batchJobDef.jobDefinitionName}`;
+
+    // Define the policy statement
+    const jobDefinitionPolicyStatement = new PolicyStatement({
+      actions: ['batch:SubmitJob'], // Specify the action(s) you want to allow
+      resources: [jobDefinitionArnWithoutVersion], // Specify the ARN of the resource
+    });
+
+    // Define the policy statement
+    const jobQueuePolicyStatement = new PolicyStatement({
+      actions: ['batch:SubmitJob'], // Specify the action(s) you want to allow
+      resources: [this.batchQueue.jobQueueArn], // Specify the ARN of the resource
+    });
+    this.lambdaRole.addToPolicy(jobDefinitionPolicyStatement);
+    this.lambdaRole.addToPolicy(jobQueuePolicyStatement);
+
+    return batchJobDef;
   }
 };
