@@ -8,8 +8,10 @@ describe('PipeStack', () => {
 
   beforeEach(() => {
     props = {
-      account: '123456789012',
-      region: 'us-east-1',
+      env: {
+        account: '123456789012',
+        region: 'us-east-1',
+      },
       email: 'test@example.com',
       buckets: ['quilt-test-bucket'],
       log_email: 'log@example.com',
@@ -26,8 +28,8 @@ describe('PipeStack', () => {
     template.resourceCountIs('AWS::SNS::Subscription', 2);
     template.resourceCountIs('AWS::Events::Rule', 1);
     template.resourceCountIs('AWS::Lambda::Function', 3);
-    template.resourceCountIs('AWS::IAM::Role', 3);
-    template.resourceCountIs('AWS::IAM::Policy', 2);
+    template.resourceCountIs('AWS::IAM::Role', 4);
+    template.resourceCountIs('AWS::IAM::Policy', 3);
     template.resourceCountIs('AWS::S3::Bucket', 1);
     template.resourceCountIs('AWS::S3::BucketPolicy', 1);
   });

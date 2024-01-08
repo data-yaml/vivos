@@ -127,7 +127,9 @@ export class PipeStack extends VivosStack {
 
   public makeBatchQueue(batchName: string, vpcName: string, batchSize: number): JobQueue {
     // This resource alone will create a private / public subnet in each AZ as well as nat / internet gateway(s)
-    const vpc = Vpc.fromLookup(this, 'vivos-pipe-vpc', { vpcName: vpcName });
+    const vpc = Vpc.fromLookup(this, 'vivos-pipe-vpc', {
+      vpcName: vpcName,
+    });
     // Create AWS Batch Job Queue
     const batchQueue = new JobQueue(this, batchName);
 

@@ -12,8 +12,10 @@ describe('VivosStack', () => {
   beforeEach(() => {
     app = new App();
     stackProps = {
-      account: '123456789012',
-      region: 'us-east-1',
+      env: {
+        account: '123456789012',
+        region: 'us-east-1',
+      },
       email: 'test@example.com',
     };
     stack = new VivosStack(app, 'test', stackProps);

@@ -15,9 +15,12 @@ import { Construct } from 'constructs';
 import { Constants, KeyedConfig } from './constants';
 import { Vivos } from './vivos';
 
+
 export interface VivosStackProps extends StackProps {
-  readonly account: string;
-  readonly region: string;
+  readonly env: {
+    readonly account: string;
+    readonly region: string;
+  };
   readonly email: string;
 }
 
@@ -51,7 +54,7 @@ export class VivosStack extends Stack {
       displayName: 'VIVOS Status Topic',
     });
 
-    this.principal = new AccountPrincipal(props.account);
+    this.principal = new AccountPrincipal(props.env.account);
     this.principals = Object.fromEntries(
       VivosStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
     );
