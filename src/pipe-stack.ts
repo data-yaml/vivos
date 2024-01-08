@@ -5,30 +5,30 @@
 /// NOTE: uses EventBridge events, not S3 events
 
 import { Size } from 'aws-cdk-lib';
-import { Rule } from 'aws-cdk-lib/aws-events';
-import { SnsTopic, LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
-import { Topic } from 'aws-cdk-lib/aws-sns';
-import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
-import { Construct } from 'constructs';
-import { Pipe } from './pipe';
-import { VivosStack, VivosStackProps } from './vivos-stack';
-import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
-import { ManagedPolicy, ServicePrincipal, Role, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { ContainerImage } from 'aws-cdk-lib/aws-ecs';
 import {
   FargateComputeEnvironment,
   EcsJobDefinition,
   EcsFargateContainerDefinition,
-  JobQueue
+  JobQueue,
 } from 'aws-cdk-lib/aws-batch';
+import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { ContainerImage } from 'aws-cdk-lib/aws-ecs';
+import { Rule } from 'aws-cdk-lib/aws-events';
+import { SnsTopic, LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
+import { ManagedPolicy, ServicePrincipal, Role, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Topic } from 'aws-cdk-lib/aws-sns';
+import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
+import { Construct } from 'constructs';
+import { KeyedConfig } from './constants';
+import { Pipe } from './pipe';
+import { PipeQuilt } from './pipe.quilt';
+import { VivosStack, VivosStackProps } from './vivos-stack';
 
 export interface PipeStackProps extends VivosStackProps {
   readonly buckets: string[];
   readonly log_email: string;
   readonly vivos_stem: string;
   readonly vivos_suffixes: string[];
-  readonly vivos_batch_size: string;
-  readonly vivos_vpc: string;
 }
 
 export class PipeStack extends VivosStack {
@@ -42,8 +42,6 @@ export class PipeStack extends VivosStack {
     props.log_email = pipe.get('CDK_LOG_EMAIL');
     props.vivos_stem = pipe.get('VIVOS_CONFIG_STEM');
     props.vivos_suffixes = pipe.get('VIVOS_CONFIG_SUFFIXES').split(',');
-    props.vivos_batch_size = pipe.get('VIVOS_BATCH_SIZE');
-    props.vivos_vpc = pipe.get('VIVOS_VPC');
     console.info('PipeStackProps', props);
     return props as PipeStackProps;
   }
@@ -55,7 +53,6 @@ export class PipeStack extends VivosStack {
   }
 
   public props: PipeStackProps;
-  public batchQueue: JobQueue;
 
   constructor(scope: Construct, id: string, props: PipeStackProps) {
     super(scope, id, props);
@@ -76,13 +73,12 @@ export class PipeStack extends VivosStack {
       console.warn('No `CDK_LOG_EMAIL` provided for log notifications');
     }
 
-    const routerLambda = this.makeLambda('router', {}, this.lambdaRole, log_topic);
+    const jobEnv = PipeQuilt.ExtendStack(this);
+    const routerLambda = this.makeLambda('router', jobEnv, this.lambdaRole, log_topic);
     eventRule.addTarget(new LambdaFunction(routerLambda));
-
-    this.batchQueue = this.makeBatchQueue('vivos-batch');
   }
 
-  // TODO: automatically normalize handling of bucket names
+  // TODO: automatically normalize handling of bucket names vs URIs
   public getBucketNames(): string[] {
     if (!this.props) {
       return super.getBucketNames();
@@ -90,6 +86,17 @@ export class PipeStack extends VivosStack {
     const names = this.props.buckets.map(bucket => bucket.replace('s3://', ''));
     return super.getBucketNames().concat(names);
 
+  }
+
+  // TODO: make more generic
+  public makeEnvars(env: object): KeyedConfig {
+    const super_env = super.makeEnvars(env, this.statusTopic);
+    return {
+      ...super_env,
+      ...Pipe.PIPE_DEFAULTS,
+      ...PipeQuilt.QUILT_DEFAULTS,
+      ...env,
+    };
   }
 
   public makeEventRule(id: string, filters: object[]): Rule {
@@ -105,8 +112,8 @@ export class PipeStack extends VivosStack {
       },
     });
   }
-  
-  public  makeJobRole(): Role {
+
+  public makeJobRole(): Role {
     const ecs_tasks = new ServicePrincipal('ecs-tasks.amazonaws.com');
     const role = this.makeServiceRole(ecs_tasks, this.statusTopic);
 
@@ -118,38 +125,38 @@ export class PipeStack extends VivosStack {
     return role;
   }
 
-  public makeBatchQueue(batchName: string): JobQueue {
+  public makeBatchQueue(batchName: string, vpcName: string, batchSize: number): JobQueue {
     // This resource alone will create a private / public subnet in each AZ as well as nat / internet gateway(s)
-    const vpc = Vpc.fromLookup(this, 'quilt-vpc', { vpcName: this.props.vivos_vpc });
+    const vpc = Vpc.fromLookup(this, 'vivos-pipe-vpc', { vpcName: vpcName });
     // Create AWS Batch Job Queue
     const batchQueue = new JobQueue(this, batchName);
 
     // For loop to create Batch Compute Environments
-    const count = parseInt(this.props.vivos_batch_size);
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < batchSize; i++) {
       const name = `${batchName}FargateEnv${i}`;
       const fargateSpotEnvironment = new FargateComputeEnvironment(this, name, {
         vpc: vpc,
         vpcSubnets: { subnetType: SubnetType.PRIVATE_WITH_EGRESS },
       });
 
-      this.batchQueue.addComputeEnvironment(fargateSpotEnvironment, i);
+      batchQueue.addComputeEnvironment(fargateSpotEnvironment, i);
     }
     return batchQueue;
   }
 
-  public makeJobDefinition(id: string, image: ContainerImage, command=[]) {
-    const job_definition = `${id}JobDefinition`;
+  // TODO: allow Pipe to override any parameters to EcsFargateContainerDefinition
+  public makeJobDefinition(job_definition: string, registry: string, command: string[], queueARN: string): EcsJobDefinition {
+
     const job_role = this.makeJobRole();
     // Create Job Definition to submit job in batch job queue.
     const batchJobDef = new EcsJobDefinition(this, job_definition, {
       container: new EcsFargateContainerDefinition(this, 'FargateCDKJobDef', {
-        image: image,
+        image: ContainerImage.fromRegistry(registry),
         command: command,
         memory: Size.mebibytes(512),
         cpu: 0.25,
         executionRole: job_role,
-        jobRole: job_role, // TODO: split out as separate role  
+        jobRole: job_role, // TODO: split out as separate role
       }),
     });
 
@@ -165,7 +172,7 @@ export class PipeStack extends VivosStack {
     // Define the policy statement
     const jobQueuePolicyStatement = new PolicyStatement({
       actions: ['batch:SubmitJob'], // Specify the action(s) you want to allow
-      resources: [this.batchQueue.jobQueueArn], // Specify the ARN of the resource
+      resources: [queueARN], // Specify the ARN of the resource
     });
     this.lambdaRole.addToPolicy(jobDefinitionPolicyStatement);
     this.lambdaRole.addToPolicy(jobQueuePolicyStatement);

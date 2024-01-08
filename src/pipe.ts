@@ -9,15 +9,13 @@ import { Vivos } from './vivos';
 
 export class Pipe extends Vivos {
 
-  public static ENV_DEFAULTS = {
+  public static PIPE_DEFAULTS = {
     VIVOS_CONFIG_STEM: 'pipe',
     VIVOS_CONFIG_SUFFIXES: 'json,yaml,yml',
-    VIVOS_VPC: 'sales-production',
-    VIVOS_BATCH_SIZE: '1',
   };
 
   public static ENV_KEYS(): string[] {
-    return Object.keys(Pipe.ENV_DEFAULTS);
+    return Object.keys(Pipe.PIPE_DEFAULTS);
   }
 
   public static getPrefix(): string {
@@ -32,7 +30,7 @@ export class Pipe extends Vivos {
   }
 
   public env_defaults(): KeyedConfig {
-    return Pipe.ENV_DEFAULTS;
+    return Pipe.PIPE_DEFAULTS;
   }
 
   public findPrefix(): string {
@@ -69,7 +67,7 @@ export class Pipe extends Vivos {
     }
     const input: KeyedConfig = this.getEventObject();
     this.cc.updateContext(input);
-    
+
     const output = await this.run(input);
     await this.write_sentinel(output);
     return { status: 'success' };

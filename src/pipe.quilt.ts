@@ -1,14 +1,16 @@
-import { Pipe } from './pipe';
+import { BatchClient, SubmitJobCommand } from '@aws-sdk/client-batch';
 import { KeyedConfig } from './constants';
-import { BatchClient, SubmitJobCommand } from "@aws-sdk/client-batch";
+import { Pipe } from './pipe';
+import { PipeStack } from './pipe-stack';
 
 export class PipeQuilt extends Pipe {
 
   public static QUILT_DEFAULTS = {
+    QUILT_BATCH_SIZE: '1',
     QUILT_VPC: 'sales-production',
-    QUILT_DOCKER_IMAGE: '850787717197.dkr.ecr.us-east-1.amazonaws.com/edp-container-registry:latest',
-    QUILT_JOB: 'N/A',
-    QUILT_QUEUE: 'N/A',
+    QUILT_DOCKER: '850787717197.dkr.ecr.us-east-1.amazonaws.com/edp-container-registry:latest',
+    QUILT_JOB: 'PipeQuiltPackagerJob',
+    QUILT_QUEUE: 'PipeQuiltPackagerQueue',
   };
 
   public static QUILT_KEYS(): string[] {
@@ -17,6 +19,24 @@ export class PipeQuilt extends Pipe {
 
   public static getPrefix(): string {
     return 'quilt';
+  }
+
+  public static ExtendStack(stack: PipeStack) {
+    const batchName = this.QUILT_DEFAULTS.QUILT_QUEUE;
+    const batchSize = Number(this.QUILT_DEFAULTS.QUILT_BATCH_SIZE);
+    const jobName = this.QUILT_DEFAULTS.QUILT_JOB;
+    const vpcName = PipeQuilt.QUILT_DEFAULTS.QUILT_VPC;
+
+    const batchQueue = stack.makeBatchQueue(batchName, vpcName, batchSize);
+    const registry = PipeQuilt.QUILT_DEFAULTS.QUILT_DOCKER;
+    const command = ['python', '/quilt_packager.py'];
+    const job = stack.makeJobDefinition(jobName, registry, command, batchQueue.jobQueueArn);
+    // set QUILT_JOB and QUILT_QUEUE in the stack props?
+    const environment = {
+      QUILT_QUEUE: batchQueue.jobQueueName,
+      QUILT_JOB: job.jobDefinitionName,
+    };
+    return environment;
   }
 
   constructor(event: any, context: any) {
@@ -34,7 +54,7 @@ export class PipeQuilt extends Pipe {
       { name: 'bucket', value: String(raw_bucket) },
       { name: 'prefix', value: String(prefix) },
       // Add key values from input to environment
-      ...Object.entries(input).map(([key, value]) => ({ name: key, value: String(value) }))
+      ...Object.entries(input).map(([key, value]) => ({ name: key, value: String(value) })),
     ];
 
     try {
@@ -45,8 +65,8 @@ export class PipeQuilt extends Pipe {
         jobName: this.constructor.name,
         jobQueue: job_queue,
         containerOverrides: {
-          environment
-        }
+          environment,
+        },
       });
       const response = await client.send(command);
       console.log(response);
@@ -54,16 +74,16 @@ export class PipeQuilt extends Pipe {
       // Return the response from the submit_job call
       return JSON.stringify({
         statusCode: 200,
-        body: response
+        body: response,
       });
     } catch (e) {
       // Handle exceptions and errors
       console.log(e);
       return JSON.stringify({
         statusCode: 500,
-        body: String(e)
+        body: String(e),
       });
     }
   }
-    
+
 }
