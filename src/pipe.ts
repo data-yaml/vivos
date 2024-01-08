@@ -67,7 +67,9 @@ export class Pipe extends Vivos {
         message: 'Sentinel file newer than event file',
       };
     }
-    const input = this.getEventObject();
+    const input: KeyedConfig = this.getEventObject();
+    this.cc.updateContext(input);
+    
     const output = await this.run(input);
     await this.write_sentinel(output);
     return { status: 'success' };
