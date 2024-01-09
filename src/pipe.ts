@@ -9,13 +9,13 @@ import { Vivos } from './vivos';
 
 export class Pipe extends Vivos {
 
-  public static ENV_DEFAULTS = {
+  public static PIPE_DEFAULTS = {
     VIVOS_CONFIG_STEM: 'pipe',
     VIVOS_CONFIG_SUFFIXES: 'json,yaml,yml',
   };
 
   public static ENV_KEYS(): string[] {
-    return Object.keys(Pipe.ENV_DEFAULTS);
+    return Object.keys(Pipe.PIPE_DEFAULTS);
   }
 
   public static getPrefix(): string {
@@ -30,7 +30,7 @@ export class Pipe extends Vivos {
   }
 
   public env_defaults(): KeyedConfig {
-    return Pipe.ENV_DEFAULTS;
+    return Pipe.PIPE_DEFAULTS;
   }
 
   public findPrefix(): string {
@@ -65,13 +65,16 @@ export class Pipe extends Vivos {
         message: 'Sentinel file newer than event file',
       };
     }
-    const input = this.getEventObject();
+    const input: KeyedConfig = await this.getEventObject();
+    this.cc.updateContext(input);
+
     const output = await this.run(input);
-    await this.write_sentinel(output);
-    return { status: 'success' };
+    output.status = 'success';
+    await this.write_sentinel(JSON.stringify(output));
+    return output;
   }
 
-  public async run(input: KeyedConfig): Promise<string> {
-    return input.toString();
+  public async run(input: KeyedConfig): Promise<KeyedConfig> {
+    return input;
   }
 }

@@ -15,9 +15,12 @@ import { Construct } from 'constructs';
 import { Constants, KeyedConfig } from './constants';
 import { Vivos } from './vivos';
 
+
 export interface VivosStackProps extends StackProps {
-  readonly account: string;
-  readonly region: string;
+  readonly env: {
+    readonly account: string;
+    readonly region: string;
+  };
   readonly email: string;
 }
 
@@ -37,7 +40,9 @@ export class VivosStack extends Stack {
   protected static PRINCIPAL_KEYS = ['events', 'lambda'];
   protected readonly principal: AccountPrincipal;
   protected readonly principals: { [key: string]: ServicePrincipal };
-  public readonly workBucket: Bucket;
+  public readonly rawBucket: Bucket;
+  public readonly stageBucket: Bucket;
+  public readonly prodBucket: Bucket;
   public readonly lambdaRole: Role;
   public readonly statusTopic: Topic;
   public readonly stack_name: string;
@@ -51,11 +56,13 @@ export class VivosStack extends Stack {
       displayName: 'VIVOS Status Topic',
     });
 
-    this.principal = new AccountPrincipal(props.account);
+    this.principal = new AccountPrincipal(props.env.account);
     this.principals = Object.fromEntries(
       VivosStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
     );
-    this.workBucket = this.makeBucket('vivos-pipes');
+    this.rawBucket = this.makeBucket('vivos-pipes');
+    this.stageBucket = this.makeBucket('vivos-staging');
+    this.prodBucket = this.makeBucket('vivos-production');
 
     this.statusTopic.addSubscription(
       new EmailSubscription(props.email),
@@ -65,11 +72,11 @@ export class VivosStack extends Stack {
       this.statusTopic.grantPublish(principal);
     }
 
-    this.lambdaRole = this.makeLambdaRole(this.principals.lambda, this.statusTopic);
+    this.lambdaRole = this.makeServiceRole(this.principals.lambda, this.statusTopic);
   }
 
   public getBucketNames(): string[] {
-    return [this.workBucket.bucketName];
+    return [this.rawBucket.bucketName];
   }
 
   public getBucketARNs(): string[] {
@@ -120,10 +127,10 @@ export class VivosStack extends Stack {
     });
   }
 
-  public makeLambdaRole(lambdaPrincipal: ServicePrincipal, topic: Topic) {
+  public makeServiceRole(servicePrincipal: ServicePrincipal, topic: Topic) {
     const APP_NAME = Constants.DEFAULTS.APP_NAME;
-    const lambdaRole = new Role(this, `${APP_NAME}-${lambdaPrincipal.service}-role`, {
-      assumedBy: lambdaPrincipal,
+    const serviceRole = new Role(this, `${APP_NAME}-${servicePrincipal.service}-role`, {
+      assumedBy: servicePrincipal,
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName(
           'service-role/AWSLambdaBasicExecutionRole',
@@ -133,17 +140,17 @@ export class VivosStack extends Stack {
         ),
       ],
     });
-    const lambdaSNSPolicy = new PolicyStatement({
-      sid: 'VivosLambdaSNSPolicy',
+    const serviceSNSPolicy = new PolicyStatement({
+      sid: 'VivosServiceSNSPolicy',
       actions: ['sns:Publish'],
       resources: [
         topic.topicArn,
       ],
     });
-    lambdaRole.addToPolicy(lambdaSNSPolicy);
+    serviceRole.addToPolicy(serviceSNSPolicy);
 
-    const lambdaS3Policy = new PolicyStatement({
-      sid: 'VivosLambdaS3Policy',
+    const serviceS3Policy = new PolicyStatement({
+      sid: 'VivosServiceS3Policy',
       actions: [
         's3:ListBucket',
         's3:GetObject*',
@@ -152,8 +159,8 @@ export class VivosStack extends Stack {
       ],
       resources: this.getBucketARNs(),
     });
-    lambdaRole.addToPolicy(lambdaS3Policy);
-    return lambdaRole;
+    serviceRole.addToPolicy(serviceS3Policy);
+    return serviceRole;
   }
 
 }

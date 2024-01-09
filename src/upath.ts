@@ -92,6 +92,20 @@ export class UPath {
     this.params = params;
   }
 
+  public toURI(): string {
+    if (this.scheme === 's3') {
+      return `s3://${this.bucket}/${this.key}`;
+    } else if (this.scheme === 'file') {
+      return this.key;
+    } else {
+      throw new Error(`Unsupported scheme: ${this.scheme}`);
+    }
+  }
+
+  public toString(): string {
+    return `UPath(${this.toURI()})`;
+  }
+
   public extension(): string {
     const split = this.key.split('.');
     return split.slice(-1)[0];
@@ -102,6 +116,13 @@ export class UPath {
     split.pop();
     split.push(extension);
     const key = split.join('.');
+    return new UPath(key, this.bucket, this.scheme, this.params);
+  }
+
+  public parent(): UPath {
+    const split = this.key.split('/');
+    split.pop();
+    const key = split.join('/');
     return new UPath(key, this.bucket, this.scheme, this.params);
   }
 

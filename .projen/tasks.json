@@ -211,13 +211,13 @@
       },
       "steps": [
         {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,@types/js-yaml,@types/node,@types/tmp,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,aws-cdk,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,eslint,jest,jest-junit,projen,ts-jest,ts-node,typescript,@aws-sdk/client-s3,@aws-sdk/client-sns,aws-cdk-lib,aws-lambda,axios,constructs,dotenv,handlebars,js-yaml,openapi-client-axios,openapi-types,openapicmd,tmp"
+          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,@types/js-yaml,@types/node,@types/tmp,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,aws-cdk,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,eslint,jest,jest-junit,projen,ts-jest,ts-node,typescript,@aws-sdk/client-batch,@aws-sdk/client-s3,@aws-sdk/client-sns,aws-cdk-lib,aws-lambda,axios,constructs,dotenv,handlebars,js-yaml,openapi-client-axios,openapi-types,openapicmd,tmp"
         },
         {
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @types/jest @types/js-yaml @types/node @types/tmp @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen ts-jest ts-node typescript @aws-sdk/client-s3 @aws-sdk/client-sns aws-cdk-lib aws-lambda axios constructs dotenv handlebars js-yaml openapi-client-axios openapi-types openapicmd tmp"
+          "exec": "yarn upgrade @types/jest @types/js-yaml @types/node @types/tmp @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen ts-jest ts-node typescript @aws-sdk/client-batch @aws-sdk/client-s3 @aws-sdk/client-sns aws-cdk-lib aws-lambda axios constructs dotenv handlebars js-yaml openapi-client-axios openapi-types openapicmd tmp"
         },
         {
           "exec": "npx projen"

@@ -58,6 +58,14 @@ describe('UPath', () => {
     });
   });
 
+  describe('toString()', () => {
+    it('should return the correct string representation', () => {
+      const result = helpers.s3_upath();
+      expect(result).toBeDefined();
+      expect(result.toString()).toContain(helpers.pipe_uri_s3());
+    });
+  });
+
   describe('parse', () => {
     // NOTE: requires network connection
     it('should parse s3 object data correctly', async () => {

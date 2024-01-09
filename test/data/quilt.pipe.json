@@ -1,0 +1,17 @@
+{
+  "id": "1",
+  "user": "ernest",
+  "next": {
+    "key": "tower.pipe.json",
+    "value": {
+      "computeEnvId": "{{ computeEnvId }}",
+      "pipeline": "https://github.com/quiltdata/nf-quilt",
+      "workDir": "{{ bucket }}",
+      "revision": "main",
+      "configProfiles": [
+        "standard"
+      ],
+      "configText": "plugins = ['nf-quilt']"
+    }
+  }
+}

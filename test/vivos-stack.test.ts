@@ -12,8 +12,10 @@ describe('VivosStack', () => {
   beforeEach(() => {
     app = new App();
     stackProps = {
-      account: '123456789012',
-      region: 'us-east-1',
+      env: {
+        account: '123456789012',
+        region: 'us-east-1',
+      },
       email: 'test@example.com',
     };
     stack = new VivosStack(app, 'test', stackProps);
@@ -25,9 +27,9 @@ describe('VivosStack', () => {
     expect(topic.topicArn).toBeDefined();
   });
 
-  test('workBucket', () => {
-    expect(stack.workBucket).toBeDefined();
-    const bucket = stack.workBucket;
+  test('rawBucket', () => {
+    expect(stack.rawBucket).toBeDefined();
+    const bucket = stack.rawBucket;
     expect(bucket.bucketName).toBeDefined();
   });
 
@@ -47,9 +49,9 @@ describe('VivosStack', () => {
     expect(envars.BASE_API).not.toEqual('./api');
   });
 
-  test('MakeLambdaRole', () => {
+  test('makeServiceRole', () => {
     const lambdaPrincipal = new ServicePrincipal('s3.amazonaws.com');
-    const lambdaRole = stack.makeLambdaRole(lambdaPrincipal, stack.statusTopic);
+    const lambdaRole = stack.makeServiceRole(lambdaPrincipal, stack.statusTopic);
 
     expect(lambdaRole.assumeRoleAction).toEqual('sts:AssumeRole');
   });

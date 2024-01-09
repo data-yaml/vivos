@@ -33,6 +33,13 @@ describe('Pipe', () => {
     expect(prefix).toBe('test');
   });
 
+  it('reads the event object', async () => {
+    const obj = await pipe.getEventObject();
+    console.log(obj);
+    expect(obj).toBeDefined();
+    expect(obj.user).toBe('ernest');
+  });
+
   it('newer sentinel file ignores execution', async () => {
     await pipe.write_sentinel('output');
     const isNewer = await pipe.sentinel_newer();
@@ -53,6 +60,6 @@ describe('Pipe', () => {
   it('should run the pipe with input configuration', async () => {
     const output = await pipe.run(input);
     // Add your assertions here
-    expect(output).toBe(input.toString());
+    expect(output).toBe(input);
   });
 });

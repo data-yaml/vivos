@@ -59,8 +59,10 @@ export class Vivos {
 
   public defaultProps(): KeyedConfig {
     return {
-      account: this.get('CDK_DEFAULT_ACCOUNT'),
-      region: this.get('CDK_DEFAULT_REGION'),
+      env: {
+        account: this.get('CDK_DEFAULT_ACCOUNT'),
+        region: this.get('CDK_DEFAULT_REGION'),
+      },
       email: this.get('CDK_DEFAULT_EMAIL'),
     };
   }

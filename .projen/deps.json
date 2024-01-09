@@ -75,6 +75,10 @@
       "type": "build"
     },
     {
+      "name": "@aws-sdk/client-batch",
+      "type": "runtime"
+    },
+    {
       "name": "@aws-sdk/client-s3",
       "type": "runtime"
     },
