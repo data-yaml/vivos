@@ -12,11 +12,8 @@ export class PipeQuilt extends Pipe {
     QUILT_JOB: 'PipeQuiltPackagerJob',
     QUILT_QUEUE: 'PipeQuiltPackagerQueue',
     QUILT_NEXT: 'vivos-staging',
+    QUILT_PROD: 'vivos-production',
   };
-
-  public static QUILT_KEYS(): string[] {
-    return Object.keys(PipeQuilt.QUILT_DEFAULTS);
-  }
 
   public static getPrefix(): string {
     return 'quilt';
@@ -36,6 +33,7 @@ export class PipeQuilt extends Pipe {
       QUILT_QUEUE: batchQueue.jobQueueName,
       QUILT_JOB: job.jobDefinitionName,
       QUILT_NEXT: stack.stageBucket.bucketName,
+      QUILT_PROD: stack.prodBucket.bucketName,
     };
     return environment;
   }

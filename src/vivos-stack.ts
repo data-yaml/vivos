@@ -76,7 +76,11 @@ export class VivosStack extends Stack {
   }
 
   public getBucketNames(): string[] {
-    return [this.rawBucket.bucketName];
+    return [
+      this.rawBucket.bucketName,
+      this.stageBucket.bucketName,
+      this.prodBucket.bucketName,
+    ];
   }
 
   public getBucketARNs(): string[] {

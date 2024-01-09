@@ -56,7 +56,6 @@ describe('Pipe', () => {
     expect(result.status).toEqual('success');
   });
 
-
   it('should run the pipe with input configuration', async () => {
     const output = await pipe.run(input);
     // Add your assertions here

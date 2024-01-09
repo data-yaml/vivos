@@ -43,9 +43,9 @@ export class Vivos {
 
   public api_defaults(): KeyedConfig {
     return {
-      BASE_API: 's3://quilt-vivos/api',
-      BASE_CONFIG: 's3://quilt-vivos/config',
-      BASE_REGION: 'us-west-2',
+      BASE_API: 's3://vivos-pipes/api',
+      BASE_CONFIG: 's3://vivos-pipes/config',
+      BASE_REGION: 'us-east-1',
       PETSTORE_API_FILE: 'petstore.yaml',
       PETSTORE_API_URL: 'https://petstore.swagger.io/v2',
     };
@@ -85,7 +85,7 @@ export class Vivos {
 
   public async getEventObject(): Promise<KeyedConfig> {
     const entry_uri = this.getEventObjectURI();
-    return UPath.LoadObjectURI(entry_uri);
+    return UPath.LoadObjectURI(entry_uri, this.cc.context);
   }
 
   // log message to STATUS_TOPIC_ARN if defined
