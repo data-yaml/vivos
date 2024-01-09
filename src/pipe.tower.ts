@@ -1,5 +1,6 @@
 import { KeyedConfig } from './constants';
 import { Pipe } from './pipe';
+import { PipeQuilt } from './pipe.quilt';
 import { VivosTower } from './vivos.tower';
 
 export class PipeTower extends Pipe {
@@ -12,14 +13,29 @@ export class PipeTower extends Pipe {
   }
 
   readonly tower: VivosTower;
+  readonly quilt: PipeQuilt;
+  readonly sourceURI: string;
+  readonly destURI: string;
+
   constructor(event: any, context: any) {
     super(event, context);
     this.tower = new VivosTower(event, context);
+    this.quilt = new PipeQuilt(event, context);
+    const packageName = this.quilt.packageName();
+    const sourceBucket = this.quilt.get('QUILT_NEXT');
+    const destBucket = this.quilt.get('QUILT_PROD');
+    this.sourceURI = `quilt+s3://${sourceBucket}#package=${packageName}`;
+    this.destURI = `quilt+s3://${destBucket}#package=${packageName}`;
+
     // ensure event contains a config file
   }
 
   public async run(input: KeyedConfig) {
     console.debug('PipeTower.run(input)', JSON.stringify(input));
+    if (input.hasOwnProperty('quilt')) {
+      // Run the quilt pipeline to create package at sourceURI
+      await this.quilt.run(input.quilt);
+    }
     try {
       // Submit the workflow using NextFlow Tower
       const options = await this.tower.launch_options();

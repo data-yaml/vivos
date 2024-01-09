@@ -43,22 +43,33 @@ export class PipeQuilt extends Pipe {
     // ensure event contains a config file
   }
 
+  public parentFolder(): string {
+    const parent = this.event_path.parent();
+    return parent.key.replace(/\/$/, ''); 
+  }
+
+  public packageName(): string {
+    // last two segments of parent folder
+    const parent = this.parentFolder();
+    const segments = parent.split('/');
+    const last = segments.slice(-2);
+    return last.join('/');
+  }
+
   public async run(input: KeyedConfig): Promise<KeyedConfig> {
     console.debug('PipeQuilt.run(input)', JSON.stringify(input));
     const region = this.get('AWS_REGION');
     const job_queue = this.get('QUILT_QUEUE');
     const job_definition = this.get('QUILT_JOB');
-    const raw_bucket = this.event_bucket;
-    const next_bucket = this.get('QUILT_NEXT');
-    const parent = this.event_path.parent();
     const environment = [
-      { name: 'bucket', value: String(raw_bucket) },
-      { name: 'prefix', value: parent.key },
-      { name: 'next_bucket', value: next_bucket },
+      { name: 'bucket', value: this.event_bucket },
+      { name: 'prefix', value: this.parentFolder() },
+      { name: 'next_bucket', value: this.get('QUILT_NEXT') },
       // Add key values from input to environment
       ...Object.entries(input).map(([key, value]) => ({ name: key, value: String(value) })),
     ];
     console.debug('Environment:', JSON.stringify(environment));
+    
     try {
       // Submit a job to the Batch job queue
       const client = new BatchClient({ region: region });

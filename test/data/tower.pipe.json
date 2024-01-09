@@ -9,5 +9,8 @@
     "standard"
   ],
   "configText": "plugins = ['nf-quilt']",
-  "paramsText": "{\"outdir\":\"quilt+s3://{{ QUILT_PROD }}#package={{ TOWER_DEFAULT_PIPELINE }}\"}"
+  "paramsText": "{\"outdir\":\"quilt+s3://{{ QUILT_PROD }}#package={{ TOWER_DEFAULT_PIPELINE }}\"}",
+  "quilt": {
+    "id": "1"
+  }
 }
