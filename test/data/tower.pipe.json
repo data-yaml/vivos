@@ -1,12 +1,13 @@
 {
-  "computeEnvId": "{{ computeEnvId }}",
+  "id": "1",
+  "computeEnvId": "{{ TOWER_COMPUTE_ENV_ID }}",
   "runName": "hideous_mccarthy",
   "pipeline": "https://github.com/quiltdata/nf-quilt",
-  "workDir": "{{ bucket }}",
+  "workDir": "{{ QUILT_PROD }}",
   "revision": "main",
   "configProfiles": [
     "standard"
   ],
   "configText": "plugins = ['nf-quilt']",
-  "paramsText": "{\"outdir\":\"quilt+{{ bucket }}#package={{ pipeline }}\"}"
+  "paramsText": "{\"outdir\":\"quilt+{{ QUILT_PROD }}#package={{ TOWER_DEFAULT_PIPELINE }}\"}"
 }

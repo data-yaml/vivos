@@ -3,6 +3,10 @@ import { Pipe } from './pipe';
 import { VivosTower } from './vivos.tower';
 
 export class PipeTower extends Pipe {
+  public static TOWER_DEFAULTS = {
+    TOWER_DEFAULT_PIPELINE: 'nf-core/hlatyping',
+  };
+
   public static getPrefix(): string {
     return 'tower';
   }

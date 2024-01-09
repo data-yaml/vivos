@@ -56,6 +56,8 @@ describe('Pipe', () => {
     expect(result.status).toEqual('success');
   });
 
+  it('expands variables in the input document', async () => {''
+  });
 
   it('should run the pipe with input configuration', async () => {
     const output = await pipe.run(input);
