@@ -1,5 +1,6 @@
 import { IT, helpers } from './helpers';
 import { VivosTower } from '../src/vivos.tower';
+import fs from 'fs';
 
 describe('VivosTower', () => {
   let vivos: VivosTower;
@@ -98,6 +99,17 @@ describe('VivosTower', () => {
 
 
   // itif(hasOutput)
+  IT.ifhas('SAVE_OPTIONS')('should write out launch_options', async () => {
+    const bucket = vivos.get('CDK_DEFAULT_BUCKET');
+    const launchOptions = await vivos.launch_options(pipeline, bucket);
+    expect(launchOptions).toBeDefined();
+
+    // Save launchOptions to a file
+    const filePath = vivos.get('SAVE_OPTIONS');
+    fs.writeFileSync(filePath, JSON.stringify(launchOptions, null, 2));
+  });
+
+
   IT.ifhas('LAUNCH_WORKFLOWS')('should launch a workflow', async () => {
     const bucket = vivos.get('CDK_DEFAULT_BUCKET');
     const launchOptions = await vivos.launch_options(pipeline, bucket);

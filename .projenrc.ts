@@ -34,6 +34,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     '.DS_Store',
     'test/__snapshots__/*',
     'test.pipe.md',
+    'inputs',
   ],
 });
 project.tryFindObjectFile('.github/workflows/build.yml')!.addOverride('jobs.build.env', {
