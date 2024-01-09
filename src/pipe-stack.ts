@@ -23,6 +23,8 @@ import { KeyedConfig } from './constants';
 import { Pipe } from './pipe';
 import { PipeQuilt } from './pipe.quilt';
 import { VivosStack, VivosStackProps } from './vivos-stack';
+import { Constants } from './constants';
+import { VivosTower } from './vivos.tower';
 
 export interface PipeStackProps extends VivosStackProps {
   readonly buckets: string[];
@@ -95,6 +97,7 @@ export class PipeStack extends VivosStack {
       ...super_env,
       ...Pipe.PIPE_DEFAULTS,
       ...PipeQuilt.QUILT_DEFAULTS,
+      ...Constants.MapEnvars(VivosTower.ENVARS),
       ...env,
     };
   }

@@ -1,0 +1,12 @@
+{
+  "computeEnvId": "{{ computeEnvId }}",
+  "runName": "hideous_mccarthy",
+  "pipeline": "https://github.com/quiltdata/nf-quilt",
+  "workDir": "{{ bucket }}",
+  "revision": "main",
+  "configProfiles": [
+    "standard"
+  ],
+  "configText": "plugins = ['nf-quilt']",
+  "paramsText": "{\"outdir\":\"quilt+{{ bucket }}#package={{ pipeline }}\"}"
+}
