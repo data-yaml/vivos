@@ -2,7 +2,9 @@
   "id": "1",
   "computeEnvId": "{{ TOWER_COMPUTE_ENV_ID }}",
   "runName": "hideous_mccarthy",
-  "pipeline": "https://github.com/quiltdata/nf-quilt",
+  "samplesheet": "quilt+s3://vivos-staging#package=data/hlatyping:latest&path=samplesheet.hlatyping.csv",
+  "pipeline": "nf-core/hlatyping",
+  "stageBucket": "{{ QUILT_NEXT }}",
   "workDir": "s3://{{ QUILT_PROD }}",
   "revision": "main",
   "configProfiles": [
@@ -10,6 +12,9 @@
   ],
   "configText": "plugins = ['nf-quilt']",
   "paramsText": "{\"outdir\":\"quilt+s3://{{ QUILT_PROD }}#package={{ TOWER_DEFAULT_PIPELINE }}\"}",
+  "user_meta:": {
+    
+  }
   "quilt": {
     "id": "1"
   }

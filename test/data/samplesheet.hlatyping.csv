@@ -1,2 +1,2 @@
 sample,fastq_1,fastq_2,bam,seq_type
-SAMPLE_FASTQ,quilt+s3://vivos-staging#package=data/hlatyping@877b16e395619c9f70ecb06632c935a9ac7c41a256d32771d1cccee6d54a1ac8&path=NA11995_SRR766010_1_fished.fastq.gz,quilt+s3://vivos-staging#package=data/hlatyping@877b16e395619c9f70ecb06632c935a9ac7c41a256d32771d1cccee6d54a1ac8&path=NA11995_SRR766010_2_fished.fastq.gz,dna
+SAMPLE_FASTQ,"quilt+s3://vivos-staging#package=data/hlatyping&path=NA11995_SRR766010_1_fished.fastq.gz","quilt+s3://vivos-staging#package=data/hlatyping&path=NA11995_SRR766010_2_fished.fastq.gz",,dna
