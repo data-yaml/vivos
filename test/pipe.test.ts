@@ -33,6 +33,12 @@ describe('Pipe', () => {
     expect(prefix).toBe('test');
   });
 
+  it('reads the event object', async () => {
+    const obj = await pipe.getEventObject();
+    expect(obj).toBeDefined();
+    expect(obj.bucket).toBe('');
+  });
+
   it('newer sentinel file ignores execution', async () => {
     await pipe.write_sentinel('output');
     const isNewer = await pipe.sentinel_newer();

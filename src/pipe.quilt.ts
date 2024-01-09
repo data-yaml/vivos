@@ -11,6 +11,7 @@ export class PipeQuilt extends Pipe {
     QUILT_DOCKER: '850787717197.dkr.ecr.us-east-1.amazonaws.com/edp-container-registry:latest',
     QUILT_JOB: 'PipeQuiltPackagerJob',
     QUILT_QUEUE: 'PipeQuiltPackagerQueue',
+    QUILT_NEXT: 'vivos-staging'
   };
 
   public static QUILT_KEYS(): string[] {
@@ -45,15 +46,17 @@ export class PipeQuilt extends Pipe {
   }
 
   public async run(input: KeyedConfig): Promise<KeyedConfig> {
+    console.debug('PipeQuilt.run(input)', JSON.stringify(input));
     const region = this.get('AWS_REGION');
     const job_queue = this.get('QUILT_QUEUE');
     const job_definition = this.get('QUILT_JOB');
     const raw_bucket = this.event_bucket;
+    const next_bucket = this.get('QUILT_NEXT');
     const parent = this.event_path.parent();
     const environment = [
       { name: 'bucket', value: String(raw_bucket) },
       { name: 'prefix', value: parent.key },
-      { name: 'next_bucket', value: input.QUILT_NEXT },
+      { name: 'next_bucket', value: next_bucket },
       // Add key values from input to environment
       ...Object.entries(input).map(([key, value]) => ({ name: key, value: String(value) })),
     ];
