@@ -1,6 +1,6 @@
 {
-    "input": "https://raw.githubusercontent.com/nf-core/test-datasets/hlatyping/samplesheets/samplesheet_full.csv",
-    "outdir": "quilt+{{ bucket }}#package={{ package }}",
+    "input": "quilt+s3://vivos-staging#package=data/hlatyping:latest&path=samplesheet.hlatyping.csv",
+    "outdir": "quilt+s3://vivos-production#package=data/hlatyping",
     "benchling": {
         "id": "{{ benchling.id }}",
         "name": "{{ benchling.name }}",
