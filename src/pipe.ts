@@ -58,6 +58,12 @@ export class Pipe extends Vivos {
     return;
   }
 
+  public async write_next(next_pipe: KeyedConfig, output: KeyedConfig): Promise<void> {
+    const next_path = (next_pipe);
+    await next_path.save(JSON.stringify(output));
+    return;
+  }
+
   public async exec(): Promise<any> {
     if (await this.sentinel_newer()) {
       return {
@@ -70,6 +76,9 @@ export class Pipe extends Vivos {
 
     const output = await this.run(input);
     output.status = 'success';
+    if (input.next_pipe !== undefined && input.next_pipe !== null && input.next_pipe !== '') {
+      await this.write_next(input.next_pipe, output);
+    }
     await this.write_sentinel(JSON.stringify(output));
     return output;
   }
