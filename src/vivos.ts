@@ -85,7 +85,7 @@ export class Vivos {
 
   public async getEventObject(): Promise<KeyedConfig> {
     const entry_uri = this.getEventObjectURI();
-    return UPath.LoadObjectURI(entry_uri);
+    return UPath.LoadObjectURI(entry_uri, this.cc.context);
   }
 
   // log message to STATUS_TOPIC_ARN if defined

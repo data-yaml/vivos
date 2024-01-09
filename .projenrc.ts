@@ -33,7 +33,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     '.env*',
     '.DS_Store',
     'test/__snapshots__/*',
-    'test.pipe.md',
+    '*.pipe.md',
     'inputs',
   ],
 });

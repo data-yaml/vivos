@@ -56,7 +56,8 @@ describe('Pipe', () => {
     expect(result.status).toEqual('success');
   });
 
-  it('expands variables in the input document', async () => {''
+  it('expands variables for tower.pipe.json', async () => {
+    
   });
 
   it('should run the pipe with input configuration', async () => {

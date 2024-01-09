@@ -33,7 +33,7 @@ jspm_packages/
 .env*
 .DS_Store
 test/__snapshots__/*
-test.pipe.md
+*.pipe.md
 inputs
 /test-reports/
 junit.xml
