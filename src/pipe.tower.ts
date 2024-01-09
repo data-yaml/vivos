@@ -34,6 +34,7 @@ export class PipeTower extends Pipe {
     console.debug('PipeTower.run(input)', JSON.stringify(input));
     if (input.hasOwnProperty('quilt')) {
       // Run the quilt pipeline to create package at sourceURI
+      // TODO: override package name from input.quilt
       await this.quilt.run(input.quilt);
     }
     try {

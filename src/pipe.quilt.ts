@@ -45,7 +45,7 @@ export class PipeQuilt extends Pipe {
 
   public parentFolder(): string {
     const parent = this.event_path.parent();
-    return parent.key.replace(/\/$/, ''); 
+    return parent.key.replace(/\/$/, '');
   }
 
   public packageName(): string {
@@ -69,7 +69,7 @@ export class PipeQuilt extends Pipe {
       ...Object.entries(input).map(([key, value]) => ({ name: key, value: String(value) })),
     ];
     console.debug('Environment:', JSON.stringify(environment));
-    
+
     try {
       // Submit a job to the Batch job queue
       const client = new BatchClient({ region: region });
