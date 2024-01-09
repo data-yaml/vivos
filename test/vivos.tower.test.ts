@@ -1,6 +1,6 @@
+import fs from 'fs';
 import { IT, helpers } from './helpers';
 import { VivosTower } from '../src/vivos.tower';
-import fs from 'fs';
 
 describe('VivosTower', () => {
   let vivos: VivosTower;
