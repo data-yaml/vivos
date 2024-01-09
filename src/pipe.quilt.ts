@@ -11,7 +11,7 @@ export class PipeQuilt extends Pipe {
     QUILT_DOCKER: '850787717197.dkr.ecr.us-east-1.amazonaws.com/edp-container-registry:latest',
     QUILT_JOB: 'PipeQuiltPackagerJob',
     QUILT_QUEUE: 'PipeQuiltPackagerQueue',
-    QUILT_NEXT: 'vivos-staging'
+    QUILT_NEXT: 'vivos-staging',
   };
 
   public static QUILT_KEYS(): string[] {

@@ -35,8 +35,9 @@ describe('Pipe', () => {
 
   it('reads the event object', async () => {
     const obj = await pipe.getEventObject();
+    console.log(obj);
     expect(obj).toBeDefined();
-    expect(obj.bucket).toBe('');
+    expect(obj.user).toBe('ernest');
   });
 
   it('newer sentinel file ignores execution', async () => {
