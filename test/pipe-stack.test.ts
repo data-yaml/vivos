@@ -43,4 +43,15 @@ describe('PipeStack', () => {
     expect(buckets.length).toEqual(4);
     expect(stack.lambdaRole).toBeDefined();
   });
+
+  it('should import child envars', () => {
+    const root_env = {key: "value"};
+    const env = stack.makeEnvars(root_env);
+    expect(env).toBeDefined();
+    expect(env.key).toEqual('value');
+    expect(env.VIVOS_CONFIG_STEM).toEqual('pipe');
+    expect(env.QUILT_PROD).toEqual('vivos-production');
+    expect(env.TOWER_DEFAULT_PIPELINE).toEqual('nf-core/hlatyping');
+    expect(env.TOWER_COMPUTE_ENV_ID).toBeDefined();
+  });
 });

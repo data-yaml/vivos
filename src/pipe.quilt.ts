@@ -12,6 +12,7 @@ export class PipeQuilt extends Pipe {
     QUILT_JOB: 'PipeQuiltPackagerJob',
     QUILT_QUEUE: 'PipeQuiltPackagerQueue',
     QUILT_NEXT: 'vivos-staging',
+    QUILT_PROD: 'vivos-production',
   };
 
   public static getPrefix(): string {
