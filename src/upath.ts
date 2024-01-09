@@ -119,6 +119,13 @@ export class UPath {
     return new UPath(key, this.bucket, this.scheme, this.params);
   }
 
+  public parent(): UPath {
+    const split = this.key.split('/');
+    split.pop();
+    const key = split.join('/');
+    return new UPath(key, this.bucket, this.scheme, this.params);
+  }
+
   public async load(region = ''): Promise<string> {
     if (this.scheme === 's3') {
       return this.loadS3(region);

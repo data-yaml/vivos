@@ -31,10 +31,10 @@ export class PipeQuilt extends Pipe {
     const registry = PipeQuilt.QUILT_DEFAULTS.QUILT_DOCKER;
     const command = ['python', '/quilt_packager.py'];
     const job = stack.makeJobDefinition(jobName, registry, command, batchQueue.jobQueueArn);
-    // set QUILT_JOB and QUILT_QUEUE in the stack props?
     const environment = {
       QUILT_QUEUE: batchQueue.jobQueueName,
       QUILT_JOB: job.jobDefinitionName,
+      QUILT_NEXT: stack.stageBucket.bucketName,
     };
     return environment;
   }
@@ -49,10 +49,11 @@ export class PipeQuilt extends Pipe {
     const job_queue = this.get('QUILT_QUEUE');
     const job_definition = this.get('QUILT_JOB');
     const raw_bucket = this.event_bucket;
-    const prefix = this.findPrefix();
+    const parent = this.event_path.parent();
     const environment = [
       { name: 'bucket', value: String(raw_bucket) },
-      { name: 'prefix', value: String(prefix) },
+      { name: 'prefix', value: parent.key },
+      { name: 'next_bucket', value: input.QUILT_NEXT },
       // Add key values from input to environment
       ...Object.entries(input).map(([key, value]) => ({ name: key, value: String(value) })),
     ];
