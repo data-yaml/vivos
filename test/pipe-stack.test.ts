@@ -45,7 +45,7 @@ describe('PipeStack', () => {
   });
 
   it('should import child envars', () => {
-    const root_env = {key: "value"};
+    const root_env = { key: 'value' };
     const env = stack.makeEnvars(root_env);
     expect(env).toBeDefined();
     expect(env.key).toEqual('value');

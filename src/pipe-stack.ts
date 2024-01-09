@@ -19,13 +19,12 @@ import { ManagedPolicy, ServicePrincipal, Role, PolicyStatement } from 'aws-cdk-
 import { Topic } from 'aws-cdk-lib/aws-sns';
 import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
-import { KeyedConfig } from './constants';
+import { Constants, KeyedConfig } from './constants';
 import { Pipe } from './pipe';
 import { PipeQuilt } from './pipe.quilt';
-import { VivosStack, VivosStackProps } from './vivos-stack';
-import { Constants } from './constants';
-import { VivosTower } from './vivos.tower';
 import { PipeTower } from './pipe.tower';
+import { VivosStack, VivosStackProps } from './vivos-stack';
+import { VivosTower } from './vivos.tower';
 
 export interface PipeStackProps extends VivosStackProps {
   readonly buckets: string[];
