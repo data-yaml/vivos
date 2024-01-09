@@ -31,8 +31,8 @@ describe('PipeStack', () => {
     template.resourceCountIs('AWS::Lambda::Function', 3);
     template.resourceCountIs('AWS::IAM::Role', 4);
     template.resourceCountIs('AWS::IAM::Policy', 3);
-    template.resourceCountIs('AWS::S3::Bucket', 1);
-    template.resourceCountIs('AWS::S3::BucketPolicy', 1);
+    template.resourceCountIs('AWS::S3::Bucket', 3);
+    template.resourceCountIs('AWS::S3::BucketPolicy', 3);
     template.resourceCountIs('AWS::Batch::ComputeEnvironment', 1);
   });
 

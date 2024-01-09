@@ -23,7 +23,7 @@ export class PipeQuilt extends Pipe {
 
   public static ExtendStack(stack: PipeStack) {
     const batchName = this.QUILT_DEFAULTS.QUILT_QUEUE;
-    const batchSize = Number(this.QUILT_DEFAULTS.QUILT_BATCH_SIZE) || 1;
+    const batchSize = Number(this.QUILT_DEFAULTS.QUILT_BATCH_SIZE);
     const jobName = this.QUILT_DEFAULTS.QUILT_JOB;
     const vpcName = PipeQuilt.QUILT_DEFAULTS.QUILT_VPC;
 

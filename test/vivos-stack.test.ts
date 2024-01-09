@@ -27,9 +27,9 @@ describe('VivosStack', () => {
     expect(topic.topicArn).toBeDefined();
   });
 
-  test('workBucket', () => {
-    expect(stack.workBucket).toBeDefined();
-    const bucket = stack.workBucket;
+  test('rawBucket', () => {
+    expect(stack.rawBucket).toBeDefined();
+    const bucket = stack.rawBucket;
     expect(bucket.bucketName).toBeDefined();
   });
 

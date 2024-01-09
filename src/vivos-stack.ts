@@ -40,7 +40,9 @@ export class VivosStack extends Stack {
   protected static PRINCIPAL_KEYS = ['events', 'lambda'];
   protected readonly principal: AccountPrincipal;
   protected readonly principals: { [key: string]: ServicePrincipal };
-  public readonly workBucket: Bucket;
+  public readonly rawBucket: Bucket;
+  public readonly stageBucket: Bucket;
+  public readonly prodBucket: Bucket;
   public readonly lambdaRole: Role;
   public readonly statusTopic: Topic;
   public readonly stack_name: string;
@@ -58,7 +60,9 @@ export class VivosStack extends Stack {
     this.principals = Object.fromEntries(
       VivosStack.PRINCIPAL_KEYS.map(x => [x, new ServicePrincipal(`${x}.amazonaws.com`)]),
     );
-    this.workBucket = this.makeBucket('vivos-pipes');
+    this.rawBucket = this.makeBucket('vivos-pipes');
+    this.stageBucket = this.makeBucket('vivos-staging');
+    this.prodBucket = this.makeBucket('vivos-production');
 
     this.statusTopic.addSubscription(
       new EmailSubscription(props.email),
@@ -72,7 +76,7 @@ export class VivosStack extends Stack {
   }
 
   public getBucketNames(): string[] {
-    return [this.workBucket.bucketName];
+    return [this.rawBucket.bucketName];
   }
 
   public getBucketARNs(): string[] {
