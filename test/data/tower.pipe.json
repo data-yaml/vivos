@@ -1,13 +1,23 @@
 {
   "id": "1",
   "computeEnvId": "{{ TOWER_COMPUTE_ENV_ID }}",
-  "runName": "hideous_mccarthy",
-  "pipeline": "https://github.com/quiltdata/nf-quilt",
-  "workDir": "s3://{{ QUILT_PROD }}",
+  "samplesheet": "s3://vivos-pipes/data/hlatyping/samplesheet.csv",
+  "pipeline": "nf-core/hlatyping",
+  "stageBucket": "s3://{{ QUILT_NEXT }}",
+  "prodBucket": "s3://{{ QUILT_PROD }}",
+  "workDir": "s3://quilt-demos",
   "revision": "main",
   "configProfiles": [
-    "standard"
+    "test"
   ],
   "configText": "plugins = ['nf-quilt']",
-  "paramsText": "{\"outdir\":\"quilt+s3://{{ QUILT_PROD }}#package={{ TOWER_DEFAULT_PIPELINE }}\"}"
+  "pattern_suffix": "fastq.gz",
+  "user_meta": {
+    "Instrument ID": "014DR84N",
+    "Run Number": 14,
+    "Owner": "EPrabhakar"
+  },
+  "quilt": {
+    "id": "1"
+  }
 }

@@ -1,14 +1,6 @@
 {
-    "input": "https://raw.githubusercontent.com/nf-core/test-datasets/hlatyping/samplesheets/samplesheet_full.csv",
-    "outdir": "quilt+{{ bucket }}#package={{ package }}",
-    "benchling": {
-        "id": "{{ benchling.id }}",
-        "name": "{{ benchling.name }}",
-        "displayId": "{{ benchling.displayId }}",
-        "apiURL": "{{ benchling.apiURL }}",
-        "webURL": "{{ benchling.webURL }}",
-        "creator.name": "{{ benchling.creator.name }}"
-    },
+    "input": "{{ raw }}/{{ package }}/samplesheet.csv",
+    "outdir": "quilt+{{ bucket }}{{ user_meta }}#package={{ package }}",
     "solver": "glpk",
     "enumerations": 1,
     "beta": 0.009,
@@ -30,5 +22,6 @@
     "multiqc_logo": "${projectDir}/assets/nf-core-hlatyping_logo_light.png",
     "tracedir": "${params.outdir}/pipeline_info",
     "validate_params": true,
+    "schema_ignore_params": "benchling",
     "show_hidden_params": false
 }

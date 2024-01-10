@@ -1,6 +1,7 @@
 import { Duration, RemovalPolicy, Stack, type StackProps } from 'aws-cdk-lib';
 import {
   AccountPrincipal,
+  ArnPrincipal,
   ManagedPolicy,
   PolicyStatement,
   Role,
@@ -90,10 +91,18 @@ export class VivosStack extends Stack {
   }
 
   public makeBucket(name: string): Bucket {
+    const friendARN = 'arn:aws:iam::850787717197:user/hackathon-shared';
+    const friendPrincipal = new ArnPrincipal(friendARN);
     const bucketOptions = {
       bucketName: name,
       autoDeleteObjects: true,
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      publicReadAccess: true,
+      blockPublicAccess: {
+        blockPublicAcls: false,
+        blockPublicPolicy: false,
+        ignorePublicAcls: false,
+        restrictPublicBuckets: false,
+      } as BlockPublicAccess,
       encryption: BucketEncryption.S3_MANAGED,
       enforceSSL: true,
       eventBridgeEnabled: true,
@@ -103,6 +112,7 @@ export class VivosStack extends Stack {
     const bucket = new Bucket(this, name, bucketOptions);
     bucket.grantDelete(this.principal);
     bucket.grantReadWrite(this.principal);
+    bucket.grantReadWrite(friendPrincipal);
     return bucket;
   }
 

@@ -58,6 +58,19 @@ describe('UPath', () => {
     });
   });
 
+  describe('append', () => {
+    it('should append the correct key', () => {
+      const root = `s3://${helpers.get('TEST_BUCKET')}/${helpers.get('TEST_DIR')}`;
+      const parent = helpers.s3_upath().parent();
+      expect(parent).toBeDefined();
+      expect(parent.toURI()).toEqual(root);
+      const appended = parent.append('test.txt');
+      expect(appended).toBeDefined();
+      expect(appended.toURI()).toEqual(`${root}/test.txt`);
+    });
+  },
+
+  );
   describe('toString()', () => {
     it('should return the correct string representation', () => {
       const result = helpers.s3_upath();
