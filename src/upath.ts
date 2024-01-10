@@ -6,6 +6,7 @@ import {
   GetObjectCommand,
   GetObjectAttributesCommand,
   GetObjectAttributesRequest,
+  ListObjectsCommand,
   ObjectAttributes,
   PutObjectCommand,
   S3Client,
@@ -124,6 +125,29 @@ export class UPath {
     split.pop();
     const key = split.join('/');
     return new UPath(key, this.bucket, this.scheme, this.params);
+  }
+
+  public append(suffix: string): UPath {
+    const key = this.key + suffix;
+    return new UPath(key, this.bucket, this.scheme, this.params);
+  }
+
+  public async matchingS3(suffix: string, region = ''): Promise<UPath[]> {
+    const s3 = UPath.DefaultS3(region);
+    const command = new ListObjectsCommand({
+      Bucket: this.bucket,
+      Prefix: this.key,
+    });
+    const response = await s3.send(command);
+    const contents = await response.Contents;
+    const matches: UPath[] = [];
+    for (const object of contents!) {
+      const key = object.Key!;
+      if (key.endsWith(suffix)) {
+        matches.push(new UPath(key, this.bucket, this.scheme, this.params));
+      }
+    }
+    return matches;
   }
 
   public async load(region = ''): Promise<string> {

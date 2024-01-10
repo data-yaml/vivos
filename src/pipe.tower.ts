@@ -30,12 +30,28 @@ export class PipeTower extends Pipe {
     // ensure event contains a config file
   }
 
+  // Create samplesheet.csv from files matching pattern in folder
+  public async createSamplesheet(pattern: string) {
+    const HEADER = "sample,fastq_1,fastq_2,bam,seq_type\nSAMPLE_FASTQ,"
+    const FOOTER = ",,dna"
+    const parent = this.event_path.parent();
+    const files = await parent.matchingS3(pattern);
+    const uris = files.map((file) => file.toURI()).join(',');
+    const rows = HEADER + uris + FOOTER;
+    const samplesheet = parent.append('samplesheet.csv');
+    await samplesheet.save(rows);
+  }
+
   public async run(input: KeyedConfig) {
     console.debug('PipeTower.run(input)', JSON.stringify(input));
     if (input.hasOwnProperty('quilt')) {
       // Run the quilt pipeline to create package at sourceURI
       // TODO: override package name from input.quilt
       await this.quilt.run(input.quilt);
+    }
+    if (input.hasOwnProperty('pattern_suffix')) {
+      // Create samplesheet from matching files
+      await this.createSamplesheet(input.pattern_suffix);
     }
     try {
       // Submit the workflow using NextFlow Tower
