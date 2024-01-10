@@ -12,7 +12,7 @@
   ],
   "configText": "plugins = ['nf-quilt']",
   "pattern_suffix": "fastq.gz",
-  "user_meta:": {
+  "user_meta": {
     "Instrument ID": "014DR84N",
     "Run Number": 14,
     "Owner": "EPrabhakar"

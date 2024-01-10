@@ -54,8 +54,6 @@ export class PipeTower extends Pipe {
       await this.createSamplesheet(input.pattern_suffix);
     }
     const user_meta = (input.hasOwnProperty('user_meta')) ? '?' + JSON.stringify(input.user_meta) : '';
-    console.log('user_meta', user_meta);
-
     try {
       // Submit the workflow using NextFlow Tower
       const options = await this.tower.launch_options(
