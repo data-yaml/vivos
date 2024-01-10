@@ -128,7 +128,7 @@ export class UPath {
   }
 
   public append(suffix: string): UPath {
-    const key = this.key + suffix;
+    const key = `${this.key}/${suffix}`;
     return new UPath(key, this.bucket, this.scheme, this.params);
   }
 

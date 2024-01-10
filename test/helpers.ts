@@ -1,8 +1,9 @@
 import Constants, { KeyedConfig } from '../src/constants';
 import { UPath } from '../src/upath';
 
-const TEST_CONSTANTS = {
+export const TEST_CONSTANTS = {
   TEST_BUCKET: 'quilt-demos',
+  TEST_DIR: 'test/data',
   TEST_KEY: 'test/data/test.pipe.json',
   TEST_EVENT: 'test/data/test.event.json',
   TEST_REGION: 'us-east-1',

@@ -4,14 +4,14 @@
   "samplesheet": "s3://vivos-pipes/data/hlatyping/samplesheet.csv",
   "pipeline": "nf-core/hlatyping",
   "stageBucket": "s3://{{ QUILT_NEXT }}",
-  "workDir": "s3://{{ QUILT_PROD }}",
+  "prodBucket": "s3://{{ QUILT_PROP }}",
+  "workDir": "s3://quilt-demos",
   "revision": "main",
   "configProfiles": [
-    "standard"
+    "test"
   ],
   "configText": "plugins = ['nf-quilt']",
   "pattern_suffix": "fastq.gz",
-  "paramsText": "{\"outdir\":\"quilt+s3://{{ QUILT_PROD }}#package={{ TOWER_DEFAULT_PIPELINE }}\"}",
   "user_meta:": {
     "Instrument ID": "014DR84N",
     "Run Number": 14,
