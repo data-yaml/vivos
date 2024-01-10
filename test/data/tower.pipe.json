@@ -4,7 +4,7 @@
   "samplesheet": "s3://vivos-pipes/data/hlatyping/samplesheet.csv",
   "pipeline": "nf-core/hlatyping",
   "stageBucket": "s3://{{ QUILT_NEXT }}",
-  "prodBucket": "s3://{{ QUILT_PROP }}",
+  "prodBucket": "s3://{{ QUILT_PROD }}",
   "workDir": "s3://quilt-demos",
   "revision": "main",
   "configProfiles": [

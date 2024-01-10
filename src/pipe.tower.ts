@@ -54,13 +54,14 @@ export class PipeTower extends Pipe {
       await this.createSamplesheet(input.pattern_suffix);
     }
     const user_meta = (input.hasOwnProperty('user_meta')) ? '?' + JSON.stringify(input.user_meta) : '';
+    console.log('user_meta', user_meta);
 
     try {
       // Submit the workflow using NextFlow Tower
       const options = await this.tower.launch_options(
         input.pipeline,
-        this.event_bucket,
-        this.get('QUILT_NEXT'),
+        `s3://${this.quilt.get('QUILT_PROD')}`,
+        `s3://${this.quilt.get('QUILT_NEXT')}`,
         user_meta,
       );
       const workflowId = await this.tower.launch(options);

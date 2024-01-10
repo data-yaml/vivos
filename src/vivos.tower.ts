@@ -147,6 +147,7 @@ export class VivosTower extends Vivos {
       computeEnvId: this.computeEnvId,
       // benchling: await this.getBenchlingInfo(),
     };
+    console.debug('launch_options', JSON.stringify(env));
     const base_config = this.cc.get('BASE_CONFIG');
     if (typeof base_config === 'string') {
       env.base_config = base_config;
