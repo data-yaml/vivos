@@ -128,7 +128,7 @@ export class VivosTower extends Vivos {
     return status || 'None';
   }
 
-  public async launch_options(pipeline: string = '', bucket: string = ''): Promise<WorkflowLaunchRequest> {
+  public async launch_options(pipeline: string = '', bucket: string = '', user_meta = '', raw = ''): Promise<WorkflowLaunchRequest> {
     if (bucket === '') {
       bucket = this.get('CDK_DEFAULT_BUCKET');
     };
@@ -140,9 +140,11 @@ export class VivosTower extends Vivos {
       }
     }
     const env: KeyedConfig = {
+      raw: raw,
+      user_meta: user_meta,
       bucket: bucket,
       computeEnvId: this.computeEnvId,
-      benchling: await this.getBenchlingInfo(),
+      // benchling: await this.getBenchlingInfo(),
     };
     const base_config = this.cc.get('BASE_CONFIG');
     if (typeof base_config === 'string') {

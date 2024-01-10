@@ -32,8 +32,8 @@ export class PipeTower extends Pipe {
 
   // Create samplesheet.csv from files matching pattern in folder
   public async createSamplesheet(pattern: string) {
-    const HEADER = "sample,fastq_1,fastq_2,bam,seq_type\nSAMPLE_FASTQ,"
-    const FOOTER = ",,dna"
+    const HEADER = 'sample,fastq_1,fastq_2,bam,seq_type\nSAMPLE_FASTQ,';
+    const FOOTER = ',,dna';
     const parent = this.event_path.parent();
     const files = await parent.matchingS3(pattern);
     const uris = files.map((file) => file.toURI()).join(',');

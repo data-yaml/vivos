@@ -1,10 +1,9 @@
 {
   "id": "1",
   "computeEnvId": "{{ TOWER_COMPUTE_ENV_ID }}",
-  "runName": "hideous_mccarthy",
-  "samplesheet": "quilt+s3://vivos-staging#package=data/hlatyping:latest&path=samplesheet.hlatyping.csv",
+  "samplesheet": "s3://vivos-pipes/data/hlatyping/samplesheet.csv",
   "pipeline": "nf-core/hlatyping",
-  "stageBucket": "{{ QUILT_NEXT }}",
+  "stageBucket": "s3://{{ QUILT_NEXT }}",
   "workDir": "s3://{{ QUILT_PROD }}",
   "revision": "main",
   "configProfiles": [
@@ -14,9 +13,9 @@
   "pattern_suffix": "fastq.gz",
   "paramsText": "{\"outdir\":\"quilt+s3://{{ QUILT_PROD }}#package={{ TOWER_DEFAULT_PIPELINE }}\"}",
   "user_meta:": {
-    "ExperimentID": "0012345",
-    "Project": "HLA Typing",
-    "Sample": "HGM-001"
+    "Instrument ID": "014DR84N",
+    "Run Number": 14,
+    "Owner": "EPrabhakar"
   },
   "quilt": {
     "id": "1"

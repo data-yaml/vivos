@@ -1,6 +1,6 @@
 {
-    "input": "{{ samplesheet }}",
-    "outdir": "quilt+{{ bucket }}#package={{ package }}",
+    "input": "{{ raw }}/{{ package }}/samplesheet.csv",
+    "outdir": "quilt+{{ bucket }}{{ user_meta }}#package={{ package }}",
     "solver": "glpk",
     "enumerations": 1,
     "beta": 0.009,
