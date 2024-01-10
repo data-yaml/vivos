@@ -53,9 +53,16 @@ export class PipeTower extends Pipe {
       // Create samplesheet from matching files
       await this.createSamplesheet(input.pattern_suffix);
     }
+    const user_meta = (input.hasOwnProperty('user_meta')) ? '?' + JSON.stringify(input.user_meta) : '';
+
     try {
       // Submit the workflow using NextFlow Tower
-      const options = await this.tower.launch_options();
+      const options = await this.tower.launch_options(
+        input.pipeline,
+        this.event_bucket,
+        this.get('QUILT_NEXT'),
+        user_meta,
+      );
       const workflowId = await this.tower.launch(options);
       return {
         statusCode: 200,

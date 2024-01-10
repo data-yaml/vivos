@@ -1,5 +1,5 @@
 {
-    "input": "{{ bucket }}/{{ package }}/samplesheet.csv",
+    "input": "{{ raw }}/{{ package }}/samplesheet.csv",
     "outdir": "quilt+{{ bucket }}{{ user_meta }}#package={{ package }}",
     "solver": "glpk",
     "enumerations": 1,
